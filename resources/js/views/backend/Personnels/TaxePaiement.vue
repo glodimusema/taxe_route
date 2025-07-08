@@ -11,7 +11,7 @@
           </v-btn>
         </v-card-title>
         <v-card-text>
-          <!-- layout -->
+          <!-- layout  -->
 
           <div>
 
@@ -62,6 +62,75 @@
                                   :rules="[(v) => !!v || 'Ce champ est requis']" :items="anneeList" item-text="name_annee"
                                   item-value="id" outlined v-model="svData.refAnnee">
                                 </v-autocomplete>
+                              </div>
+                            </v-flex>
+
+
+                            <v-flex xs12 sm12 md12 lg12>
+                              <div class="mr-1">
+                                <v-autocomplete label="Selectionnez le Type d'exploitation" prepend-inner-icon="mdi-map" dense
+                                  :rules="[(v) => !!v || 'Ce champ est requis']" :items="exploitationList" item-text="nom_exploitation"
+                                  item-value="id" outlined v-model="svData.refExploitation">
+                                </v-autocomplete>
+                              </div>
+                            </v-flex>
+
+
+                            <v-flex xs12 sm12 md6 lg6>
+                              <div class="mr-1">
+                                <v-text-field label="Quantité" prepend-inner-icon="extension" dense
+                                  :rules="[(v) => !!v || 'Ce champ est requis']" outlined v-model="svData.qte">
+                                </v-text-field>
+                              </div>
+                            </v-flex>
+                            <v-flex xs12 sm12 md6 lg6>
+                              <div class="mr-1">
+                                <v-text-field label="Recouvrement" prepend-inner-icon="extension" dense
+                                  :rules="[(v) => !!v || 'Ce champ est requis']" outlined v-model="svData.recouvrement">
+                                </v-text-field>
+                              </div>
+                            </v-flex>
+
+
+                            <!-- 'marque_vehicule','lieu_chargement','destination','bordereau','observations' -->
+
+                            <v-flex xs12 sm12 md6 lg6>
+                              <div class="mr-1">
+                                <v-text-field label="Marque Vehicule" prepend-inner-icon="extension" dense
+                                  :rules="[(v) => !!v || 'Ce champ est requis']" outlined v-model="svData.marque_vehicule">
+                                </v-text-field>
+                              </div>
+                            </v-flex>
+                            <v-flex xs12 sm12 md6 lg6>
+                              <div class="mr-1">
+                                <v-text-field label="Lieu de Chargement" prepend-inner-icon="extension" dense
+                                  :rules="[(v) => !!v || 'Ce champ est requis']" outlined v-model="svData.lieu_chargement">
+                                </v-text-field>
+                              </div>
+                            </v-flex>
+
+
+                             <v-flex xs12 sm12 md6 lg6>
+                              <div class="mr-1">
+                                <v-text-field label="Destination" prepend-inner-icon="extension" dense
+                                  :rules="[(v) => !!v || 'Ce champ est requis']" outlined v-model="svData.destination">
+                                </v-text-field>
+                              </div>
+                            </v-flex>
+                            <v-flex xs12 sm12 md6 lg6>
+                              <div class="mr-1">
+                                <v-text-field label="N° Bordereau" prepend-inner-icon="extension" dense
+                                  :rules="[(v) => !!v || 'Ce champ est requis']" outlined v-model="svData.bordereau">
+                                </v-text-field>
+                              </div>
+                            </v-flex>
+
+
+                            <v-flex xs12 sm12 md12 lg12>
+                              <div class="mr-1">
+                                <v-text-field label="Observations" prepend-inner-icon="extension" dense
+                                  :rules="[(v) => !!v || 'Ce champ est requis']" outlined v-model="svData.observations">
+                                </v-text-field>
                               </div>
                             </v-flex>
 
@@ -223,6 +292,9 @@ export default {
       refEse: 0,
       //'id','montant','montantLettre','motif','dateOperation', 'refEse','refCompte','refAgent','author'
 
+      //,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
+    //'destination','bordereau','observations'
+
       svData: {
         id: '',
         refEse: 0,
@@ -230,18 +302,22 @@ export default {
         refMois:0,
         refAnnee:0,
         author: '',
+        qte: 0,
+        recouvrement: 0,
+        refExploitation: 0,
+        marque_vehicule: '',
+        lieu_chargement: '',
+        destination: '',
+        bordereau: '',
+        observations: '',
       },
       fetchData: [],
       agentList: [],
       anneeList: [],
       moisList: [],
+      exploitationList: [],
       don: [],
-      query: "",
-        
-
-        modifier:'',
-        supprimer:'',
-        chargement:''
+      query: ""
 
     }
   },
@@ -250,6 +326,7 @@ export default {
     // this.fetchListAgent();
     // this.fetchListAnnee();
     // this.fetchListMois();
+    // this.fetchListExploitation();
   },
   computed: {
     ...mapGetters(["categoryList", "isloading"]),
@@ -361,6 +438,16 @@ export default {
         ({ data }) => {
           var donnees = data.data;
           this.moisList = donnees;
+          //exploitationList
+        }
+      );
+    },
+    fetchListExploitation() {
+      this.editOrFetch(`${this.apiBaseURL}/fetch_taxe_exploitation2`).then(
+        ({ data }) => {
+          var donnees = data.data;
+          this.exploitationList = donnees;
+          //
         }
       );
     }
