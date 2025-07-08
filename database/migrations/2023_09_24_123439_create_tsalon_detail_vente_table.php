@@ -1,0 +1,38 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateTsalonDetailVenteTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('tsalon_detail_vente', function (Blueprint $table) {
+            $table->id();
+            $table->integer('refEnteteVente'); 
+            $table->integer('refProduit'); 
+            $table->double('puVente');
+            $table->double('qteVente');
+            $table->string('devise',20);
+            $table->double('taux');
+            $table->string('author',50);
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('tsalon_detail_vente');
+    }
+}
