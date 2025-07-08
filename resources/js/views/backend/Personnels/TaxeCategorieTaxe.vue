@@ -29,6 +29,13 @@
 
                   <v-text-field label="Prix2 (FC)" prepend-inner-icon="extension" dense
                   :rules="[(v) => !!v || 'Ce champ est requis']" outlined v-model="svData.prix_categorie2"></v-text-field>
+
+                  <v-autocomplete label="Selectionnez l'Unité"
+                     prepend-inner-icon="mdi-map" :rules="[(v) => !!v || 'Ce champ est requis']"
+                     :items="uniteList" item-text="nom_unite" item-value="id" dense
+                     outlined v-model="svData.id_unite" chips clearable>
+                 </v-autocomplete>
+
               </v-card-text>
               
               <v-card-actions>
@@ -90,6 +97,8 @@
                     <th class="text-left">Designation</th>
                     <th class="text-left">Montant(FC)</th>
                     <th class="text-left">Montant2(FC)</th>
+                    <th class="text-left">Unité</th>
+                    <th class="text-left">Quotité</th>
                     <th class="text-left">Mise à jour</th>
                     <th class="text-left">Action</th>
                   </tr>
@@ -99,6 +108,8 @@
                     <td>{{ item.designation }}</td>
                     <td>{{ item.prix_categorie }}</td>
                     <td>{{ item.prix_categorie2 }}</td>
+                    <td>{{ item.nom_unite }}</td>
+                    <td>{{ item.quotite }}</td>
                     <td>
                       {{ item.created_at | formatDate }}
                       {{ item.created_at | formatHour }}
@@ -158,15 +169,14 @@ export default {
         id: "",
         designation: "",
         prix_categorie : 0,
-        prix_categorie2 : 0
+        prix_categorie2 : 0,
+        id_unite : 0,
+        quotite : 0,
       },
       fetchData: null,
       titreModal: "",
-        
-        inserer:'',
-        modifier:'',
-        supprimer:'',
-        chargement:''
+      uniteList: [], 
+
     };
   },
   computed: {
@@ -242,6 +252,14 @@ export default {
         );
       });
     },
+    fetchListSelectionUnite() {
+        this.editOrFetch(`${this.apiBaseURL}/fetch_taxe_unite2`).then(
+            ({ data }) => {
+                var donnees = data.data;
+                this.uniteList = donnees;
+            }
+        );
+    },
 
 
   },
@@ -249,6 +267,7 @@ export default {
      
     this.testTitle();
     this.onPageChange();
+    this.fetchListSelectionUnite();
   },
 };
 </script>

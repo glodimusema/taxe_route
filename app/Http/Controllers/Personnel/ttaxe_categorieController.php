@@ -31,8 +31,9 @@ class ttaxe_categorieController extends Controller
             # code...
             $query = $this->Gquery($query);
             $data = DB::table('ttaxe_categorie')
+            ->join('taxe_unite' , 'taxe_unite.id','=','ttaxe_categorie.id_unite')
             ->select("ttaxe_categorie.id",'designation','prix_categorie','prix_categorie2',
-            'id_unite','quotite',"ttaxe_categorie.created_at")
+            'id_unite','quotite','nom_unite',"ttaxe_categorie.created_at")
             ->where('designation', 'like', '%'.$query.'%')
             ->orderBy("ttaxe_categorie.id", "desc")
             ->paginate(10);
@@ -43,8 +44,9 @@ class ttaxe_categorieController extends Controller
         }
         else{
             $data = DB::table('ttaxe_categorie')
+            ->join('taxe_unite' , 'taxe_unite.id','=','ttaxe_categorie.id_unite')
             ->select("ttaxe_categorie.id",'designation','prix_categorie','prix_categorie2',
-            'id_unite','quotite',"ttaxe_categorie.created_at")
+            'id_unite','quotite','nom_unite',"ttaxe_categorie.created_at")
             ->orderBy("ttaxe_categorie.id", "desc")
             ->paginate(10);
 
@@ -96,8 +98,9 @@ class ttaxe_categorieController extends Controller
     function fetch_dropdown_2()
     {
         $data = DB::table('ttaxe_categorie')
-        ->select("ttaxe_categorie.id",'designation','prix_categorie',
-        'prix_categorie2','id_unite','quotite',"ttaxe_categorie.created_at")
+            ->join('taxe_unite' , 'taxe_unite.id','=','ttaxe_categorie.id_unite')
+            ->select("ttaxe_categorie.id",'designation','prix_categorie','prix_categorie2',
+            'id_unite','quotite','nom_unite',"ttaxe_categorie.created_at")
         ->orderBy("id", "desc")
         ->get();
         return response()->json([
