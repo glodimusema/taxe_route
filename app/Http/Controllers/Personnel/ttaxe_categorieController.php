@@ -31,7 +31,8 @@ class ttaxe_categorieController extends Controller
             # code...
             $query = $this->Gquery($query);
             $data = DB::table('ttaxe_categorie')
-            ->select("ttaxe_categorie.id",'designation','prix_categorie','prix_categorie2',"ttaxe_categorie.created_at")
+            ->select("ttaxe_categorie.id",'designation','prix_categorie','prix_categorie2',
+            'id_unite','quotite',"ttaxe_categorie.created_at")
             ->where('designation', 'like', '%'.$query.'%')
             ->orderBy("ttaxe_categorie.id", "desc")
             ->paginate(10);
@@ -42,7 +43,8 @@ class ttaxe_categorieController extends Controller
         }
         else{
             $data = DB::table('ttaxe_categorie')
-            ->select("ttaxe_categorie.id",'designation','prix_categorie','prix_categorie2',"ttaxe_categorie.created_at")
+            ->select("ttaxe_categorie.id",'designation','prix_categorie','prix_categorie2',
+            'id_unite','quotite',"ttaxe_categorie.created_at")
             ->orderBy("ttaxe_categorie.id", "desc")
             ->paginate(10);
 
@@ -62,11 +64,13 @@ class ttaxe_categorieController extends Controller
         //prix_categorie2
         if ($query->id !='') 
         {
- 
+            //,'id_unite','quotite'
             $data = ttaxe_categorie::where("id", $query->id)->update([
                 'designation' =>  $query->designation,
                 'prix_categorie' =>  $query->prix_categorie,
-                'prix_categorie2' =>  $query->prix_categorie2
+                'prix_categorie2' =>  $query->prix_categorie2,
+                'id_unite' =>  $query->id_unite,
+                'quotite' =>  $query->quotite
             ]);
             return response()->json([
                 'data'  =>  "Modification  avec succès!!!"
@@ -76,9 +80,11 @@ class ttaxe_categorieController extends Controller
         {
      
             $data = ttaxe_categorie::create([
-                'designation' =>$query->designation,
+                'designation' =>  $query->designation,
                 'prix_categorie' =>  $query->prix_categorie,
-                'prix_categorie2' =>  $query->prix_categorie2
+                'prix_categorie2' =>  $query->prix_categorie2,
+                'id_unite' =>  $query->id_unite,
+                'quotite' =>  $query->quotite
             ]);
 
             return response()->json([
@@ -90,7 +96,8 @@ class ttaxe_categorieController extends Controller
     function fetch_dropdown_2()
     {
         $data = DB::table('ttaxe_categorie')
-        ->select("ttaxe_categorie.id",'designation','prix_categorie','prix_categorie2',"ttaxe_categorie.created_at")
+        ->select("ttaxe_categorie.id",'designation','prix_categorie',
+        'prix_categorie2','id_unite','quotite',"ttaxe_categorie.created_at")
         ->orderBy("id", "desc")
         ->get();
         return response()->json([

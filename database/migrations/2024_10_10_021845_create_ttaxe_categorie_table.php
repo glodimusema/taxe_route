@@ -19,7 +19,7 @@ class CreateTtaxeCategorieTable extends Migration
             $table->double('prix_categorie');
             $table->double('prix_categorie2');
             $table->foreignId('id_unite')->constrained('taxe_unite')->restrictOnUpdate()->restrictOnDelete();
-            $table->double('quotite');
+            $table->double('quotite')->default(0);
             $table->timestamps();
         });
     }
