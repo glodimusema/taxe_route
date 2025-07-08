@@ -47,7 +47,9 @@ class ttaxe_paiementController extends Controller
             'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
             ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
             'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
-            "tperso_annee.active")
+            "tperso_annee.active"
+            ,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
+            'destination','bordereau','observations')
             ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")
             ->where([
                 ['noms_agent', 'like', '%'.$query.'%']
@@ -71,7 +73,9 @@ class ttaxe_paiementController extends Controller
             'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
             ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
             'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
-            "tperso_annee.active") 
+            "tperso_annee.active"
+            ,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
+            'destination','bordereau','observations') 
             ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")
             ->orderBy("ttaxe_paiement.id", "desc")          
             ->paginate(10);
@@ -105,7 +109,9 @@ class ttaxe_paiementController extends Controller
             'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
             ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
             'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
-            "tperso_annee.active")   
+            "tperso_annee.active"
+            ,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
+            'destination','bordereau','observations')   
             ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")
                 ->where([
                     ['noms_agent', 'like', '%'.$query.'%'],
@@ -130,7 +136,9 @@ class ttaxe_paiementController extends Controller
                 'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
                 ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
                 'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
-                "tperso_annee.active")  
+                "tperso_annee.active"
+                ,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
+                'destination','bordereau','observations')  
                 ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")
                 ->where([
                     ['ttaxe_paiement.created_at','>=', $formattedDate]
@@ -171,7 +179,9 @@ class ttaxe_paiementController extends Controller
             'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
             ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
             'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
-            "tperso_annee.active")
+            "tperso_annee.active"
+            ,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
+            'destination','bordereau','observations')
             ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")   
                 ->where([
                     ['noms_agent', 'like', '%'.$query.'%'],
@@ -197,7 +207,9 @@ class ttaxe_paiementController extends Controller
                 'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
                 ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
                 'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
-                "tperso_annee.active")  
+                "tperso_annee.active"
+                ,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
+                'destination','bordereau','observations')  
                 ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")
                 ->where([
                     ['ttaxe_paiement.created_at','>=', $date1],
@@ -239,7 +251,9 @@ class ttaxe_paiementController extends Controller
                 'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
                 ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
                 'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
-                "tperso_annee.active") 
+                "tperso_annee.active",
+                'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
+                'destination','bordereau','observations') 
                 ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")  
                 ->where([
                     ['noms_agent', 'like', '%'.$query.'%'],
@@ -266,7 +280,9 @@ class ttaxe_paiementController extends Controller
                 'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
                 ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
                 'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
-                "tperso_annee.active") 
+                "tperso_annee.active"
+                ,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
+                'destination','bordereau','observations') 
                 ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")  
                 ->where([
                     ['ttaxe_paiement.created_at','>=', $date1],
@@ -306,7 +322,9 @@ class ttaxe_paiementController extends Controller
             'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
             ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
             'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
-            "tperso_annee.active")
+            "tperso_annee.active"
+            ,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
+            'destination','bordereau','observations')
             ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")
             ->where([
                 ['noms_agent', 'like', '%'.$query.'%'],
@@ -334,7 +352,9 @@ class ttaxe_paiementController extends Controller
             'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
             ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
             'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
-            "tperso_annee.active") 
+            "tperso_annee.active"
+            ,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
+            'destination','bordereau','observations') 
             ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")               
             ->Where('refEse',$refEse)    
             ->orderBy("ttaxe_paiement.id", "desc")
@@ -364,7 +384,9 @@ class ttaxe_paiementController extends Controller
         'colGenreActivite_Ese','ColRefCat','ColRefQuartier','colQuartier_Ese','colAdresseEntreprise_Ese',
         'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
         ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
-        'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee","tperso_annee.active")  
+        'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee","tperso_annee.active"
+        ,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
+            'destination','bordereau','observations')  
         ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")      
         ->where('ttaxe_paiement.id', $id)
         ->get();
@@ -389,7 +411,9 @@ class ttaxe_paiementController extends Controller
         'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
         ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
         'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
-        "tperso_annee.active")
+        "tperso_annee.active"
+        ,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
+            'destination','bordereau','observations')
         ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")
         ->where('ttaxe_paiement.refAgent', $refAgent)
         ->orderBy("ttaxe_paiement.id", "desc")
@@ -428,7 +452,9 @@ class ttaxe_paiementController extends Controller
 
         $montantLettre = $this->chiffreEnLettre($request->montant);
 
-        // ,'refMois','refAnnee' 'id','montant','montantLettre','motif','dateOperation','refEse','refCompte','refAgent','compteur','author' ttaxe_paiement
+        // ,'refMois','refAnnee' 'id','montant','montantLettre','motif','dateOperation','refEse','refCompte','refAgent','compteur','author'
+        // ,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
+           //  'destination','bordereau','observations' ttaxe_paiement
         $data = ttaxe_paiement::create([
             'montant'    =>  $montant,
             // 'montant'    =>  $request->montant,
@@ -440,6 +466,14 @@ class ttaxe_paiementController extends Controller
             'refMois'    =>  $request->refMois,
             'refAnnee'    =>  $request->refAnnee,                      
             'refAgent'    =>  $request->refAgent,
+            'qte' =>  $request->qte,
+            'recouvrement' =>  $request->recouvrement,
+            'refExploitation' =>  $request->refExploitation,
+            'marque_vehicule' =>  $request->marque_vehicule,
+            'lieu_chargement' =>  $request->lieu_chargement,
+            'destination' =>  $request->destination,
+            'bordereau' =>  $request->bordereau,
+            'observations' =>  $request->observations,
             'compteur'    =>  0,
             'compteur2'    =>  0,
             'author'       =>  $request->author,
@@ -461,6 +495,14 @@ class ttaxe_paiementController extends Controller
             'refAnnee'    =>  $request->refAnnee,
             'refCompte'    =>  $request->refCompte,
             'refAgent'    =>  $request->refAgent,
+            'qte' =>  $request->qte,
+            'recouvrement' =>  $request->recouvrement,
+            'refExploitation' =>  $request->refExploitation,
+            'marque_vehicule' =>  $request->marque_vehicule,
+            'lieu_chargement' =>  $request->lieu_chargement,
+            'destination' =>  $request->destination,
+            'bordereau' =>  $request->bordereau,
+            'observations' =>  $request->observations,
             'author'       =>  'Admin',
         ]);       
         return $this->msgJson('Information ajoutée avec succès');

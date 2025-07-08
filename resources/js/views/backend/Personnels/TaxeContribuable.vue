@@ -109,6 +109,31 @@
                                         </v-text-field>
                                     </div>
                                 </v-flex>
+                                
+
+                                <v-flex xs12 sm12 md6 lg6>
+                                    <div class="mr-1">
+                                        <v-text-field label="N° Permis" prepend-inner-icon="draw" dense outlined
+                                            v-model="svData.colRCCM_Ese">
+                                        </v-text-field>
+                                    </div>
+                                </v-flex>
+                                <v-flex xs12 sm12 md6 lg6>
+                                    <div class="mr-1">
+                                        <v-text-field label="N° Agrement" prepend-inner-icon="draw" dense outlined
+                                            v-model="svData.colIdNat_Ese">
+                                        </v-text-field>
+                                    </div>
+                                </v-flex>
+
+
+                                <v-flex xs12 sm12 md12 lg12>
+                                    <div class="mr-1">
+                                        <v-text-field label="Site d'Exploitation" prepend-inner-icon="draw" dense outlined
+                                            v-model="svData.colRaisonSociale_Ese">
+                                        </v-text-field>
+                                    </div>
+                                </v-flex>
 
 
                                 <v-flex xs12 sm12 md6 lg6>
@@ -127,6 +152,7 @@
                                 </v-flex>
 
 
+                                
                                 <v-flex xs12 sm12 md6 lg6>
                                     <div class="mr-1">
                                         <v-text-field label="Adresse Mail" prepend-inner-icon="draw" dense outlined
@@ -236,6 +262,8 @@
                                             <th class="text-left">Code</th>
                                             <th>Image</th>
                                             <th class="text-left">Propriètaire</th>
+                                            <th class="text-left">SiteExploitation</th>
+                                            <th class="text-left">N°Permis</th>
                                             <th class="text-left">Details</th>
                                             <th class="text-left">Catégorie</th>                                            
                                             <th class="text-left">Province</th>
@@ -260,6 +288,8 @@
                                                 <!-- images -->
                                             </td>
                                             <td>{{ item.colProprietaire_Ese }}</td>
+                                            <td>{{ item.colRaisonSociale_Ese }}</td>
+                                            <td>{{ item.colRCCM_Ese }}</td>
                                             <td>{{ item.Details }}</td>
                                             <td>{{ item.categorietaxe }}</td>                                            
                                             <td>{{ item.nomProvince }}</td>
@@ -495,9 +525,9 @@ export default {
                 this.svData.author = this.userData.name;
                 this.svData.colNom_Ese = this.svData.colProprietaire_Ese;
                 this.svData.colId_Ese = this.svData.colProprietaire_Ese;
-                this.svData.colIdNat_Ese= this.svData.colProprietaire_Ese;
-                this.svData.colRCCM_Ese= this.svData.colProprietaire_Ese;
-                this.svData.colRaisonSociale_Ese= this.svData.colProprietaire_Ese;
+                // this.svData.colIdNat_Ese= this.svData.colProprietaire_Ese;
+                // this.svData.colRCCM_Ese= this.svData.colProprietaire_Ese;
+                // this.svData.colRaisonSociale_Ese= this.svData.colProprietaire_Ese;
                 this.svData.colFormeJuridique_Ese= this.svData.colProprietaire_Ese;
                 axios
                     .post(`${this.apiBaseURL}/update_contribuable`, formData, config)
@@ -521,9 +551,9 @@ export default {
                 this.svData.author = this.userData.name;
                 this.svData.colNom_Ese = this.svData.colProprietaire_Ese;
                 this.svData.colId_Ese = this.svData.colProprietaire_Ese;
-                this.svData.colIdNat_Ese= this.svData.colProprietaire_Ese;
-                this.svData.colRCCM_Ese= this.svData.colProprietaire_Ese;
-                this.svData.colRaisonSociale_Ese= this.svData.colProprietaire_Ese;
+                // this.svData.colIdNat_Ese= this.svData.colProprietaire_Ese;
+                // this.svData.colRCCM_Ese= this.svData.colProprietaire_Ese;
+                // this.svData.colRaisonSociale_Ese= this.svData.colProprietaire_Ese;
                 this.svData.colFormeJuridique_Ese= this.svData.colProprietaire_Es;
                 axios
                     .post(`${this.apiBaseURL}/insert_contribuable`, formData, config)

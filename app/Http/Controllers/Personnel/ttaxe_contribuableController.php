@@ -191,10 +191,10 @@ class ttaxe_contribuableController extends Controller
         $proprietaire = $request->colProprietaire_Ese;
         ttaxe_contribuable::create([
             'colId_Ese'  =>  $request->colId_Ese,
-            'colIdNat_Ese'    =>  $proprietaire,
-            'colRCCM_Ese'         =>  $proprietaire,                
+            'colIdNat_Ese'    =>  $request->colIdNat_Ese,
+            'colRCCM_Ese'         =>  $request->colRCCM_Ese,                
             'colNom_Ese'      =>  $proprietaire,                
-            'colRaisonSociale_Ese'  =>  $proprietaire, 
+            'colRaisonSociale_Ese'  =>  $request->colRaisonSociale_Ese, 
             'colFormeJuridique_Ese'  =>  $proprietaire,
             'colGenreActivite_Ese'  =>  $proprietaire,
             'ColRefCat'  =>  $request->ColRefCat,
