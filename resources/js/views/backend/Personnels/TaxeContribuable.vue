@@ -781,7 +781,7 @@ export default {
                 this.$refs.TaxePaiement.fetchListAgent();
                 this.$refs.TaxePaiement.fetchListAnnee();
                 this.$refs.TaxePaiement.fetchListMois();
-                this.$refs.TaxePaiement.fetchListExploitation();
+                this.$refs.TaxePaiement.fetchListCompte();
                 this.onPageChange();
 
                 this.$refs.TaxePaiement.$data.titleComponent =

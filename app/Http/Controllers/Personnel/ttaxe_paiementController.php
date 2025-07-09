@@ -433,21 +433,17 @@ class ttaxe_paiementController extends Controller
         $montantLettre = '';
         $motif = '';
 
-        $data3 =  DB::table('ttaxe_contribuable')
-        ->join('ttaxe_categorie' , 'ttaxe_categorie.id','=','ttaxe_contribuable.ColRefCat') 
-        ->select('ttaxe_categorie.id as idCategorie','prix_categorie','prix_categorie2',
-        'ttaxe_categorie.designation as categorietaxe')
+        $data3 =  DB::table('ttaxe_categorie')
+        ->join('taxe_unite' , 'taxe_unite.id','=','ttaxe_categorie.id_unite')
+        ->select("ttaxe_categorie.id",'designation','prix_categorie','prix_categorie2',
+        'id_unite','quotite','nom_unite',"ttaxe_categorie.created_at")
         ->where([
-           ['ttaxe_contribuable.id','=', $request->refEse]
+           ['ttaxe_categorie.id','=', $request->refCompte]
         ])    
         ->get(); 
-
         foreach ($data3 as $row) 
         {
-            $montant = $row->prix_categorie;
-            $montant2 = $row->prix_categorie2;
-            $idCategorie =$row->idCategorie;
-            $motif =$row->categorietaxe;                  
+            $motif =$row->designation;                  
         }
 
         $montantLettre = $this->chiffreEnLettre($request->montant);
@@ -456,11 +452,10 @@ class ttaxe_paiementController extends Controller
         // ,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
            //  'destination','bordereau','observations' ttaxe_paiement
         $data = ttaxe_paiement::create([
-            'montant'    =>  $montant,
-            // 'montant'    =>  $request->montant,
+            'montant'    =>  $request->montant,
             'montantLettre'    =>  $montantLettre,            
             'dateOperation'    =>  $current, 
-            'refCompte'    =>  $idCategorie,  
+            'refCompte'    =>  $request->refCompte,  
             'motif'    =>  $motif,          
             'refEse'    =>  $request->refEse, 
             'refMois'    =>  $request->refMois,

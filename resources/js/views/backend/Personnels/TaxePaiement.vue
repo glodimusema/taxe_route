@@ -65,6 +65,16 @@
                               </div>
                             </v-flex>
 
+                            <!-- @change="fetchListSelectionPoste()" -->
+
+                            <v-flex xs12 sm12 md12 lg12>
+                              <div class="mr-1">
+                                <v-autocomplete label="Selectionnez la Categorie Taxe" prepend-inner-icon="mdi-map" dense
+                                  :rules="[(v) => !!v || 'Ce champ est requis']" :items="compteList" item-text="designation"
+                                  item-value="id" outlined v-model="svData.refCompte" @change="fetchListExploitation()">
+                                </v-autocomplete>
+                              </div>
+                            </v-flex>
 
                             <v-flex xs12 sm12 md12 lg12>
                               <div class="mr-1">
@@ -75,7 +85,13 @@
                               </div>
                             </v-flex>
 
-
+                            <v-flex xs12 sm12 md6 lg6>
+                              <div class="mr-1">
+                                <v-text-field label="Prix Unitaire" prepend-inner-icon="extension" dense
+                                  :rules="[(v) => !!v || 'Ce champ est requis']" outlined v-model="svData.montant">
+                                </v-text-field>
+                              </div>
+                            </v-flex>
                             <v-flex xs12 sm12 md6 lg6>
                               <div class="mr-1">
                                 <v-text-field label="Quantité" prepend-inner-icon="extension" dense
@@ -83,17 +99,16 @@
                                 </v-text-field>
                               </div>
                             </v-flex>
+
+
+
                             <v-flex xs12 sm12 md6 lg6>
                               <div class="mr-1">
                                 <v-text-field label="Recouvrement" prepend-inner-icon="extension" dense
                                   :rules="[(v) => !!v || 'Ce champ est requis']" outlined v-model="svData.recouvrement">
                                 </v-text-field>
                               </div>
-                            </v-flex>
-
-
-                            <!-- 'marque_vehicule','lieu_chargement','destination','bordereau','observations' -->
-
+                            </v-flex>                           
                             <v-flex xs12 sm12 md6 lg6>
                               <div class="mr-1">
                                 <v-text-field label="Marque Vehicule" prepend-inner-icon="extension" dense
@@ -101,6 +116,8 @@
                                 </v-text-field>
                               </div>
                             </v-flex>
+
+
                             <v-flex xs12 sm12 md6 lg6>
                               <div class="mr-1">
                                 <v-text-field label="Lieu de Chargement" prepend-inner-icon="extension" dense
@@ -108,8 +125,6 @@
                                 </v-text-field>
                               </div>
                             </v-flex>
-
-
                              <v-flex xs12 sm12 md6 lg6>
                               <div class="mr-1">
                                 <v-text-field label="Destination" prepend-inner-icon="extension" dense
@@ -117,6 +132,8 @@
                                 </v-text-field>
                               </div>
                             </v-flex>
+
+
                             <v-flex xs12 sm12 md6 lg6>
                               <div class="mr-1">
                                 <v-text-field label="N° Bordereau" prepend-inner-icon="extension" dense
@@ -124,9 +141,7 @@
                                 </v-text-field>
                               </div>
                             </v-flex>
-
-
-                            <v-flex xs12 sm12 md12 lg12>
+                            <v-flex xs12 sm12 md6 lg6>
                               <div class="mr-1">
                                 <v-text-field label="Observations" prepend-inner-icon="extension" dense
                                   :rules="[(v) => !!v || 'Ce champ est requis']" outlined v-model="svData.observations">
@@ -301,6 +316,8 @@ export default {
         refAgent:0,
         refMois:0,
         refAnnee:0,
+        refCompte:0,
+        montant:0,
         author: '',
         qte: 0,
         recouvrement: 0,
@@ -315,6 +332,7 @@ export default {
       agentList: [],
       anneeList: [],
       moisList: [],
+      compteList: [],
       exploitationList: [],
       don: [],
       query: ""
@@ -326,7 +344,7 @@ export default {
     // this.fetchListAgent();
     // this.fetchListAnnee();
     // this.fetchListMois();
-    // this.fetchListExploitation();
+    // this.fetchListCompte();
   },
   computed: {
     ...mapGetters(["categoryList", "isloading"]),
@@ -442,8 +460,17 @@ export default {
         }
       );
     },
+    fetchListCompte() {
+      this.editOrFetch(`${this.apiBaseURL}/fetch_categorie_Taxe2`).then(
+        ({ data }) => {
+          var donnees = data.data;
+          this.compteList = donnees;
+          //
+        }
+      );
+    },
     fetchListExploitation() {
-      this.editOrFetch(`${this.apiBaseURL}/fetch_taxe_exploitation2`).then(
+      this.editOrFetch(`${this.apiBaseURL}/fetch_taxe_exploitation_by_categorie/${this.svData.refCompte}`).then(
         ({ data }) => {
           var donnees = data.data;
           this.exploitationList = donnees;
