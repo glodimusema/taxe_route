@@ -34,23 +34,25 @@ class ttaxe_paiementController extends Controller
             # code..s.
             $query = $this->Gquery($request);
             $data = DB::table('ttaxe_paiement')
-            ->join('ttaxe_contribuable','ttaxe_contribuable.id','=','ttaxe_paiement.refEse')
-            ->join('ttaxe_categorie' , 'ttaxe_categorie.id','=','ttaxe_paiement.refCompte')
-            ->join('tagent' , 'tagent.id','=','ttaxe_paiement.refAgent')
-            ->join('tperso_annee' , 'tperso_annee.id','=','ttaxe_paiement.refAnnee')
-            ->join('tperso_mois' , 'tperso_mois.id','=','ttaxe_paiement.refMois')
-            ->select("ttaxe_paiement.id",'montant','montantLettre','motif',
-            'refEse','ttaxe_paiement.refCompte','refAgent','ttaxe_paiement.author',"matricule_agent",
-            "noms_agent","sexe_agent",'ttaxe_categorie.designation as categorietaxe','prix_categorie','prix_categorie2',
-            'colId_Ese','colIdNat_Ese','colRCCM_Ese','colNom_Ese','colRaisonSociale_Ese','colFormeJuridique_Ese',
-            'colGenreActivite_Ese','ColRefCat','ColRefQuartier','colQuartier_Ese','colAdresseEntreprise_Ese',
-            'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
-            ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
-            'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
-            "tperso_annee.active"
-            ,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
-            'destination','bordereau','observations')
-            ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")
+        ->join('ttaxe_contribuable','ttaxe_contribuable.id','=','ttaxe_paiement.refEse')
+        ->join('ttaxe_categorie' , 'ttaxe_categorie.id','=','ttaxe_paiement.refCompte')
+        ->join('tagent' , 'tagent.id','=','ttaxe_paiement.refAgent')
+        ->join('tperso_annee' , 'tperso_annee.id','=','ttaxe_paiement.refAnnee')
+        ->join('tperso_mois' , 'tperso_mois.id','=','ttaxe_paiement.refMois')
+        ->select("ttaxe_paiement.id",'montant','montantLettre','motif',
+        'refEse','ttaxe_paiement.refCompte','refAgent','ttaxe_paiement.author',"matricule_agent",
+        "noms_agent","sexe_agent",'ttaxe_categorie.designation as categorietaxe','prix_categorie','prix_categorie2',
+        'colId_Ese','colIdNat_Ese','colRCCM_Ese','colNom_Ese','colRaisonSociale_Ese','colFormeJuridique_Ese',
+        'colGenreActivite_Ese','ColRefCat','ColRefQuartier','colQuartier_Ese','colAdresseEntreprise_Ese',
+        'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
+        ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
+        'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
+        "tperso_annee.active"
+        ,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
+            'destination','bordereau','observations','id_unite','quotite')
+        ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")
+        ->selectRaw("(qte * montant) as montant_total")
+        ->selectRaw("(((qte * montant) * quotite)/100) as montant_quotite")
             ->where([
                 ['noms_agent', 'like', '%'.$query.'%']
             ])               
@@ -60,23 +62,25 @@ class ttaxe_paiementController extends Controller
         }
         else{
             $data = DB::table('ttaxe_paiement')
-            ->join('ttaxe_contribuable','ttaxe_contribuable.id','=','ttaxe_paiement.refEse')
-            ->join('ttaxe_categorie' , 'ttaxe_categorie.id','=','ttaxe_paiement.refCompte')
-            ->join('tagent' , 'tagent.id','=','ttaxe_paiement.refAgent')
-            ->join('tperso_annee' , 'tperso_annee.id','=','ttaxe_paiement.refAnnee')
-            ->join('tperso_mois' , 'tperso_mois.id','=','ttaxe_paiement.refMois')
-            ->select("ttaxe_paiement.id",'montant','montantLettre','motif',
-            'refEse','ttaxe_paiement.refCompte','refAgent','ttaxe_paiement.author',"matricule_agent",
-            "noms_agent","sexe_agent",'ttaxe_categorie.designation as categorietaxe','prix_categorie','prix_categorie2',
-            'colId_Ese','colIdNat_Ese','colRCCM_Ese','colNom_Ese','colRaisonSociale_Ese','colFormeJuridique_Ese',
-            'colGenreActivite_Ese','ColRefCat','ColRefQuartier','colQuartier_Ese','colAdresseEntreprise_Ese',
-            'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
-            ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
-            'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
-            "tperso_annee.active"
-            ,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
-            'destination','bordereau','observations') 
-            ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")
+        ->join('ttaxe_contribuable','ttaxe_contribuable.id','=','ttaxe_paiement.refEse')
+        ->join('ttaxe_categorie' , 'ttaxe_categorie.id','=','ttaxe_paiement.refCompte')
+        ->join('tagent' , 'tagent.id','=','ttaxe_paiement.refAgent')
+        ->join('tperso_annee' , 'tperso_annee.id','=','ttaxe_paiement.refAnnee')
+        ->join('tperso_mois' , 'tperso_mois.id','=','ttaxe_paiement.refMois')
+        ->select("ttaxe_paiement.id",'montant','montantLettre','motif',
+        'refEse','ttaxe_paiement.refCompte','refAgent','ttaxe_paiement.author',"matricule_agent",
+        "noms_agent","sexe_agent",'ttaxe_categorie.designation as categorietaxe','prix_categorie','prix_categorie2',
+        'colId_Ese','colIdNat_Ese','colRCCM_Ese','colNom_Ese','colRaisonSociale_Ese','colFormeJuridique_Ese',
+        'colGenreActivite_Ese','ColRefCat','ColRefQuartier','colQuartier_Ese','colAdresseEntreprise_Ese',
+        'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
+        ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
+        'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
+        "tperso_annee.active"
+        ,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
+            'destination','bordereau','observations','id_unite','quotite')
+        ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")
+        ->selectRaw("(qte * montant) as montant_total")
+        ->selectRaw("(((qte * montant) * quotite)/100) as montant_quotite")
             ->orderBy("ttaxe_paiement.id", "desc")          
             ->paginate(10);
 
@@ -96,23 +100,25 @@ class ttaxe_paiementController extends Controller
             
             $query = $this->Gquery($request);
             $data = DB::table('ttaxe_paiement')
-            ->join('ttaxe_contribuable','ttaxe_contribuable.id','=','ttaxe_paiement.refEse')
-            ->join('ttaxe_categorie' , 'ttaxe_categorie.id','=','ttaxe_paiement.refCompte')
-            ->join('tagent' , 'tagent.id','=','ttaxe_paiement.refAgent')
-            ->join('tperso_annee' , 'tperso_annee.id','=','ttaxe_paiement.refAnnee')
-            ->join('tperso_mois' , 'tperso_mois.id','=','ttaxe_paiement.refMois')
-            ->select("ttaxe_paiement.id",'montant','montantLettre','motif',
-            'refEse','ttaxe_paiement.refCompte','refAgent','ttaxe_paiement.author',"matricule_agent",
-            "noms_agent","sexe_agent",'ttaxe_categorie.designation as categorietaxe','prix_categorie','prix_categorie2',
-            'colId_Ese','colIdNat_Ese','colRCCM_Ese','colNom_Ese','colRaisonSociale_Ese','colFormeJuridique_Ese',
-            'colGenreActivite_Ese','ColRefCat','ColRefQuartier','colQuartier_Ese','colAdresseEntreprise_Ese',
-            'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
-            ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
-            'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
-            "tperso_annee.active"
-            ,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
-            'destination','bordereau','observations')   
-            ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")
+        ->join('ttaxe_contribuable','ttaxe_contribuable.id','=','ttaxe_paiement.refEse')
+        ->join('ttaxe_categorie' , 'ttaxe_categorie.id','=','ttaxe_paiement.refCompte')
+        ->join('tagent' , 'tagent.id','=','ttaxe_paiement.refAgent')
+        ->join('tperso_annee' , 'tperso_annee.id','=','ttaxe_paiement.refAnnee')
+        ->join('tperso_mois' , 'tperso_mois.id','=','ttaxe_paiement.refMois')
+        ->select("ttaxe_paiement.id",'montant','montantLettre','motif',
+        'refEse','ttaxe_paiement.refCompte','refAgent','ttaxe_paiement.author',"matricule_agent",
+        "noms_agent","sexe_agent",'ttaxe_categorie.designation as categorietaxe','prix_categorie','prix_categorie2',
+        'colId_Ese','colIdNat_Ese','colRCCM_Ese','colNom_Ese','colRaisonSociale_Ese','colFormeJuridique_Ese',
+        'colGenreActivite_Ese','ColRefCat','ColRefQuartier','colQuartier_Ese','colAdresseEntreprise_Ese',
+        'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
+        ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
+        'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
+        "tperso_annee.active"
+        ,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
+            'destination','bordereau','observations','id_unite','quotite')
+        ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")
+        ->selectRaw("(qte * montant) as montant_total")
+        ->selectRaw("(((qte * montant) * quotite)/100) as montant_quotite")
                 ->where([
                     ['noms_agent', 'like', '%'.$query.'%'],
                     ['ttaxe_paiement.created_at','>=', $formattedDate]
@@ -123,23 +129,25 @@ class ttaxe_paiementController extends Controller
             }
             else{
                 $data = DB::table('ttaxe_paiement')
-                ->join('ttaxe_contribuable','ttaxe_contribuable.id','=','ttaxe_paiement.refEse')
-                ->join('ttaxe_categorie' , 'ttaxe_categorie.id','=','ttaxe_paiement.refCompte')
-                ->join('tagent' , 'tagent.id','=','ttaxe_paiement.refAgent')
-                ->join('tperso_annee' , 'tperso_annee.id','=','ttaxe_paiement.refAnnee')
-                ->join('tperso_mois' , 'tperso_mois.id','=','ttaxe_paiement.refMois')
-                ->select("ttaxe_paiement.id",'montant','montantLettre','motif',
-                'refEse','ttaxe_paiement.refCompte','refAgent','ttaxe_paiement.author',"matricule_agent",
-                "noms_agent","sexe_agent",'ttaxe_categorie.designation as categorietaxe','prix_categorie','prix_categorie2',
-                'colId_Ese','colIdNat_Ese','colRCCM_Ese','colNom_Ese','colRaisonSociale_Ese','colFormeJuridique_Ese',
-                'colGenreActivite_Ese','ColRefCat','ColRefQuartier','colQuartier_Ese','colAdresseEntreprise_Ese',
-                'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
-                ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
-                'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
-                "tperso_annee.active"
-                ,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
-                'destination','bordereau','observations')  
-                ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")
+        ->join('ttaxe_contribuable','ttaxe_contribuable.id','=','ttaxe_paiement.refEse')
+        ->join('ttaxe_categorie' , 'ttaxe_categorie.id','=','ttaxe_paiement.refCompte')
+        ->join('tagent' , 'tagent.id','=','ttaxe_paiement.refAgent')
+        ->join('tperso_annee' , 'tperso_annee.id','=','ttaxe_paiement.refAnnee')
+        ->join('tperso_mois' , 'tperso_mois.id','=','ttaxe_paiement.refMois')
+        ->select("ttaxe_paiement.id",'montant','montantLettre','motif',
+        'refEse','ttaxe_paiement.refCompte','refAgent','ttaxe_paiement.author',"matricule_agent",
+        "noms_agent","sexe_agent",'ttaxe_categorie.designation as categorietaxe','prix_categorie','prix_categorie2',
+        'colId_Ese','colIdNat_Ese','colRCCM_Ese','colNom_Ese','colRaisonSociale_Ese','colFormeJuridique_Ese',
+        'colGenreActivite_Ese','ColRefCat','ColRefQuartier','colQuartier_Ese','colAdresseEntreprise_Ese',
+        'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
+        ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
+        'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
+        "tperso_annee.active"
+        ,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
+            'destination','bordereau','observations','id_unite','quotite')
+        ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")
+        ->selectRaw("(qte * montant) as montant_total")
+        ->selectRaw("(((qte * montant) * quotite)/100) as montant_quotite")
                 ->where([
                     ['ttaxe_paiement.created_at','>=', $formattedDate]
                 ]) 
@@ -166,23 +174,25 @@ class ttaxe_paiementController extends Controller
             # code..s.
             $query = $this->Gquery($request);
             $data = DB::table('ttaxe_paiement')
-            ->join('ttaxe_contribuable','ttaxe_contribuable.id','=','ttaxe_paiement.refEse')
-            ->join('ttaxe_categorie' , 'ttaxe_categorie.id','=','ttaxe_paiement.refCompte')
-            ->join('tagent' , 'tagent.id','=','ttaxe_paiement.refAgent')
-            ->join('tperso_annee' , 'tperso_annee.id','=','ttaxe_paiement.refAnnee')
-            ->join('tperso_mois' , 'tperso_mois.id','=','ttaxe_paiement.refMois')
-            ->select("ttaxe_paiement.id",'montant','montantLettre','motif',
-            'refEse','ttaxe_paiement.refCompte','refAgent','ttaxe_paiement.author',"matricule_agent",
-            "noms_agent","sexe_agent",'ttaxe_categorie.designation as categorietaxe','prix_categorie','prix_categorie2',
-            'colId_Ese','colIdNat_Ese','colRCCM_Ese','colNom_Ese','colRaisonSociale_Ese','colFormeJuridique_Ese',
-            'colGenreActivite_Ese','ColRefCat','ColRefQuartier','colQuartier_Ese','colAdresseEntreprise_Ese',
-            'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
-            ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
-            'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
-            "tperso_annee.active"
-            ,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
-            'destination','bordereau','observations')
-            ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")   
+        ->join('ttaxe_contribuable','ttaxe_contribuable.id','=','ttaxe_paiement.refEse')
+        ->join('ttaxe_categorie' , 'ttaxe_categorie.id','=','ttaxe_paiement.refCompte')
+        ->join('tagent' , 'tagent.id','=','ttaxe_paiement.refAgent')
+        ->join('tperso_annee' , 'tperso_annee.id','=','ttaxe_paiement.refAnnee')
+        ->join('tperso_mois' , 'tperso_mois.id','=','ttaxe_paiement.refMois')
+        ->select("ttaxe_paiement.id",'montant','montantLettre','motif',
+        'refEse','ttaxe_paiement.refCompte','refAgent','ttaxe_paiement.author',"matricule_agent",
+        "noms_agent","sexe_agent",'ttaxe_categorie.designation as categorietaxe','prix_categorie','prix_categorie2',
+        'colId_Ese','colIdNat_Ese','colRCCM_Ese','colNom_Ese','colRaisonSociale_Ese','colFormeJuridique_Ese',
+        'colGenreActivite_Ese','ColRefCat','ColRefQuartier','colQuartier_Ese','colAdresseEntreprise_Ese',
+        'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
+        ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
+        'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
+        "tperso_annee.active"
+        ,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
+            'destination','bordereau','observations','id_unite','quotite')
+        ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")
+        ->selectRaw("(qte * montant) as montant_total")
+        ->selectRaw("(((qte * montant) * quotite)/100) as montant_quotite")   
                 ->where([
                     ['noms_agent', 'like', '%'.$query.'%'],
                     ['ttaxe_paiement.created_at','>=', $date1],
@@ -194,23 +204,25 @@ class ttaxe_paiementController extends Controller
             }
             else{
                 $data = DB::table('ttaxe_paiement')
-                ->join('ttaxe_contribuable','ttaxe_contribuable.id','=','ttaxe_paiement.refEse')
-                ->join('ttaxe_categorie' , 'ttaxe_categorie.id','=','ttaxe_paiement.refCompte')
-                ->join('tagent' , 'tagent.id','=','ttaxe_paiement.refAgent')
-                ->join('tperso_annee' , 'tperso_annee.id','=','ttaxe_paiement.refAnnee')
-                ->join('tperso_mois' , 'tperso_mois.id','=','ttaxe_paiement.refMois')
-                ->select("ttaxe_paiement.id",'montant','montantLettre','motif',
-                'refEse','ttaxe_paiement.refCompte','refAgent','ttaxe_paiement.author',"matricule_agent",
-                "noms_agent","sexe_agent",'ttaxe_categorie.designation as categorietaxe','prix_categorie','prix_categorie2',
-                'colId_Ese','colIdNat_Ese','colRCCM_Ese','colNom_Ese','colRaisonSociale_Ese','colFormeJuridique_Ese',
-                'colGenreActivite_Ese','ColRefCat','ColRefQuartier','colQuartier_Ese','colAdresseEntreprise_Ese',
-                'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
-                ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
-                'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
-                "tperso_annee.active"
-                ,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
-                'destination','bordereau','observations')  
-                ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")
+        ->join('ttaxe_contribuable','ttaxe_contribuable.id','=','ttaxe_paiement.refEse')
+        ->join('ttaxe_categorie' , 'ttaxe_categorie.id','=','ttaxe_paiement.refCompte')
+        ->join('tagent' , 'tagent.id','=','ttaxe_paiement.refAgent')
+        ->join('tperso_annee' , 'tperso_annee.id','=','ttaxe_paiement.refAnnee')
+        ->join('tperso_mois' , 'tperso_mois.id','=','ttaxe_paiement.refMois')
+        ->select("ttaxe_paiement.id",'montant','montantLettre','motif',
+        'refEse','ttaxe_paiement.refCompte','refAgent','ttaxe_paiement.author',"matricule_agent",
+        "noms_agent","sexe_agent",'ttaxe_categorie.designation as categorietaxe','prix_categorie','prix_categorie2',
+        'colId_Ese','colIdNat_Ese','colRCCM_Ese','colNom_Ese','colRaisonSociale_Ese','colFormeJuridique_Ese',
+        'colGenreActivite_Ese','ColRefCat','ColRefQuartier','colQuartier_Ese','colAdresseEntreprise_Ese',
+        'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
+        ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
+        'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
+        "tperso_annee.active"
+        ,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
+            'destination','bordereau','observations','id_unite','quotite')
+        ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")
+        ->selectRaw("(qte * montant) as montant_total")
+        ->selectRaw("(((qte * montant) * quotite)/100) as montant_quotite")
                 ->where([
                     ['ttaxe_paiement.created_at','>=', $date1],
                     ['ttaxe_paiement.created_at','<=', $date2],
@@ -238,23 +250,25 @@ class ttaxe_paiementController extends Controller
                 # code..s.
                 $query = $this->Gquery($request);
                 $data = DB::table('ttaxe_paiement')
-                ->join('ttaxe_contribuable','ttaxe_contribuable.id','=','ttaxe_paiement.refEse')
-                ->join('ttaxe_categorie' , 'ttaxe_categorie.id','=','ttaxe_paiement.refCompte')
-                ->join('tagent' , 'tagent.id','=','ttaxe_paiement.refAgent')
-                ->join('tperso_annee' , 'tperso_annee.id','=','ttaxe_paiement.refAnnee')
-                ->join('tperso_mois' , 'tperso_mois.id','=','ttaxe_paiement.refMois')
-                ->select("ttaxe_paiement.id",'montant','montantLettre','motif',
-                'refEse','ttaxe_paiement.refCompte','refAgent','ttaxe_paiement.author',"matricule_agent",
-                "noms_agent","sexe_agent",'ttaxe_categorie.designation as categorietaxe','prix_categorie','prix_categorie2',
-                'colId_Ese','colIdNat_Ese','colRCCM_Ese','colNom_Ese','colRaisonSociale_Ese','colFormeJuridique_Ese',
-                'colGenreActivite_Ese','ColRefCat','ColRefQuartier','colQuartier_Ese','colAdresseEntreprise_Ese',
-                'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
-                ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
-                'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
-                "tperso_annee.active",
-                'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
-                'destination','bordereau','observations') 
-                ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")  
+        ->join('ttaxe_contribuable','ttaxe_contribuable.id','=','ttaxe_paiement.refEse')
+        ->join('ttaxe_categorie' , 'ttaxe_categorie.id','=','ttaxe_paiement.refCompte')
+        ->join('tagent' , 'tagent.id','=','ttaxe_paiement.refAgent')
+        ->join('tperso_annee' , 'tperso_annee.id','=','ttaxe_paiement.refAnnee')
+        ->join('tperso_mois' , 'tperso_mois.id','=','ttaxe_paiement.refMois')
+        ->select("ttaxe_paiement.id",'montant','montantLettre','motif',
+        'refEse','ttaxe_paiement.refCompte','refAgent','ttaxe_paiement.author',"matricule_agent",
+        "noms_agent","sexe_agent",'ttaxe_categorie.designation as categorietaxe','prix_categorie','prix_categorie2',
+        'colId_Ese','colIdNat_Ese','colRCCM_Ese','colNom_Ese','colRaisonSociale_Ese','colFormeJuridique_Ese',
+        'colGenreActivite_Ese','ColRefCat','ColRefQuartier','colQuartier_Ese','colAdresseEntreprise_Ese',
+        'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
+        ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
+        'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
+        "tperso_annee.active"
+        ,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
+            'destination','bordereau','observations','id_unite','quotite')
+        ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")
+        ->selectRaw("(qte * montant) as montant_total")
+        ->selectRaw("(((qte * montant) * quotite)/100) as montant_quotite")  
                 ->where([
                     ['noms_agent', 'like', '%'.$query.'%'],
                     ['ttaxe_paiement.created_at','>=', $date1],
@@ -267,23 +281,25 @@ class ttaxe_paiementController extends Controller
             }
             else{
                 $data = DB::table('ttaxe_paiement')
-                ->join('ttaxe_contribuable','ttaxe_contribuable.id','=','ttaxe_paiement.refEse')
-                ->join('ttaxe_categorie' , 'ttaxe_categorie.id','=','ttaxe_paiement.refCompte')
-                ->join('tagent' , 'tagent.id','=','ttaxe_paiement.refAgent')
-                ->join('tperso_annee' , 'tperso_annee.id','=','ttaxe_paiement.refAnnee')
-                ->join('tperso_mois' , 'tperso_mois.id','=','ttaxe_paiement.refMois')
-                ->select("ttaxe_paiement.id",'montant','montantLettre','motif',
-                'refEse','ttaxe_paiement.refCompte','refAgent','ttaxe_paiement.author',"matricule_agent",
-                "noms_agent","sexe_agent",'ttaxe_categorie.designation as categorietaxe','prix_categorie','prix_categorie2',
-                'colId_Ese','colIdNat_Ese','colRCCM_Ese','colNom_Ese','colRaisonSociale_Ese','colFormeJuridique_Ese',
-                'colGenreActivite_Ese','ColRefCat','ColRefQuartier','colQuartier_Ese','colAdresseEntreprise_Ese',
-                'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
-                ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
-                'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
-                "tperso_annee.active"
-                ,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
-                'destination','bordereau','observations') 
-                ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")  
+        ->join('ttaxe_contribuable','ttaxe_contribuable.id','=','ttaxe_paiement.refEse')
+        ->join('ttaxe_categorie' , 'ttaxe_categorie.id','=','ttaxe_paiement.refCompte')
+        ->join('tagent' , 'tagent.id','=','ttaxe_paiement.refAgent')
+        ->join('tperso_annee' , 'tperso_annee.id','=','ttaxe_paiement.refAnnee')
+        ->join('tperso_mois' , 'tperso_mois.id','=','ttaxe_paiement.refMois')
+        ->select("ttaxe_paiement.id",'montant','montantLettre','motif',
+        'refEse','ttaxe_paiement.refCompte','refAgent','ttaxe_paiement.author',"matricule_agent",
+        "noms_agent","sexe_agent",'ttaxe_categorie.designation as categorietaxe','prix_categorie','prix_categorie2',
+        'colId_Ese','colIdNat_Ese','colRCCM_Ese','colNom_Ese','colRaisonSociale_Ese','colFormeJuridique_Ese',
+        'colGenreActivite_Ese','ColRefCat','ColRefQuartier','colQuartier_Ese','colAdresseEntreprise_Ese',
+        'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
+        ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
+        'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
+        "tperso_annee.active"
+        ,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
+            'destination','bordereau','observations','id_unite','quotite')
+        ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")
+        ->selectRaw("(qte * montant) as montant_total")
+        ->selectRaw("(((qte * montant) * quotite)/100) as montant_quotite")  
                 ->where([
                     ['ttaxe_paiement.created_at','>=', $date1],
                     ['ttaxe_paiement.created_at','<=', $date2],
@@ -309,23 +325,25 @@ class ttaxe_paiementController extends Controller
             # code...
             $query = $this->Gquery($request);
             $data = DB::table('ttaxe_paiement')
-            ->join('ttaxe_contribuable','ttaxe_contribuable.id','=','ttaxe_paiement.refEse')
-            ->join('ttaxe_categorie' , 'ttaxe_categorie.id','=','ttaxe_paiement.refCompte')
-            ->join('tagent' , 'tagent.id','=','ttaxe_paiement.refAgent')
-            ->join('tperso_annee' , 'tperso_annee.id','=','ttaxe_paiement.refAnnee')
-            ->join('tperso_mois' , 'tperso_mois.id','=','ttaxe_paiement.refMois')
-            ->select("ttaxe_paiement.id",'montant','montantLettre','motif',
-            'refEse','ttaxe_paiement.refCompte','refAgent','ttaxe_paiement.author',"matricule_agent",
-            "noms_agent","sexe_agent",'ttaxe_categorie.designation as categorietaxe','prix_categorie','prix_categorie2',
-            'colId_Ese','colIdNat_Ese','colRCCM_Ese','colNom_Ese','colRaisonSociale_Ese','colFormeJuridique_Ese',
-            'colGenreActivite_Ese','ColRefCat','ColRefQuartier','colQuartier_Ese','colAdresseEntreprise_Ese',
-            'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
-            ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
-            'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
-            "tperso_annee.active"
-            ,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
-            'destination','bordereau','observations')
-            ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")
+        ->join('ttaxe_contribuable','ttaxe_contribuable.id','=','ttaxe_paiement.refEse')
+        ->join('ttaxe_categorie' , 'ttaxe_categorie.id','=','ttaxe_paiement.refCompte')
+        ->join('tagent' , 'tagent.id','=','ttaxe_paiement.refAgent')
+        ->join('tperso_annee' , 'tperso_annee.id','=','ttaxe_paiement.refAnnee')
+        ->join('tperso_mois' , 'tperso_mois.id','=','ttaxe_paiement.refMois')
+        ->select("ttaxe_paiement.id",'montant','montantLettre','motif',
+        'refEse','ttaxe_paiement.refCompte','refAgent','ttaxe_paiement.author',"matricule_agent",
+        "noms_agent","sexe_agent",'ttaxe_categorie.designation as categorietaxe','prix_categorie','prix_categorie2',
+        'colId_Ese','colIdNat_Ese','colRCCM_Ese','colNom_Ese','colRaisonSociale_Ese','colFormeJuridique_Ese',
+        'colGenreActivite_Ese','ColRefCat','ColRefQuartier','colQuartier_Ese','colAdresseEntreprise_Ese',
+        'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
+        ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
+        'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
+        "tperso_annee.active"
+        ,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
+            'destination','bordereau','observations','id_unite','quotite')
+        ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")
+        ->selectRaw("(qte * montant) as montant_total")
+        ->selectRaw("(((qte * montant) * quotite)/100) as montant_quotite")
             ->where([
                 ['noms_agent', 'like', '%'.$query.'%'],
                 ['refEse',$refEse]
@@ -339,23 +357,25 @@ class ttaxe_paiementController extends Controller
         else{
       
             $data = DB::table('ttaxe_paiement')
-            ->join('ttaxe_contribuable','ttaxe_contribuable.id','=','ttaxe_paiement.refEse')
-            ->join('ttaxe_categorie' , 'ttaxe_categorie.id','=','ttaxe_paiement.refCompte')
-            ->join('tagent' , 'tagent.id','=','ttaxe_paiement.refAgent')
-            ->join('tperso_annee' , 'tperso_annee.id','=','ttaxe_paiement.refAnnee')
-            ->join('tperso_mois' , 'tperso_mois.id','=','ttaxe_paiement.refMois')
-            ->select("ttaxe_paiement.id",'montant','montantLettre','motif',
-            'refEse','ttaxe_paiement.refCompte','refAgent','ttaxe_paiement.author',"matricule_agent",
-            "noms_agent","sexe_agent",'ttaxe_categorie.designation as categorietaxe','prix_categorie','prix_categorie2',
-            'colId_Ese','colIdNat_Ese','colRCCM_Ese','colNom_Ese','colRaisonSociale_Ese','colFormeJuridique_Ese',
-            'colGenreActivite_Ese','ColRefCat','ColRefQuartier','colQuartier_Ese','colAdresseEntreprise_Ese',
-            'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
-            ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
-            'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
-            "tperso_annee.active"
-            ,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
-            'destination','bordereau','observations') 
-            ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")               
+        ->join('ttaxe_contribuable','ttaxe_contribuable.id','=','ttaxe_paiement.refEse')
+        ->join('ttaxe_categorie' , 'ttaxe_categorie.id','=','ttaxe_paiement.refCompte')
+        ->join('tagent' , 'tagent.id','=','ttaxe_paiement.refAgent')
+        ->join('tperso_annee' , 'tperso_annee.id','=','ttaxe_paiement.refAnnee')
+        ->join('tperso_mois' , 'tperso_mois.id','=','ttaxe_paiement.refMois')
+        ->select("ttaxe_paiement.id",'montant','montantLettre','motif',
+        'refEse','ttaxe_paiement.refCompte','refAgent','ttaxe_paiement.author',"matricule_agent",
+        "noms_agent","sexe_agent",'ttaxe_categorie.designation as categorietaxe','prix_categorie','prix_categorie2',
+        'colId_Ese','colIdNat_Ese','colRCCM_Ese','colNom_Ese','colRaisonSociale_Ese','colFormeJuridique_Ese',
+        'colGenreActivite_Ese','ColRefCat','ColRefQuartier','colQuartier_Ese','colAdresseEntreprise_Ese',
+        'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
+        ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
+        'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
+        "tperso_annee.active"
+        ,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
+            'destination','bordereau','observations','id_unite','quotite')
+        ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")
+        ->selectRaw("(qte * montant) as montant_total")
+        ->selectRaw("(((qte * montant) * quotite)/100) as montant_quotite")               
             ->Where('refEse',$refEse)    
             ->orderBy("ttaxe_paiement.id", "desc")
             ->paginate(10);
@@ -384,10 +404,13 @@ class ttaxe_paiementController extends Controller
         'colGenreActivite_Ese','ColRefCat','ColRefQuartier','colQuartier_Ese','colAdresseEntreprise_Ese',
         'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
         ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
-        'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee","tperso_annee.active"
+        'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
+        "tperso_annee.active"
         ,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
-            'destination','bordereau','observations')  
-        ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")      
+            'destination','bordereau','observations','id_unite','quotite')
+        ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")
+        ->selectRaw("(qte * montant) as montant_total")
+        ->selectRaw("(((qte * montant) * quotite)/100) as montant_quotite")      
         ->where('ttaxe_paiement.id', $id)
         ->get();
 
@@ -413,8 +436,10 @@ class ttaxe_paiementController extends Controller
         'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
         "tperso_annee.active"
         ,'qte','recouvrement','refExploitation','marque_vehicule','lieu_chargement',
-            'destination','bordereau','observations')
+            'destination','bordereau','observations','id_unite','quotite')
         ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")
+        ->selectRaw("(qte * montant) as montant_total")
+        ->selectRaw("(((qte * montant) * quotite)/100) as montant_quotite")
         ->where('ttaxe_paiement.refAgent', $refAgent)
         ->orderBy("ttaxe_paiement.id", "desc")
         ->get();

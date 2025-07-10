@@ -201,7 +201,10 @@
                                 <th class="text-left">Agent</th>
                                 <th class="text-left">Menage</th>
                                 <th class="text-left">CatTaxe</th>
-                                <th class="text-left">Montant</th>
+                                <th class="text-left">Pu</th>
+                                <th class="text-left">Qté</th>
+                                <th class="text-left">PT</th>
+                                <th class="text-left">Quotité</th>
                                 <th class="text-left">DateOperation</th>
                                 <th class="text-left">MontantLettre</th>  
                                 <th class="text-left">Mois</th>  
@@ -215,6 +218,9 @@
                                 <td>{{ item.colProprietaire_Ese }}</td>
                                 <td>{{ item.categorietaxe }}</td>
                                 <td>{{ item.montant }}</td>
+                                <td>{{ item.qte }}</td>
+                                <td>{{ item.montant_total }}</td>
+                                <td>{{ item.montant_quotite }}</td>
                                 <td>{{ item.dateOperation }}</td>
                                 <td>{{ item.montantLettre }}</td>
                                 <td>{{ item.name_mois }}</td>
