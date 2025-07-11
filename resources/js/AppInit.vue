@@ -589,30 +589,30 @@ export default {
                   text: "Contrats Finis",
                   href: "/admin/ContratFini",
                 },
-                {
-                  text: "Tous les Contrats",
-                  href: "/admin/AllContrat",
-                },
-                {
-                  text: "Stages Encours",
-                  href: "/admin/StageEncours",
-                },
-                { //AllPresenceAgent
-                  text: "Tous les Stages",
-                  href: "/admin/AllStages",
-                },
-                { //AllPresenceAgent
-                  text: "Toutes les Présences",
-                  href: "/admin/AllPresenceAgent",
-                },
-                {
-                  text: "Paiement Global",
-                  href: "/admin/FichePaieGlobale",
-                },
-                {
-                  text: "Paiement/Agent",
-                  href: "/admin/FichePaie",
-                },
+                // {
+                //   text: "Tous les Contrats",
+                //   href: "/admin/AllContrat",
+                // },
+                // {
+                //   text: "Stages Encours",
+                //   href: "/admin/StageEncours",
+                // },
+                // { //AllPresenceAgent
+                //   text: "Tous les Stages",
+                //   href: "/admin/AllStages",
+                // },
+                // { //AllPresenceAgent
+                //   text: "Toutes les Présences",
+                //   href: "/admin/AllPresenceAgent",
+                // },
+                // {
+                //   text: "Paiement Global",
+                //   href: "/admin/FichePaieGlobale",
+                // },
+                // {
+                //   text: "Paiement/Agent",
+                //   href: "/admin/FichePaie",
+                // },
                 {
                   text: "Rapports Contrat",
                   href: "/admin/RapportContrat",
