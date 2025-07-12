@@ -81,6 +81,18 @@
                                 <span>Imprimer le rapport</span>
                             </v-tooltip>
                             <br> -->
+                            <br>
+
+                            <v-tooltip bottom color="black">
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on">
+                                        <v-btn @click="PrintshowListeTaxeParCategorie" block color="primary">
+                                            <v-icon>print</v-icon> LISTE DES TAXES/CATEGORIE
+                                        </v-btn>
+                                    </span>
+                                </template>
+                                <span>Imprimer le rapport</span>
+                            </v-tooltip>
 
                             <br>
                             <v-flex xs12 sm12 md12 lg12>
@@ -318,13 +330,25 @@
                                 </v-autocomplete>
                               </div>
                             </v-flex>
-                            <!-- <br> -->
+                            <!-- <br> PrintshowListeTaxeParCategorie -->
 
                             <v-tooltip bottom color="black">
                                 <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on">
                                         <v-btn @click="PrintshowListeMembre_Profession" block color="primary">
                                             <v-icon>print</v-icon> LISTE DES MEMBRES/PROFESSION
+                                        </v-btn>
+                                    </span>
+                                </template>
+                                <span>Imprimer le rapport</span>
+                            </v-tooltip>
+                            <br>
+
+                            <v-tooltip bottom color="black">
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on">
+                                        <v-btn @click="PrintshowListeTaxeParCategorie" block color="primary">
+                                            <v-icon>print</v-icon> LISTE DES TAXES/CATEGORIE
                                         </v-btn>
                                     </span>
                                 </template>
@@ -711,6 +735,12 @@ export default {
             if(this.svData.id_profession != '')
             {
               window.open(`${this.apiBaseURL}/fetch_rapport_liste_membres_profession?id_profession=` + this.svData.id_profession);
+            }
+        },
+        PrintshowListeTaxeParCategorie() {            
+            if(this.svData.refCompte != '')
+            {
+              window.open(`${this.apiBaseURL}/fetch_rapport_liste_taxe_categorie?id_categorie_taxe=` + this.svData.refCompte);
             }
         },
         PrintshowDepenseBanqueByDate() {

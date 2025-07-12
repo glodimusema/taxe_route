@@ -1968,9 +1968,10 @@ Route::post('update_compter_paiement', [ttaxe_paiementController::class, 'update
 Route::get("delete_taxe_paiement/{id}", [ttaxe_paiementController::class, 'delete_data']);
 
 
-// fetch_carte_membre
+// fetch_rapport_liste_taxe_categorie
 
 
+Route::get("fetch_rapport_liste_taxe_categorie", [tTaxeRapportPdfController::class, 'fetch_rapport_liste_taxe_categorie']);
 Route::get("fetch_carte_membre", [tTaxeRapportPdfController::class, 'fetch_carte_membre']);
 Route::get("fetch_rapport_liste_membres_profession", [tTaxeRapportPdfController::class, 'fetch_rapport_liste_membres_profession']);
 Route::get("pdf_bonentree_data", [tTaxeRapportPdfController::class, 'pdf_bon_data']);

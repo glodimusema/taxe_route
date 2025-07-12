@@ -334,8 +334,8 @@ function printRapportContratDate($date1, $date2)
                         <td class="cs91032837" style="width:41px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>N&#176;</nobr></td>
                         <td class="cs479D8C74" colspan="4" style="width:187px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>NOMS</nobr></td>
                         <td class="cs479D8C74" colspan="2" style="width:95px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>TYPE&nbsp;CONTRAT</nobr></td>
-                        <td class="cs479D8C74" colspan="2" style="width:124px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>POSTE</nobr></td>
-                        <td class="cs479D8C74" style="width:113px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>LIEU</nobr></td>
+                        <td class="cs479D8C74" colspan="2" style="width:124px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>FONCTION</nobr></td>
+                        <td class="cs479D8C74" style="width:113px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>AFFECTATION</nobr></td>
                         <td class="cs479D8C74" colspan="2" style="width:92px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>MUTUELLE</nobr></td>
                         <td class="cs479D8C74" style="width:90px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>DEBUT&nbsp;CONT.</nobr></td>
                         <td class="cs479D8C74" colspan="4" style="width:78px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>FIN&nbsp;CONT.</nobr></td>
@@ -375,6 +375,10 @@ function showRapportContratDate($date1, $date2)
         ->join('villes' , 'villes.id','=','communes.idVille')
         ->join('provinces' , 'provinces.id','=','villes.idProvince')
         ->join('pays' , 'pays.id','=','provinces.idPays')
+        ->join('taxe_site_affect' , 'taxe_site_affect.id','=','tperso_affectation_agent.refSiteAffectation')
+        ->join('taxe_sous_poste_affect' , 'taxe_sous_poste_affect.id','=','taxe_site_affect.id_sous_poste_affect')
+        ->join('taxe_poste_affect' , 'taxe_poste_affect.id','=','taxe_sous_poste_affect.id_poste_affect')
+        ->join('taxe_antene' , 'taxe_antene.id','=','taxe_poste_affect.id_antene')
         ->select("tperso_affectation_agent.id",'refAgent','refServicePerso','refCategorieAgent','refPoste','refLieuAffectation',
         'refMutuelle','refTypeContrat','dateAffectation','dureecontrat','dureeLettre','dateFin','dateDebutEssaie',
         'dateFinEssaie','JourTrail1','JourTrail2','heureTrail1','heureTrail2','TempsPause','nbrConge','nbrCongeLettre',
@@ -384,8 +388,10 @@ function showRapportContratDate($date1, $date2)
         "etatcivil_agent","refAvenue_agent","contact_agent","mail_agent","grade_agent","fonction_agent",
         "specialite_agent","Categorie_agent","niveauEtude_agent","anneeFinEtude_agent","Ecole_agent","tagent.photo as photo_agent",
         "tagent.slug as slug_agent","name_serv_perso","name_categorie_service","name_categorie_agent",
-        'nom_poste','description_poste','nom_lieu','description_lieu','nom_mutuelle','description_mutuelle',
-        'nom_contrat','code_contrat')
+        'tperso_poste.nom_poste','description_poste','nom_lieu','description_lieu','nom_mutuelle','description_mutuelle',
+        'nom_contrat','code_contrat','refSiteAffectation','nom_site_affect','id_sous_poste_affect',
+        'nom_sous_poste','id_poste_affect','taxe_poste_affect.nom_poste as nom_poste_affect','id_antene','nom_antene')
+        // ->selectRaw('CONCAT(YEAR, datenaissance_agent, CURDATE()) as age_agent')
         ->selectRaw('TIMESTAMPDIFF(YEAR, datenaissance_agent, CURDATE()) as age_agent')   
         ->selectRaw('TIMESTAMPDIFF(MONTH, CURDATE(), dateFin) as dureerestante')    
         ->selectRaw("CASE  WHEN (TIMESTAMPDIFF(MONTH, CURDATE(), dateFin))>0 THEN 'Encours' ELSE 'Fini' END as Statut")     
@@ -405,11 +411,11 @@ function showRapportContratDate($date1, $date2)
                 	<tr style="vertical-align:top;">
                     <td style="width:0px;height:24px;"></td>
                     <td></td>
-                    <td class="cs86F8EF7F" style="width:41px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$count.'</nobr></td>
+                    <td class="cs86F8EF7F" style="width:41px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$count.'</nobr></td> 
                     <td class="csD06EB5B2" colspan="4" style="width:187px;height:22px;line-height:10px;text-align:center;vertical-align:middle;">'.$row->noms_agent.'</td>
                     <td class="csD06EB5B2" colspan="2" style="width:95px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->code_contrat.'</nobr></td>
-                    <td class="csD06EB5B2" colspan="2" style="width:124px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_poste.'</nobr></td>
-                    <td class="csD06EB5B2" style="width:113px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_lieu.'</nobr></td>
+                    <td class="csD06EB5B2" colspan="2" style="width:124px;height:22px;line-height:10px;text-align:center;vertical-align:middle;">'.$row->fonction_agent.'</td>
+                    <td class="csD06EB5B2" style="width:113px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_site_affect.'</nobr></td>
                     <td class="csD06EB5B2" colspan="2" style="width:92px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_mutuelle.'</nobr></td>
                     <td class="csD06EB5B2" style="width:90px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->dateAffectation.'</nobr></td>
                     <td class="csD06EB5B2" colspan="4" style="width:78px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->dateFin.'</nobr></td>
@@ -740,8 +746,8 @@ function printRapportFinContratDate($date1, $date2)
                         <td class="cs91032837" style="width:41px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>N&#176;</nobr></td>
                         <td class="cs479D8C74" colspan="4" style="width:187px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>NOMS</nobr></td>
                         <td class="cs479D8C74" colspan="2" style="width:95px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>TYPE&nbsp;CONTRAT</nobr></td>
-                        <td class="cs479D8C74" colspan="2" style="width:124px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>POSTE</nobr></td>
-                        <td class="cs479D8C74" style="width:113px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>LIEU</nobr></td>
+                        <td class="cs479D8C74" colspan="2" style="width:124px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>FONCTION</nobr></td>
+                        <td class="cs479D8C74" style="width:113px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>AFFECTATION</nobr></td>
                         <td class="cs479D8C74" colspan="2" style="width:92px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>MUTUELLE</nobr></td>
                         <td class="cs479D8C74" style="width:90px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>DEBUT&nbsp;CONT.</nobr></td>
                         <td class="cs479D8C74" colspan="4" style="width:78px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>FIN&nbsp;CONT.</nobr></td>
@@ -781,6 +787,10 @@ function showRapportFinContratDate($date1, $date2)
         ->join('villes' , 'villes.id','=','communes.idVille')
         ->join('provinces' , 'provinces.id','=','villes.idProvince')
         ->join('pays' , 'pays.id','=','provinces.idPays')
+        ->join('taxe_site_affect' , 'taxe_site_affect.id','=','tperso_affectation_agent.refSiteAffectation')
+        ->join('taxe_sous_poste_affect' , 'taxe_sous_poste_affect.id','=','taxe_site_affect.id_sous_poste_affect')
+        ->join('taxe_poste_affect' , 'taxe_poste_affect.id','=','taxe_sous_poste_affect.id_poste_affect')
+        ->join('taxe_antene' , 'taxe_antene.id','=','taxe_poste_affect.id_antene')
         ->select("tperso_affectation_agent.id",'refAgent','refServicePerso','refCategorieAgent','refPoste','refLieuAffectation',
         'refMutuelle','refTypeContrat','dateAffectation','dureecontrat','dureeLettre','dateFin','dateDebutEssaie',
         'dateFinEssaie','JourTrail1','JourTrail2','heureTrail1','heureTrail2','TempsPause','nbrConge','nbrCongeLettre',
@@ -790,8 +800,10 @@ function showRapportFinContratDate($date1, $date2)
         "etatcivil_agent","refAvenue_agent","contact_agent","mail_agent","grade_agent","fonction_agent",
         "specialite_agent","Categorie_agent","niveauEtude_agent","anneeFinEtude_agent","Ecole_agent","tagent.photo as photo_agent",
         "tagent.slug as slug_agent","name_serv_perso","name_categorie_service","name_categorie_agent",
-        'nom_poste','description_poste','nom_lieu','description_lieu','nom_mutuelle','description_mutuelle',
-        'nom_contrat','code_contrat')
+        'tperso_poste.nom_poste','description_poste','nom_lieu','description_lieu','nom_mutuelle','description_mutuelle',
+        'nom_contrat','code_contrat','refSiteAffectation','nom_site_affect','id_sous_poste_affect',
+        'nom_sous_poste','id_poste_affect','taxe_poste_affect.nom_poste as nom_poste_affect','id_antene','nom_antene')
+        // ->selectRaw('CONCAT(YEAR, datenaissance_agent, CURDATE()) as age_agent')
         ->selectRaw('TIMESTAMPDIFF(YEAR, datenaissance_agent, CURDATE()) as age_agent')   
         ->selectRaw('TIMESTAMPDIFF(MONTH, CURDATE(), dateFin) as dureerestante')    
         ->selectRaw("CASE  WHEN (TIMESTAMPDIFF(MONTH, CURDATE(), dateFin))>0 THEN 'Encours' ELSE 'Fini' END as Statut")     
@@ -814,8 +826,8 @@ function showRapportFinContratDate($date1, $date2)
                     <td class="cs86F8EF7F" style="width:41px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$count.'</nobr></td>
                     <td class="csD06EB5B2" colspan="4" style="width:187px;height:22px;line-height:10px;text-align:center;vertical-align:middle;">'.$row->noms_agent.'</td>
                     <td class="csD06EB5B2" colspan="2" style="width:95px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->code_contrat.'</nobr></td>
-                    <td class="csD06EB5B2" colspan="2" style="width:124px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_poste.'</nobr></td>
-                    <td class="csD06EB5B2" style="width:113px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_lieu.'</nobr></td>
+                    <td class="csD06EB5B2" colspan="2" style="width:124px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->fonction_agent.'</nobr></td>
+                    <td class="csD06EB5B2" style="width:113px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_site_affect.'</nobr></td>
                     <td class="csD06EB5B2" colspan="2" style="width:92px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_mutuelle.'</nobr></td>
                     <td class="csD06EB5B2" style="width:90px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->dateAffectation.'</nobr></td>
                     <td class="csD06EB5B2" colspan="4" style="width:78px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->dateFin.'</nobr></td>
@@ -1149,8 +1161,8 @@ function printRapportContratDateTypeContrat($date1, $date2, $refTypeContrat)
                         <td class="cs91032837" style="width:41px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>N&#176;</nobr></td>
                         <td class="cs479D8C74" colspan="4" style="width:187px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>NOMS</nobr></td>
                         <td class="cs479D8C74" colspan="2" style="width:95px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>TYPE&nbsp;CONTRAT</nobr></td>
-                        <td class="cs479D8C74" colspan="2" style="width:124px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>POSTE</nobr></td>
-                        <td class="cs479D8C74" style="width:113px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>LIEU</nobr></td>
+                        <td class="cs479D8C74" colspan="2" style="width:124px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>FONCTION</nobr></td>
+                        <td class="cs479D8C74" style="width:113px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>AFFECTATION</nobr></td>
                         <td class="cs479D8C74" colspan="2" style="width:92px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>MUTUELLE</nobr></td>
                         <td class="cs479D8C74" style="width:90px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>DEBUT&nbsp;CONT.</nobr></td>
                         <td class="cs479D8C74" colspan="4" style="width:78px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>FIN&nbsp;CONT.</nobr></td>
@@ -1177,34 +1189,40 @@ function showRapportContratDateTypeContrat($date1, $date2, $refTypeContrat)
     $count=0;
 
     $data = DB::table('tperso_affectation_agent')
-    ->join('tperso_poste','tperso_poste.id','=','tperso_affectation_agent.refPoste')
-    ->join('tperso_lieuaffectation','tperso_lieuaffectation.id','=','tperso_affectation_agent.refLieuAffectation')
-    ->join('tperso_mutuelle','tperso_mutuelle.id','=','tperso_affectation_agent.refMutuelle')
-    ->join('tperso_typecontrat','tperso_typecontrat.id','=','tperso_affectation_agent.refTypeContrat')
-    ->join('tperso_categorie_agent','tperso_categorie_agent.id','=','tperso_affectation_agent.refCategorieAgent')
-    ->join('tperso_service_personnel','tperso_service_personnel.id','=','tperso_affectation_agent.refServicePerso')
-    ->join('tperso_categorie_service','tperso_categorie_service.id','=','tperso_service_personnel.refCatService')
-    ->join('tagent','tagent.id','=','tperso_affectation_agent.refAgent')
-    ->join('avenues' , 'avenues.id','=','tagent.refAvenue_agent')
-    ->join('quartiers' , 'quartiers.id','=','avenues.idQuartier')
-    ->join('communes' , 'communes.id','=','quartiers.idCommune')
-    ->join('villes' , 'villes.id','=','communes.idVille')
-    ->join('provinces' , 'provinces.id','=','villes.idProvince')
-    ->join('pays' , 'pays.id','=','provinces.idPays')
-    ->select("tperso_affectation_agent.id",'refAgent','refServicePerso','refCategorieAgent','refPoste','refLieuAffectation',
-    'refMutuelle','refTypeContrat','dateAffectation','dureecontrat','dureeLettre','dateFin','dateDebutEssaie',
-    'dateFinEssaie','JourTrail1','JourTrail2','heureTrail1','heureTrail2','TempsPause','nbrConge','nbrCongeLettre',
-    'nomOffice','postnomOffice','qualifieOffice','codeAgent','directeur','numCNSS','numImpot','numcpteBanque',
-    'BanqueAgant','autresDetail','conge',"tperso_affectation_agent.author","matricule_agent",
-    "noms_agent","sexe_agent","datenaissance_agent","lieunaissnce_agent","provinceOrigine_agent",
-    "etatcivil_agent","refAvenue_agent","contact_agent","mail_agent","grade_agent","fonction_agent",
-    "specialite_agent","Categorie_agent","niveauEtude_agent","anneeFinEtude_agent","Ecole_agent","tagent.photo as photo_agent",
-    "tagent.slug as slug_agent","name_serv_perso","name_categorie_service","name_categorie_agent",
-    'nom_poste','description_poste','nom_lieu','description_lieu','nom_mutuelle','description_mutuelle',
-    'nom_contrat','code_contrat')
-    ->selectRaw('TIMESTAMPDIFF(YEAR, datenaissance_agent, CURDATE()) as age_agent')   
-    ->selectRaw('TIMESTAMPDIFF(MONTH, CURDATE(), dateFin) as dureerestante')    
-    ->selectRaw("CASE  WHEN (TIMESTAMPDIFF(MONTH, CURDATE(), dateFin))>0 THEN 'Encours' ELSE 'Fini' END as Statut")     
+        ->join('tperso_poste','tperso_poste.id','=','tperso_affectation_agent.refPoste')
+        ->join('tperso_lieuaffectation','tperso_lieuaffectation.id','=','tperso_affectation_agent.refLieuAffectation')
+        ->join('tperso_mutuelle','tperso_mutuelle.id','=','tperso_affectation_agent.refMutuelle')
+        ->join('tperso_typecontrat','tperso_typecontrat.id','=','tperso_affectation_agent.refTypeContrat')
+        ->join('tperso_categorie_agent','tperso_categorie_agent.id','=','tperso_affectation_agent.refCategorieAgent')
+        ->join('tperso_service_personnel','tperso_service_personnel.id','=','tperso_affectation_agent.refServicePerso')
+        ->join('tperso_categorie_service','tperso_categorie_service.id','=','tperso_service_personnel.refCatService')
+        ->join('tagent','tagent.id','=','tperso_affectation_agent.refAgent')
+        ->join('avenues' , 'avenues.id','=','tagent.refAvenue_agent')
+        ->join('quartiers' , 'quartiers.id','=','avenues.idQuartier')
+        ->join('communes' , 'communes.id','=','quartiers.idCommune')
+        ->join('villes' , 'villes.id','=','communes.idVille')
+        ->join('provinces' , 'provinces.id','=','villes.idProvince')
+        ->join('pays' , 'pays.id','=','provinces.idPays')
+        ->join('taxe_site_affect' , 'taxe_site_affect.id','=','tperso_affectation_agent.refSiteAffectation')
+        ->join('taxe_sous_poste_affect' , 'taxe_sous_poste_affect.id','=','taxe_site_affect.id_sous_poste_affect')
+        ->join('taxe_poste_affect' , 'taxe_poste_affect.id','=','taxe_sous_poste_affect.id_poste_affect')
+        ->join('taxe_antene' , 'taxe_antene.id','=','taxe_poste_affect.id_antene')
+        ->select("tperso_affectation_agent.id",'refAgent','refServicePerso','refCategorieAgent','refPoste','refLieuAffectation',
+        'refMutuelle','refTypeContrat','dateAffectation','dureecontrat','dureeLettre','dateFin','dateDebutEssaie',
+        'dateFinEssaie','JourTrail1','JourTrail2','heureTrail1','heureTrail2','TempsPause','nbrConge','nbrCongeLettre',
+        'nomOffice','postnomOffice','qualifieOffice','codeAgent','directeur','numCNSS','numImpot','numcpteBanque',
+        'BanqueAgant','autresDetail','conge',"tperso_affectation_agent.author","matricule_agent",
+        "noms_agent","sexe_agent","datenaissance_agent","lieunaissnce_agent","provinceOrigine_agent",
+        "etatcivil_agent","refAvenue_agent","contact_agent","mail_agent","grade_agent","fonction_agent",
+        "specialite_agent","Categorie_agent","niveauEtude_agent","anneeFinEtude_agent","Ecole_agent","tagent.photo as photo_agent",
+        "tagent.slug as slug_agent","name_serv_perso","name_categorie_service","name_categorie_agent",
+        'tperso_poste.nom_poste','description_poste','nom_lieu','description_lieu','nom_mutuelle','description_mutuelle',
+        'nom_contrat','code_contrat','refSiteAffectation','nom_site_affect','id_sous_poste_affect',
+        'nom_sous_poste','id_poste_affect','taxe_poste_affect.nom_poste as nom_poste_affect','id_antene','nom_antene')
+        // ->selectRaw('CONCAT(YEAR, datenaissance_agent, CURDATE()) as age_agent')
+        ->selectRaw('TIMESTAMPDIFF(YEAR, datenaissance_agent, CURDATE()) as age_agent')   
+        ->selectRaw('TIMESTAMPDIFF(MONTH, CURDATE(), dateFin) as dureerestante')    
+        ->selectRaw("CASE  WHEN (TIMESTAMPDIFF(MONTH, CURDATE(), dateFin))>0 THEN 'Encours' ELSE 'Fini' END as Statut")     
     ->where([
         ['dateAffectation','>=', $date1],
         ['dateAffectation','<=', $date2],
@@ -1225,8 +1243,8 @@ function showRapportContratDateTypeContrat($date1, $date2, $refTypeContrat)
                 <td class="cs86F8EF7F" style="width:41px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$count.'</nobr></td>
                 <td class="csD06EB5B2" colspan="4" style="width:187px;height:22px;line-height:10px;text-align:center;vertical-align:middle;">'.$row->noms_agent.'</td>
                 <td class="csD06EB5B2" colspan="2" style="width:95px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->code_contrat.'</nobr></td>
-                <td class="csD06EB5B2" colspan="2" style="width:124px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_poste.'</nobr></td>
-                <td class="csD06EB5B2" style="width:113px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_lieu.'</nobr></td>
+                <td class="csD06EB5B2" colspan="2" style="width:124px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->fonction_agent.'</nobr></td>
+                <td class="csD06EB5B2" style="width:113px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_site_affect.'</nobr></td>
                 <td class="csD06EB5B2" colspan="2" style="width:92px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_mutuelle.'</nobr></td>
                 <td class="csD06EB5B2" style="width:90px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->dateAffectation.'</nobr></td>
                 <td class="csD06EB5B2" colspan="4" style="width:78px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->dateFin.'</nobr></td>
@@ -1559,8 +1577,8 @@ function printRapportContratDatePoste($date1, $date2, $refPoste)
                         <td class="cs91032837" style="width:41px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>N&#176;</nobr></td>
                         <td class="cs479D8C74" colspan="4" style="width:187px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>NOMS</nobr></td>
                         <td class="cs479D8C74" colspan="2" style="width:95px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>TYPE&nbsp;CONTRAT</nobr></td>
-                        <td class="cs479D8C74" colspan="2" style="width:124px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>POSTE</nobr></td>
-                        <td class="cs479D8C74" style="width:113px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>LIEU</nobr></td>
+                        <td class="cs479D8C74" colspan="2" style="width:124px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>FONCTION</nobr></td>
+                        <td class="cs479D8C74" style="width:113px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>AFFECTATION</nobr></td>
                         <td class="cs479D8C74" colspan="2" style="width:92px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>MUTUELLE</nobr></td>
                         <td class="cs479D8C74" style="width:90px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>DEBUT&nbsp;CONT.</nobr></td>
                         <td class="cs479D8C74" colspan="4" style="width:78px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>FIN&nbsp;CONT.</nobr></td>
@@ -1587,34 +1605,40 @@ function showRapportContratDatePoste($date1, $date2, $refPoste)
     $count=0;
 
     $data = DB::table('tperso_affectation_agent')
-    ->join('tperso_poste','tperso_poste.id','=','tperso_affectation_agent.refPoste')
-    ->join('tperso_lieuaffectation','tperso_lieuaffectation.id','=','tperso_affectation_agent.refLieuAffectation')
-    ->join('tperso_mutuelle','tperso_mutuelle.id','=','tperso_affectation_agent.refMutuelle')
-    ->join('tperso_typecontrat','tperso_typecontrat.id','=','tperso_affectation_agent.refTypeContrat')
-    ->join('tperso_categorie_agent','tperso_categorie_agent.id','=','tperso_affectation_agent.refCategorieAgent')
-    ->join('tperso_service_personnel','tperso_service_personnel.id','=','tperso_affectation_agent.refServicePerso')
-    ->join('tperso_categorie_service','tperso_categorie_service.id','=','tperso_service_personnel.refCatService')
-    ->join('tagent','tagent.id','=','tperso_affectation_agent.refAgent')
-    ->join('avenues' , 'avenues.id','=','tagent.refAvenue_agent')
-    ->join('quartiers' , 'quartiers.id','=','avenues.idQuartier')
-    ->join('communes' , 'communes.id','=','quartiers.idCommune')
-    ->join('villes' , 'villes.id','=','communes.idVille')
-    ->join('provinces' , 'provinces.id','=','villes.idProvince')
-    ->join('pays' , 'pays.id','=','provinces.idPays')
-    ->select("tperso_affectation_agent.id",'refAgent','refServicePerso','refCategorieAgent','refPoste','refLieuAffectation',
-    'refMutuelle','refTypeContrat','dateAffectation','dureecontrat','dureeLettre','dateFin','dateDebutEssaie',
-    'dateFinEssaie','JourTrail1','JourTrail2','heureTrail1','heureTrail2','TempsPause','nbrConge','nbrCongeLettre',
-    'nomOffice','postnomOffice','qualifieOffice','codeAgent','directeur','numCNSS','numImpot','numcpteBanque',
-    'BanqueAgant','autresDetail','conge',"tperso_affectation_agent.author","matricule_agent",
-    "noms_agent","sexe_agent","datenaissance_agent","lieunaissnce_agent","provinceOrigine_agent",
-    "etatcivil_agent","refAvenue_agent","contact_agent","mail_agent","grade_agent","fonction_agent",
-    "specialite_agent","Categorie_agent","niveauEtude_agent","anneeFinEtude_agent","Ecole_agent","tagent.photo as photo_agent",
-    "tagent.slug as slug_agent","name_serv_perso","name_categorie_service","name_categorie_agent",
-    'nom_poste','description_poste','nom_lieu','description_lieu','nom_mutuelle','description_mutuelle',
-    'nom_contrat','code_contrat')
-    ->selectRaw('TIMESTAMPDIFF(YEAR, datenaissance_agent, CURDATE()) as age_agent')   
-    ->selectRaw('TIMESTAMPDIFF(MONTH, CURDATE(), dateFin) as dureerestante')    
-    ->selectRaw("CASE  WHEN (TIMESTAMPDIFF(MONTH, CURDATE(), dateFin))>0 THEN 'Encours' ELSE 'Fini' END as Statut")     
+        ->join('tperso_poste','tperso_poste.id','=','tperso_affectation_agent.refPoste')
+        ->join('tperso_lieuaffectation','tperso_lieuaffectation.id','=','tperso_affectation_agent.refLieuAffectation')
+        ->join('tperso_mutuelle','tperso_mutuelle.id','=','tperso_affectation_agent.refMutuelle')
+        ->join('tperso_typecontrat','tperso_typecontrat.id','=','tperso_affectation_agent.refTypeContrat')
+        ->join('tperso_categorie_agent','tperso_categorie_agent.id','=','tperso_affectation_agent.refCategorieAgent')
+        ->join('tperso_service_personnel','tperso_service_personnel.id','=','tperso_affectation_agent.refServicePerso')
+        ->join('tperso_categorie_service','tperso_categorie_service.id','=','tperso_service_personnel.refCatService')
+        ->join('tagent','tagent.id','=','tperso_affectation_agent.refAgent')
+        ->join('avenues' , 'avenues.id','=','tagent.refAvenue_agent')
+        ->join('quartiers' , 'quartiers.id','=','avenues.idQuartier')
+        ->join('communes' , 'communes.id','=','quartiers.idCommune')
+        ->join('villes' , 'villes.id','=','communes.idVille')
+        ->join('provinces' , 'provinces.id','=','villes.idProvince')
+        ->join('pays' , 'pays.id','=','provinces.idPays')
+        ->join('taxe_site_affect' , 'taxe_site_affect.id','=','tperso_affectation_agent.refSiteAffectation')
+        ->join('taxe_sous_poste_affect' , 'taxe_sous_poste_affect.id','=','taxe_site_affect.id_sous_poste_affect')
+        ->join('taxe_poste_affect' , 'taxe_poste_affect.id','=','taxe_sous_poste_affect.id_poste_affect')
+        ->join('taxe_antene' , 'taxe_antene.id','=','taxe_poste_affect.id_antene')
+        ->select("tperso_affectation_agent.id",'refAgent','refServicePerso','refCategorieAgent','refPoste','refLieuAffectation',
+        'refMutuelle','refTypeContrat','dateAffectation','dureecontrat','dureeLettre','dateFin','dateDebutEssaie',
+        'dateFinEssaie','JourTrail1','JourTrail2','heureTrail1','heureTrail2','TempsPause','nbrConge','nbrCongeLettre',
+        'nomOffice','postnomOffice','qualifieOffice','codeAgent','directeur','numCNSS','numImpot','numcpteBanque',
+        'BanqueAgant','autresDetail','conge',"tperso_affectation_agent.author","matricule_agent",
+        "noms_agent","sexe_agent","datenaissance_agent","lieunaissnce_agent","provinceOrigine_agent",
+        "etatcivil_agent","refAvenue_agent","contact_agent","mail_agent","grade_agent","fonction_agent",
+        "specialite_agent","Categorie_agent","niveauEtude_agent","anneeFinEtude_agent","Ecole_agent","tagent.photo as photo_agent",
+        "tagent.slug as slug_agent","name_serv_perso","name_categorie_service","name_categorie_agent",
+        'tperso_poste.nom_poste','description_poste','nom_lieu','description_lieu','nom_mutuelle','description_mutuelle',
+        'nom_contrat','code_contrat','refSiteAffectation','nom_site_affect','id_sous_poste_affect',
+        'nom_sous_poste','id_poste_affect','taxe_poste_affect.nom_poste as nom_poste_affect','id_antene','nom_antene')
+        // ->selectRaw('CONCAT(YEAR, datenaissance_agent, CURDATE()) as age_agent')
+        ->selectRaw('TIMESTAMPDIFF(YEAR, datenaissance_agent, CURDATE()) as age_agent')   
+        ->selectRaw('TIMESTAMPDIFF(MONTH, CURDATE(), dateFin) as dureerestante')    
+        ->selectRaw("CASE  WHEN (TIMESTAMPDIFF(MONTH, CURDATE(), dateFin))>0 THEN 'Encours' ELSE 'Fini' END as Statut")     
     ->where([
         ['dateAffectation','>=', $date1],
         ['dateAffectation','<=', $date2],
@@ -1635,8 +1659,8 @@ function showRapportContratDatePoste($date1, $date2, $refPoste)
                 <td class="cs86F8EF7F" style="width:41px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$count.'</nobr></td>
                 <td class="csD06EB5B2" colspan="4" style="width:187px;height:22px;line-height:10px;text-align:center;vertical-align:middle;">'.$row->noms_agent.'</td>
                 <td class="csD06EB5B2" colspan="2" style="width:95px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->code_contrat.'</nobr></td>
-                <td class="csD06EB5B2" colspan="2" style="width:124px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_poste.'</nobr></td>
-                <td class="csD06EB5B2" style="width:113px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_lieu.'</nobr></td>
+                <td class="csD06EB5B2" colspan="2" style="width:124px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->fonction_agent.'</nobr></td>
+                <td class="csD06EB5B2" style="width:113px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_site_affect.'</nobr></td>
                 <td class="csD06EB5B2" colspan="2" style="width:92px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_mutuelle.'</nobr></td>
                 <td class="csD06EB5B2" style="width:90px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->dateAffectation.'</nobr></td>
                 <td class="csD06EB5B2" colspan="4" style="width:78px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->dateFin.'</nobr></td>
@@ -1968,8 +1992,8 @@ function printRapportContratDateLieuAffectation($date1, $date2, $refLieuAffectat
                         <td class="cs91032837" style="width:41px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>N&#176;</nobr></td>
                         <td class="cs479D8C74" colspan="4" style="width:187px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>NOMS</nobr></td>
                         <td class="cs479D8C74" colspan="2" style="width:95px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>TYPE&nbsp;CONTRAT</nobr></td>
-                        <td class="cs479D8C74" colspan="2" style="width:124px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>POSTE</nobr></td>
-                        <td class="cs479D8C74" style="width:113px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>LIEU</nobr></td>
+                        <td class="cs479D8C74" colspan="2" style="width:124px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>FONCTION</nobr></td>
+                        <td class="cs479D8C74" style="width:113px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>AFFECTATION</nobr></td>
                         <td class="cs479D8C74" colspan="2" style="width:92px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>MUTUELLE</nobr></td>
                         <td class="cs479D8C74" style="width:90px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>DEBUT&nbsp;CONT.</nobr></td>
                         <td class="cs479D8C74" colspan="4" style="width:78px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>FIN&nbsp;CONT.</nobr></td>
@@ -1996,34 +2020,40 @@ function showRapportContratDateLieuAffectation($date1, $date2, $refLieuAffectati
     $count=0;
 
     $data = DB::table('tperso_affectation_agent')
-    ->join('tperso_poste','tperso_poste.id','=','tperso_affectation_agent.refPoste')
-    ->join('tperso_lieuaffectation','tperso_lieuaffectation.id','=','tperso_affectation_agent.refLieuAffectation')
-    ->join('tperso_mutuelle','tperso_mutuelle.id','=','tperso_affectation_agent.refMutuelle')
-    ->join('tperso_typecontrat','tperso_typecontrat.id','=','tperso_affectation_agent.refTypeContrat')
-    ->join('tperso_categorie_agent','tperso_categorie_agent.id','=','tperso_affectation_agent.refCategorieAgent')
-    ->join('tperso_service_personnel','tperso_service_personnel.id','=','tperso_affectation_agent.refServicePerso')
-    ->join('tperso_categorie_service','tperso_categorie_service.id','=','tperso_service_personnel.refCatService')
-    ->join('tagent','tagent.id','=','tperso_affectation_agent.refAgent')
-    ->join('avenues' , 'avenues.id','=','tagent.refAvenue_agent')
-    ->join('quartiers' , 'quartiers.id','=','avenues.idQuartier')
-    ->join('communes' , 'communes.id','=','quartiers.idCommune')
-    ->join('villes' , 'villes.id','=','communes.idVille')
-    ->join('provinces' , 'provinces.id','=','villes.idProvince')
-    ->join('pays' , 'pays.id','=','provinces.idPays')
-    ->select("tperso_affectation_agent.id",'refAgent','refServicePerso','refCategorieAgent','refPoste','refLieuAffectation',
-    'refMutuelle','refTypeContrat','dateAffectation','dureecontrat','dureeLettre','dateFin','dateDebutEssaie',
-    'dateFinEssaie','JourTrail1','JourTrail2','heureTrail1','heureTrail2','TempsPause','nbrConge','nbrCongeLettre',
-    'nomOffice','postnomOffice','qualifieOffice','codeAgent','directeur','numCNSS','numImpot','numcpteBanque',
-    'BanqueAgant','autresDetail','conge',"tperso_affectation_agent.author","matricule_agent",
-    "noms_agent","sexe_agent","datenaissance_agent","lieunaissnce_agent","provinceOrigine_agent",
-    "etatcivil_agent","refAvenue_agent","contact_agent","mail_agent","grade_agent","fonction_agent",
-    "specialite_agent","Categorie_agent","niveauEtude_agent","anneeFinEtude_agent","Ecole_agent","tagent.photo as photo_agent",
-    "tagent.slug as slug_agent","name_serv_perso","name_categorie_service","name_categorie_agent",
-    'nom_poste','description_poste','nom_lieu','description_lieu','nom_mutuelle','description_mutuelle',
-    'nom_contrat','code_contrat')
-    ->selectRaw('TIMESTAMPDIFF(YEAR, datenaissance_agent, CURDATE()) as age_agent')   
-    ->selectRaw('TIMESTAMPDIFF(MONTH, CURDATE(), dateFin) as dureerestante')    
-    ->selectRaw("CASE  WHEN (TIMESTAMPDIFF(MONTH, CURDATE(), dateFin))>0 THEN 'Encours' ELSE 'Fini' END as Statut")     
+        ->join('tperso_poste','tperso_poste.id','=','tperso_affectation_agent.refPoste')
+        ->join('tperso_lieuaffectation','tperso_lieuaffectation.id','=','tperso_affectation_agent.refLieuAffectation')
+        ->join('tperso_mutuelle','tperso_mutuelle.id','=','tperso_affectation_agent.refMutuelle')
+        ->join('tperso_typecontrat','tperso_typecontrat.id','=','tperso_affectation_agent.refTypeContrat')
+        ->join('tperso_categorie_agent','tperso_categorie_agent.id','=','tperso_affectation_agent.refCategorieAgent')
+        ->join('tperso_service_personnel','tperso_service_personnel.id','=','tperso_affectation_agent.refServicePerso')
+        ->join('tperso_categorie_service','tperso_categorie_service.id','=','tperso_service_personnel.refCatService')
+        ->join('tagent','tagent.id','=','tperso_affectation_agent.refAgent')
+        ->join('avenues' , 'avenues.id','=','tagent.refAvenue_agent')
+        ->join('quartiers' , 'quartiers.id','=','avenues.idQuartier')
+        ->join('communes' , 'communes.id','=','quartiers.idCommune')
+        ->join('villes' , 'villes.id','=','communes.idVille')
+        ->join('provinces' , 'provinces.id','=','villes.idProvince')
+        ->join('pays' , 'pays.id','=','provinces.idPays')
+        ->join('taxe_site_affect' , 'taxe_site_affect.id','=','tperso_affectation_agent.refSiteAffectation')
+        ->join('taxe_sous_poste_affect' , 'taxe_sous_poste_affect.id','=','taxe_site_affect.id_sous_poste_affect')
+        ->join('taxe_poste_affect' , 'taxe_poste_affect.id','=','taxe_sous_poste_affect.id_poste_affect')
+        ->join('taxe_antene' , 'taxe_antene.id','=','taxe_poste_affect.id_antene')
+        ->select("tperso_affectation_agent.id",'refAgent','refServicePerso','refCategorieAgent','refPoste','refLieuAffectation',
+        'refMutuelle','refTypeContrat','dateAffectation','dureecontrat','dureeLettre','dateFin','dateDebutEssaie',
+        'dateFinEssaie','JourTrail1','JourTrail2','heureTrail1','heureTrail2','TempsPause','nbrConge','nbrCongeLettre',
+        'nomOffice','postnomOffice','qualifieOffice','codeAgent','directeur','numCNSS','numImpot','numcpteBanque',
+        'BanqueAgant','autresDetail','conge',"tperso_affectation_agent.author","matricule_agent",
+        "noms_agent","sexe_agent","datenaissance_agent","lieunaissnce_agent","provinceOrigine_agent",
+        "etatcivil_agent","refAvenue_agent","contact_agent","mail_agent","grade_agent","fonction_agent",
+        "specialite_agent","Categorie_agent","niveauEtude_agent","anneeFinEtude_agent","Ecole_agent","tagent.photo as photo_agent",
+        "tagent.slug as slug_agent","name_serv_perso","name_categorie_service","name_categorie_agent",
+        'tperso_poste.nom_poste','description_poste','nom_lieu','description_lieu','nom_mutuelle','description_mutuelle',
+        'nom_contrat','code_contrat','refSiteAffectation','nom_site_affect','id_sous_poste_affect',
+        'nom_sous_poste','id_poste_affect','taxe_poste_affect.nom_poste as nom_poste_affect','id_antene','nom_antene')
+        // ->selectRaw('CONCAT(YEAR, datenaissance_agent, CURDATE()) as age_agent')
+        ->selectRaw('TIMESTAMPDIFF(YEAR, datenaissance_agent, CURDATE()) as age_agent')   
+        ->selectRaw('TIMESTAMPDIFF(MONTH, CURDATE(), dateFin) as dureerestante')    
+        ->selectRaw("CASE  WHEN (TIMESTAMPDIFF(MONTH, CURDATE(), dateFin))>0 THEN 'Encours' ELSE 'Fini' END as Statut")     
     ->where([
         ['dateAffectation','>=', $date1],
         ['dateAffectation','<=', $date2],
@@ -2044,8 +2074,8 @@ function showRapportContratDateLieuAffectation($date1, $date2, $refLieuAffectati
                 <td class="cs86F8EF7F" style="width:41px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$count.'</nobr></td>
                 <td class="csD06EB5B2" colspan="4" style="width:187px;height:22px;line-height:10px;text-align:center;vertical-align:middle;">'.$row->noms_agent.'</td>
                 <td class="csD06EB5B2" colspan="2" style="width:95px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->code_contrat.'</nobr></td>
-                <td class="csD06EB5B2" colspan="2" style="width:124px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_poste.'</nobr></td>
-                <td class="csD06EB5B2" style="width:113px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_lieu.'</nobr></td>
+                <td class="csD06EB5B2" colspan="2" style="width:124px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->fonction_agent.'</nobr></td>
+                <td class="csD06EB5B2" style="width:113px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_site_affect.'</nobr></td>
                 <td class="csD06EB5B2" colspan="2" style="width:92px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_mutuelle.'</nobr></td>
                 <td class="csD06EB5B2" style="width:90px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->dateAffectation.'</nobr></td>
                 <td class="csD06EB5B2" colspan="4" style="width:78px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->dateFin.'</nobr></td>
@@ -2377,8 +2407,8 @@ function printRapportContratDateMutuelle($date1, $date2, $refMutuelle)
                         <td class="cs91032837" style="width:41px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>N&#176;</nobr></td>
                         <td class="cs479D8C74" colspan="4" style="width:187px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>NOMS</nobr></td>
                         <td class="cs479D8C74" colspan="2" style="width:95px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>TYPE&nbsp;CONTRAT</nobr></td>
-                        <td class="cs479D8C74" colspan="2" style="width:124px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>POSTE</nobr></td>
-                        <td class="cs479D8C74" style="width:113px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>LIEU</nobr></td>
+                        <td class="cs479D8C74" colspan="2" style="width:124px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>FONCTION</nobr></td>
+                        <td class="cs479D8C74" style="width:113px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>AFFECTATION</nobr></td>
                         <td class="cs479D8C74" colspan="2" style="width:92px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>MUTUELLE</nobr></td>
                         <td class="cs479D8C74" style="width:90px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>DEBUT&nbsp;CONT.</nobr></td>
                         <td class="cs479D8C74" colspan="4" style="width:78px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>FIN&nbsp;CONT.</nobr></td>
@@ -2405,34 +2435,40 @@ function showRapportContratDateMutuelle($date1, $date2, $refMutuelle)
     $count=0;
 
     $data = DB::table('tperso_affectation_agent')
-    ->join('tperso_poste','tperso_poste.id','=','tperso_affectation_agent.refPoste')
-    ->join('tperso_lieuaffectation','tperso_lieuaffectation.id','=','tperso_affectation_agent.refLieuAffectation')
-    ->join('tperso_mutuelle','tperso_mutuelle.id','=','tperso_affectation_agent.refMutuelle')
-    ->join('tperso_typecontrat','tperso_typecontrat.id','=','tperso_affectation_agent.refTypeContrat')
-    ->join('tperso_categorie_agent','tperso_categorie_agent.id','=','tperso_affectation_agent.refCategorieAgent')
-    ->join('tperso_service_personnel','tperso_service_personnel.id','=','tperso_affectation_agent.refServicePerso')
-    ->join('tperso_categorie_service','tperso_categorie_service.id','=','tperso_service_personnel.refCatService')
-    ->join('tagent','tagent.id','=','tperso_affectation_agent.refAgent')
-    ->join('avenues' , 'avenues.id','=','tagent.refAvenue_agent')
-    ->join('quartiers' , 'quartiers.id','=','avenues.idQuartier')
-    ->join('communes' , 'communes.id','=','quartiers.idCommune')
-    ->join('villes' , 'villes.id','=','communes.idVille')
-    ->join('provinces' , 'provinces.id','=','villes.idProvince')
-    ->join('pays' , 'pays.id','=','provinces.idPays')
-    ->select("tperso_affectation_agent.id",'refAgent','refServicePerso','refCategorieAgent','refPoste','refLieuAffectation',
-    'refMutuelle','refTypeContrat','dateAffectation','dureecontrat','dureeLettre','dateFin','dateDebutEssaie',
-    'dateFinEssaie','JourTrail1','JourTrail2','heureTrail1','heureTrail2','TempsPause','nbrConge','nbrCongeLettre',
-    'nomOffice','postnomOffice','qualifieOffice','codeAgent','directeur','numCNSS','numImpot','numcpteBanque',
-    'BanqueAgant','autresDetail','conge',"tperso_affectation_agent.author","matricule_agent",
-    "noms_agent","sexe_agent","datenaissance_agent","lieunaissnce_agent","provinceOrigine_agent",
-    "etatcivil_agent","refAvenue_agent","contact_agent","mail_agent","grade_agent","fonction_agent",
-    "specialite_agent","Categorie_agent","niveauEtude_agent","anneeFinEtude_agent","Ecole_agent","tagent.photo as photo_agent",
-    "tagent.slug as slug_agent","name_serv_perso","name_categorie_service","name_categorie_agent",
-    'nom_poste','description_poste','nom_lieu','description_lieu','nom_mutuelle','description_mutuelle',
-    'nom_contrat','code_contrat')
-    ->selectRaw('TIMESTAMPDIFF(YEAR, datenaissance_agent, CURDATE()) as age_agent')   
-    ->selectRaw('TIMESTAMPDIFF(MONTH, CURDATE(), dateFin) as dureerestante')    
-    ->selectRaw("CASE  WHEN (TIMESTAMPDIFF(MONTH, CURDATE(), dateFin))>0 THEN 'Encours' ELSE 'Fini' END as Statut")     
+        ->join('tperso_poste','tperso_poste.id','=','tperso_affectation_agent.refPoste')
+        ->join('tperso_lieuaffectation','tperso_lieuaffectation.id','=','tperso_affectation_agent.refLieuAffectation')
+        ->join('tperso_mutuelle','tperso_mutuelle.id','=','tperso_affectation_agent.refMutuelle')
+        ->join('tperso_typecontrat','tperso_typecontrat.id','=','tperso_affectation_agent.refTypeContrat')
+        ->join('tperso_categorie_agent','tperso_categorie_agent.id','=','tperso_affectation_agent.refCategorieAgent')
+        ->join('tperso_service_personnel','tperso_service_personnel.id','=','tperso_affectation_agent.refServicePerso')
+        ->join('tperso_categorie_service','tperso_categorie_service.id','=','tperso_service_personnel.refCatService')
+        ->join('tagent','tagent.id','=','tperso_affectation_agent.refAgent')
+        ->join('avenues' , 'avenues.id','=','tagent.refAvenue_agent')
+        ->join('quartiers' , 'quartiers.id','=','avenues.idQuartier')
+        ->join('communes' , 'communes.id','=','quartiers.idCommune')
+        ->join('villes' , 'villes.id','=','communes.idVille')
+        ->join('provinces' , 'provinces.id','=','villes.idProvince')
+        ->join('pays' , 'pays.id','=','provinces.idPays')
+        ->join('taxe_site_affect' , 'taxe_site_affect.id','=','tperso_affectation_agent.refSiteAffectation')
+        ->join('taxe_sous_poste_affect' , 'taxe_sous_poste_affect.id','=','taxe_site_affect.id_sous_poste_affect')
+        ->join('taxe_poste_affect' , 'taxe_poste_affect.id','=','taxe_sous_poste_affect.id_poste_affect')
+        ->join('taxe_antene' , 'taxe_antene.id','=','taxe_poste_affect.id_antene')
+        ->select("tperso_affectation_agent.id",'refAgent','refServicePerso','refCategorieAgent','refPoste','refLieuAffectation',
+        'refMutuelle','refTypeContrat','dateAffectation','dureecontrat','dureeLettre','dateFin','dateDebutEssaie',
+        'dateFinEssaie','JourTrail1','JourTrail2','heureTrail1','heureTrail2','TempsPause','nbrConge','nbrCongeLettre',
+        'nomOffice','postnomOffice','qualifieOffice','codeAgent','directeur','numCNSS','numImpot','numcpteBanque',
+        'BanqueAgant','autresDetail','conge',"tperso_affectation_agent.author","matricule_agent",
+        "noms_agent","sexe_agent","datenaissance_agent","lieunaissnce_agent","provinceOrigine_agent",
+        "etatcivil_agent","refAvenue_agent","contact_agent","mail_agent","grade_agent","fonction_agent",
+        "specialite_agent","Categorie_agent","niveauEtude_agent","anneeFinEtude_agent","Ecole_agent","tagent.photo as photo_agent",
+        "tagent.slug as slug_agent","name_serv_perso","name_categorie_service","name_categorie_agent",
+        'tperso_poste.nom_poste','description_poste','nom_lieu','description_lieu','nom_mutuelle','description_mutuelle',
+        'nom_contrat','code_contrat','refSiteAffectation','nom_site_affect','id_sous_poste_affect',
+        'nom_sous_poste','id_poste_affect','taxe_poste_affect.nom_poste as nom_poste_affect','id_antene','nom_antene')
+        // ->selectRaw('CONCAT(YEAR, datenaissance_agent, CURDATE()) as age_agent')
+        ->selectRaw('TIMESTAMPDIFF(YEAR, datenaissance_agent, CURDATE()) as age_agent')   
+        ->selectRaw('TIMESTAMPDIFF(MONTH, CURDATE(), dateFin) as dureerestante')    
+        ->selectRaw("CASE  WHEN (TIMESTAMPDIFF(MONTH, CURDATE(), dateFin))>0 THEN 'Encours' ELSE 'Fini' END as Statut")     
     ->where([
         ['dateAffectation','>=', $date1],
         ['dateAffectation','<=', $date2],
@@ -2453,8 +2489,8 @@ function showRapportContratDateMutuelle($date1, $date2, $refMutuelle)
                 <td class="cs86F8EF7F" style="width:41px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$count.'</nobr></td>
                 <td class="csD06EB5B2" colspan="4" style="width:187px;height:22px;line-height:10px;text-align:center;vertical-align:middle;">'.$row->noms_agent.'</td>
                 <td class="csD06EB5B2" colspan="2" style="width:95px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->code_contrat.'</nobr></td>
-                <td class="csD06EB5B2" colspan="2" style="width:124px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_poste.'</nobr></td>
-                <td class="csD06EB5B2" style="width:113px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_lieu.'</nobr></td>
+                <td class="csD06EB5B2" colspan="2" style="width:124px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->fonction_agent.'</nobr></td>
+                <td class="csD06EB5B2" style="width:113px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_site_affect.'</nobr></td>
                 <td class="csD06EB5B2" colspan="2" style="width:92px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_mutuelle.'</nobr></td>
                 <td class="csD06EB5B2" style="width:90px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->dateAffectation.'</nobr></td>
                 <td class="csD06EB5B2" colspan="4" style="width:78px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->dateFin.'</nobr></td>
@@ -2785,8 +2821,8 @@ function printRapportContratDateProjet($date1, $date2, $projet_id)
                         <td class="cs91032837" style="width:41px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>N&#176;</nobr></td>
                         <td class="cs479D8C74" colspan="4" style="width:187px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>NOMS</nobr></td>
                         <td class="cs479D8C74" colspan="2" style="width:95px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>TYPE&nbsp;CONTRAT</nobr></td>
-                        <td class="cs479D8C74" colspan="2" style="width:124px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>POSTE</nobr></td>
-                        <td class="cs479D8C74" style="width:113px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>LIEU</nobr></td>
+                        <td class="cs479D8C74" colspan="2" style="width:124px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>FONCTION</nobr></td>
+                        <td class="cs479D8C74" style="width:113px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>AFFECTATION</nobr></td>
                         <td class="cs479D8C74" colspan="2" style="width:92px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>MUTUELLE</nobr></td>
                         <td class="cs479D8C74" style="width:90px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>DEBUT&nbsp;CONT.</nobr></td>
                         <td class="cs479D8C74" colspan="4" style="width:78px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>FIN&nbsp;CONT.</nobr></td>
@@ -2813,43 +2849,40 @@ function showRapportContratDateProjet($date1, $date2, $projet_id)
     $count=0;
 
     $data = DB::table('tperso_affectation_agent')
-    ->join('tperso_parametre_salairebase','tperso_parametre_salairebase.id','=','tperso_affectation_agent.param_salaire_id')
-    ->join('tperso_projets','tperso_projets.id','=','tperso_parametre_salairebase.projet_id')
-    ->join('tperso_partenaire','tperso_partenaire.id','=','tperso_projets.partenaire_id')
-    ->join('tperso_poste','tperso_poste.id','=','tperso_affectation_agent.refPoste')
-    ->join('tperso_lieuaffectation','tperso_lieuaffectation.id','=','tperso_affectation_agent.refLieuAffectation')
-    ->join('tperso_mutuelle','tperso_mutuelle.id','=','tperso_affectation_agent.refMutuelle')
-    ->join('tperso_typecontrat','tperso_typecontrat.id','=','tperso_affectation_agent.refTypeContrat')
-    ->join('tperso_categorie_agent','tperso_categorie_agent.id','=','tperso_affectation_agent.refCategorieAgent')
-    ->join('tperso_service_personnel','tperso_service_personnel.id','=','tperso_affectation_agent.refServicePerso')
-    ->join('tperso_categorie_service','tperso_categorie_service.id','=','tperso_service_personnel.refCatService')
-    ->join('tagent','tagent.id','=','tperso_affectation_agent.refAgent')
-    ->join('avenues' , 'avenues.id','=','tagent.refAvenue_agent')
-    ->join('quartiers' , 'quartiers.id','=','avenues.idQuartier')
-    ->join('communes' , 'communes.id','=','quartiers.idCommune')
-    ->join('villes' , 'villes.id','=','communes.idVille')
-    ->join('provinces' , 'provinces.id','=','villes.idProvince')
-    ->join('pays' , 'pays.id','=','provinces.idPays')
-    ->select("tperso_affectation_agent.id",'refAgent','refServicePerso','refCategorieAgent','refPoste','refLieuAffectation',
-    'refMutuelle','refTypeContrat','dateAffectation','dureecontrat','dureeLettre','dateFin','dateDebutEssaie',
-    'dateFinEssaie','JourTrail1','JourTrail2','heureTrail1','heureTrail2','TempsPause','nbrConge','nbrCongeLettre',
-    'nomOffice','postnomOffice','qualifieOffice','codeAgent','directeur','numCNSS','numImpot','numcpteBanque',
-    'BanqueAgant','autresDetail','conge',"tperso_affectation_agent.author","matricule_agent","nummaison_agent",
-    "noms_agent","sexe_agent","datenaissance_agent","lieunaissnce_agent","provinceOrigine_agent",
-    "etatcivil_agent","refAvenue_agent","contact_agent","mail_agent","grade_agent","fonction_agent",
-    "specialite_agent","Categorie_agent","niveauEtude_agent","anneeFinEtude_agent","Ecole_agent","tagent.photo as photo_agent",
-    "tagent.slug as slug_agent","name_serv_perso","name_categorie_service","name_categorie_agent",
-    'nom_poste','description_poste','nom_lieu','description_lieu','nom_mutuelle','description_mutuelle',
-    'nom_contrat','code_contrat','conjoint_agent','nomMere_agent','nomPere_agent','Nationalite_agent',
-    'Collectivite_agent','Territoire_agent','EmployeurAnt_agent','PersRef_agent','nomAvenue','nomQuartier','nomCommune','nomVille','nomProvince','nomPays',
-    'tperso_affectation_agent.created_at','nomOffice','postnomOffice','qualifieOffice','fammiliale','logement',
-    'tperso_affectation_agent.transport','sal_brut','sal_brut_imposable',
-    'inss_qpo','inss_qpp','cnss','inpp','onem','ipr',"salaire_base")
-    ->selectRaw('TIMESTAMPDIFF(YEAR, datenaissance_agent, CURDATE()) as age_agent')  
-    ->selectRaw('TIMESTAMPDIFF(MONTH, CURDATE(), dateFin) as dureerestante')
-    ->selectRaw('TIMESTAMPDIFF(MONTH, dateDebutEssaie, dateFinEssaie) as dureeessaie')
-    ->selectRaw('((salaire_base +fammiliale + logement + tperso_affectation_agent.transport) - inss_qpo - ipr) as netPaie')    
-    ->selectRaw("CASE  WHEN (TIMESTAMPDIFF(MONTH, CURDATE(), dateFin))>0 THEN 'Encours' ELSE 'Fini' END as Statut")     
+        ->join('tperso_poste','tperso_poste.id','=','tperso_affectation_agent.refPoste')
+        ->join('tperso_lieuaffectation','tperso_lieuaffectation.id','=','tperso_affectation_agent.refLieuAffectation')
+        ->join('tperso_mutuelle','tperso_mutuelle.id','=','tperso_affectation_agent.refMutuelle')
+        ->join('tperso_typecontrat','tperso_typecontrat.id','=','tperso_affectation_agent.refTypeContrat')
+        ->join('tperso_categorie_agent','tperso_categorie_agent.id','=','tperso_affectation_agent.refCategorieAgent')
+        ->join('tperso_service_personnel','tperso_service_personnel.id','=','tperso_affectation_agent.refServicePerso')
+        ->join('tperso_categorie_service','tperso_categorie_service.id','=','tperso_service_personnel.refCatService')
+        ->join('tagent','tagent.id','=','tperso_affectation_agent.refAgent')
+        ->join('avenues' , 'avenues.id','=','tagent.refAvenue_agent')
+        ->join('quartiers' , 'quartiers.id','=','avenues.idQuartier')
+        ->join('communes' , 'communes.id','=','quartiers.idCommune')
+        ->join('villes' , 'villes.id','=','communes.idVille')
+        ->join('provinces' , 'provinces.id','=','villes.idProvince')
+        ->join('pays' , 'pays.id','=','provinces.idPays')
+        ->join('taxe_site_affect' , 'taxe_site_affect.id','=','tperso_affectation_agent.refSiteAffectation')
+        ->join('taxe_sous_poste_affect' , 'taxe_sous_poste_affect.id','=','taxe_site_affect.id_sous_poste_affect')
+        ->join('taxe_poste_affect' , 'taxe_poste_affect.id','=','taxe_sous_poste_affect.id_poste_affect')
+        ->join('taxe_antene' , 'taxe_antene.id','=','taxe_poste_affect.id_antene')
+        ->select("tperso_affectation_agent.id",'refAgent','refServicePerso','refCategorieAgent','refPoste','refLieuAffectation',
+        'refMutuelle','refTypeContrat','dateAffectation','dureecontrat','dureeLettre','dateFin','dateDebutEssaie',
+        'dateFinEssaie','JourTrail1','JourTrail2','heureTrail1','heureTrail2','TempsPause','nbrConge','nbrCongeLettre',
+        'nomOffice','postnomOffice','qualifieOffice','codeAgent','directeur','numCNSS','numImpot','numcpteBanque',
+        'BanqueAgant','autresDetail','conge',"tperso_affectation_agent.author","matricule_agent",
+        "noms_agent","sexe_agent","datenaissance_agent","lieunaissnce_agent","provinceOrigine_agent",
+        "etatcivil_agent","refAvenue_agent","contact_agent","mail_agent","grade_agent","fonction_agent",
+        "specialite_agent","Categorie_agent","niveauEtude_agent","anneeFinEtude_agent","Ecole_agent","tagent.photo as photo_agent",
+        "tagent.slug as slug_agent","name_serv_perso","name_categorie_service","name_categorie_agent",
+        'tperso_poste.nom_poste','description_poste','nom_lieu','description_lieu','nom_mutuelle','description_mutuelle',
+        'nom_contrat','code_contrat','refSiteAffectation','nom_site_affect','id_sous_poste_affect',
+        'nom_sous_poste','id_poste_affect','taxe_poste_affect.nom_poste as nom_poste_affect','id_antene','nom_antene')
+        // ->selectRaw('CONCAT(YEAR, datenaissance_agent, CURDATE()) as age_agent')
+        ->selectRaw('TIMESTAMPDIFF(YEAR, datenaissance_agent, CURDATE()) as age_agent')   
+        ->selectRaw('TIMESTAMPDIFF(MONTH, CURDATE(), dateFin) as dureerestante')    
+        ->selectRaw("CASE  WHEN (TIMESTAMPDIFF(MONTH, CURDATE(), dateFin))>0 THEN 'Encours' ELSE 'Fini' END as Statut")     
     ->where([
         ['dateAffectation','>=', $date1],
         ['dateAffectation','<=', $date2],
@@ -2870,8 +2903,8 @@ function showRapportContratDateProjet($date1, $date2, $projet_id)
                 <td class="cs86F8EF7F" style="width:41px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$count.'</nobr></td>
                 <td class="csD06EB5B2" colspan="4" style="width:187px;height:22px;line-height:10px;text-align:center;vertical-align:middle;">'.$row->noms_agent.'</td>
                 <td class="csD06EB5B2" colspan="2" style="width:95px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->code_contrat.'</nobr></td>
-                <td class="csD06EB5B2" colspan="2" style="width:124px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_poste.'</nobr></td>
-                <td class="csD06EB5B2" style="width:113px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_lieu.'</nobr></td>
+                <td class="csD06EB5B2" colspan="2" style="width:124px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->fonction_agent.'</nobr></td>
+                <td class="csD06EB5B2" style="width:113px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_site_affect.'</nobr></td>
                 <td class="csD06EB5B2" colspan="2" style="width:92px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_mutuelle.'</nobr></td>
                 <td class="csD06EB5B2" style="width:90px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->dateAffectation.'</nobr></td>
                 <td class="csD06EB5B2" colspan="4" style="width:78px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->dateFin.'</nobr></td>
@@ -3202,8 +3235,8 @@ function printRapportContratDateSexe($date1, $date2, $sexe_agent)
                         <td class="cs91032837" style="width:41px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>N&#176;</nobr></td>
                         <td class="cs479D8C74" colspan="4" style="width:187px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>NOMS</nobr></td>
                         <td class="cs479D8C74" colspan="2" style="width:95px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>TYPE&nbsp;CONTRAT</nobr></td>
-                        <td class="cs479D8C74" colspan="2" style="width:124px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>POSTE</nobr></td>
-                        <td class="cs479D8C74" style="width:113px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>LIEU</nobr></td>
+                        <td class="cs479D8C74" colspan="2" style="width:124px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>FONCTION</nobr></td>
+                        <td class="cs479D8C74" style="width:113px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>AFFECTATION</nobr></td>
                         <td class="cs479D8C74" colspan="2" style="width:92px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>MUTUELLE</nobr></td>
                         <td class="cs479D8C74" style="width:90px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>DEBUT&nbsp;CONT.</nobr></td>
                         <td class="cs479D8C74" colspan="4" style="width:78px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>FIN&nbsp;CONT.</nobr></td>
@@ -3230,43 +3263,40 @@ function showRapportContratDateSexe($date1, $date2, $sexe_agent)
     $count=0;
 
     $data = DB::table('tperso_affectation_agent')
-    ->join('tperso_parametre_salairebase','tperso_parametre_salairebase.id','=','tperso_affectation_agent.param_salaire_id')
-    ->join('tperso_projets','tperso_projets.id','=','tperso_parametre_salairebase.projet_id')
-    ->join('tperso_partenaire','tperso_partenaire.id','=','tperso_projets.partenaire_id')
-    ->join('tperso_poste','tperso_poste.id','=','tperso_affectation_agent.refPoste')
-    ->join('tperso_lieuaffectation','tperso_lieuaffectation.id','=','tperso_affectation_agent.refLieuAffectation')
-    ->join('tperso_mutuelle','tperso_mutuelle.id','=','tperso_affectation_agent.refMutuelle')
-    ->join('tperso_typecontrat','tperso_typecontrat.id','=','tperso_affectation_agent.refTypeContrat')
-    ->join('tperso_categorie_agent','tperso_categorie_agent.id','=','tperso_affectation_agent.refCategorieAgent')
-    ->join('tperso_service_personnel','tperso_service_personnel.id','=','tperso_affectation_agent.refServicePerso')
-    ->join('tperso_categorie_service','tperso_categorie_service.id','=','tperso_service_personnel.refCatService')
-    ->join('tagent','tagent.id','=','tperso_affectation_agent.refAgent')
-    ->join('avenues' , 'avenues.id','=','tagent.refAvenue_agent')
-    ->join('quartiers' , 'quartiers.id','=','avenues.idQuartier')
-    ->join('communes' , 'communes.id','=','quartiers.idCommune')
-    ->join('villes' , 'villes.id','=','communes.idVille')
-    ->join('provinces' , 'provinces.id','=','villes.idProvince')
-    ->join('pays' , 'pays.id','=','provinces.idPays')
-    ->select("tperso_affectation_agent.id",'refAgent','refServicePerso','refCategorieAgent','refPoste','refLieuAffectation',
-    'refMutuelle','refTypeContrat','dateAffectation','dureecontrat','dureeLettre','dateFin','dateDebutEssaie',
-    'dateFinEssaie','JourTrail1','JourTrail2','heureTrail1','heureTrail2','TempsPause','nbrConge','nbrCongeLettre',
-    'nomOffice','postnomOffice','qualifieOffice','codeAgent','directeur','numCNSS','numImpot','numcpteBanque',
-    'BanqueAgant','autresDetail','conge',"tperso_affectation_agent.author","matricule_agent","nummaison_agent",
-    "noms_agent","sexe_agent","datenaissance_agent","lieunaissnce_agent","provinceOrigine_agent",
-    "etatcivil_agent","refAvenue_agent","contact_agent","mail_agent","grade_agent","fonction_agent",
-    "specialite_agent","Categorie_agent","niveauEtude_agent","anneeFinEtude_agent","Ecole_agent","tagent.photo as photo_agent",
-    "tagent.slug as slug_agent","name_serv_perso","name_categorie_service","name_categorie_agent",
-    'nom_poste','description_poste','nom_lieu','description_lieu','nom_mutuelle','description_mutuelle',
-    'nom_contrat','code_contrat','conjoint_agent','nomMere_agent','nomPere_agent','Nationalite_agent',
-    'Collectivite_agent','Territoire_agent','EmployeurAnt_agent','PersRef_agent','nomAvenue','nomQuartier','nomCommune','nomVille','nomProvince','nomPays',
-    'tperso_affectation_agent.created_at','nomOffice','postnomOffice','qualifieOffice','fammiliale','logement',
-    'tperso_affectation_agent.transport','sal_brut','sal_brut_imposable',
-    'inss_qpo','inss_qpp','cnss','inpp','onem','ipr',"salaire_base")
-    ->selectRaw('TIMESTAMPDIFF(YEAR, datenaissance_agent, CURDATE()) as age_agent')  
-    ->selectRaw('TIMESTAMPDIFF(MONTH, CURDATE(), dateFin) as dureerestante')
-    ->selectRaw('TIMESTAMPDIFF(MONTH, dateDebutEssaie, dateFinEssaie) as dureeessaie')
-    ->selectRaw('((salaire_base +fammiliale + logement + tperso_affectation_agent.transport) - inss_qpo - ipr) as netPaie')    
-    ->selectRaw("CASE  WHEN (TIMESTAMPDIFF(MONTH, CURDATE(), dateFin))>0 THEN 'Encours' ELSE 'Fini' END as Statut")     
+        ->join('tperso_poste','tperso_poste.id','=','tperso_affectation_agent.refPoste')
+        ->join('tperso_lieuaffectation','tperso_lieuaffectation.id','=','tperso_affectation_agent.refLieuAffectation')
+        ->join('tperso_mutuelle','tperso_mutuelle.id','=','tperso_affectation_agent.refMutuelle')
+        ->join('tperso_typecontrat','tperso_typecontrat.id','=','tperso_affectation_agent.refTypeContrat')
+        ->join('tperso_categorie_agent','tperso_categorie_agent.id','=','tperso_affectation_agent.refCategorieAgent')
+        ->join('tperso_service_personnel','tperso_service_personnel.id','=','tperso_affectation_agent.refServicePerso')
+        ->join('tperso_categorie_service','tperso_categorie_service.id','=','tperso_service_personnel.refCatService')
+        ->join('tagent','tagent.id','=','tperso_affectation_agent.refAgent')
+        ->join('avenues' , 'avenues.id','=','tagent.refAvenue_agent')
+        ->join('quartiers' , 'quartiers.id','=','avenues.idQuartier')
+        ->join('communes' , 'communes.id','=','quartiers.idCommune')
+        ->join('villes' , 'villes.id','=','communes.idVille')
+        ->join('provinces' , 'provinces.id','=','villes.idProvince')
+        ->join('pays' , 'pays.id','=','provinces.idPays')
+        ->join('taxe_site_affect' , 'taxe_site_affect.id','=','tperso_affectation_agent.refSiteAffectation')
+        ->join('taxe_sous_poste_affect' , 'taxe_sous_poste_affect.id','=','taxe_site_affect.id_sous_poste_affect')
+        ->join('taxe_poste_affect' , 'taxe_poste_affect.id','=','taxe_sous_poste_affect.id_poste_affect')
+        ->join('taxe_antene' , 'taxe_antene.id','=','taxe_poste_affect.id_antene')
+        ->select("tperso_affectation_agent.id",'refAgent','refServicePerso','refCategorieAgent','refPoste','refLieuAffectation',
+        'refMutuelle','refTypeContrat','dateAffectation','dureecontrat','dureeLettre','dateFin','dateDebutEssaie',
+        'dateFinEssaie','JourTrail1','JourTrail2','heureTrail1','heureTrail2','TempsPause','nbrConge','nbrCongeLettre',
+        'nomOffice','postnomOffice','qualifieOffice','codeAgent','directeur','numCNSS','numImpot','numcpteBanque',
+        'BanqueAgant','autresDetail','conge',"tperso_affectation_agent.author","matricule_agent",
+        "noms_agent","sexe_agent","datenaissance_agent","lieunaissnce_agent","provinceOrigine_agent",
+        "etatcivil_agent","refAvenue_agent","contact_agent","mail_agent","grade_agent","fonction_agent",
+        "specialite_agent","Categorie_agent","niveauEtude_agent","anneeFinEtude_agent","Ecole_agent","tagent.photo as photo_agent",
+        "tagent.slug as slug_agent","name_serv_perso","name_categorie_service","name_categorie_agent",
+        'tperso_poste.nom_poste','description_poste','nom_lieu','description_lieu','nom_mutuelle','description_mutuelle',
+        'nom_contrat','code_contrat','refSiteAffectation','nom_site_affect','id_sous_poste_affect',
+        'nom_sous_poste','id_poste_affect','taxe_poste_affect.nom_poste as nom_poste_affect','id_antene','nom_antene')
+        // ->selectRaw('CONCAT(YEAR, datenaissance_agent, CURDATE()) as age_agent')
+        ->selectRaw('TIMESTAMPDIFF(YEAR, datenaissance_agent, CURDATE()) as age_agent')   
+        ->selectRaw('TIMESTAMPDIFF(MONTH, CURDATE(), dateFin) as dureerestante')    
+        ->selectRaw("CASE  WHEN (TIMESTAMPDIFF(MONTH, CURDATE(), dateFin))>0 THEN 'Encours' ELSE 'Fini' END as Statut")     
     ->where([
         ['dateAffectation','>=', $date1],
         ['dateAffectation','<=', $date2],
@@ -3287,8 +3317,8 @@ function showRapportContratDateSexe($date1, $date2, $sexe_agent)
                 <td class="cs86F8EF7F" style="width:41px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$count.'</nobr></td>
                 <td class="csD06EB5B2" colspan="4" style="width:187px;height:22px;line-height:10px;text-align:center;vertical-align:middle;">'.$row->noms_agent.'</td>
                 <td class="csD06EB5B2" colspan="2" style="width:95px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->code_contrat.'</nobr></td>
-                <td class="csD06EB5B2" colspan="2" style="width:124px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_poste.'</nobr></td>
-                <td class="csD06EB5B2" style="width:113px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_lieu.'</nobr></td>
+                <td class="csD06EB5B2" colspan="2" style="width:124px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->fonction_agent.'</nobr></td>
+                <td class="csD06EB5B2" style="width:113px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_site_affect.'</nobr></td>
                 <td class="csD06EB5B2" colspan="2" style="width:92px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_mutuelle.'</nobr></td>
                 <td class="csD06EB5B2" style="width:90px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->dateAffectation.'</nobr></td>
                 <td class="csD06EB5B2" colspan="4" style="width:78px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->dateFin.'</nobr></td>
@@ -3619,8 +3649,8 @@ function printRapportContratDateConge($date1, $date2, $conge)
                         <td class="cs91032837" style="width:41px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>N&#176;</nobr></td>
                         <td class="cs479D8C74" colspan="4" style="width:187px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>NOMS</nobr></td>
                         <td class="cs479D8C74" colspan="2" style="width:95px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>TYPE&nbsp;CONTRAT</nobr></td>
-                        <td class="cs479D8C74" colspan="2" style="width:124px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>POSTE</nobr></td>
-                        <td class="cs479D8C74" style="width:113px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>LIEU</nobr></td>
+                        <td class="cs479D8C74" colspan="2" style="width:124px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>FONCTION</nobr></td>
+                        <td class="cs479D8C74" style="width:113px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>AFFECTATION</nobr></td>
                         <td class="cs479D8C74" colspan="2" style="width:92px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>MUTUELLE</nobr></td>
                         <td class="cs479D8C74" style="width:90px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>DEBUT&nbsp;CONT.</nobr></td>
                         <td class="cs479D8C74" colspan="4" style="width:78px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>FIN&nbsp;CONT.</nobr></td>
@@ -3647,34 +3677,40 @@ function showRapportContratDateConge($date1, $date2, $conge)
     $count=0;
 
     $data = DB::table('tperso_affectation_agent')
-    ->join('tperso_poste','tperso_poste.id','=','tperso_affectation_agent.refPoste')
-    ->join('tperso_lieuaffectation','tperso_lieuaffectation.id','=','tperso_affectation_agent.refLieuAffectation')
-    ->join('tperso_mutuelle','tperso_mutuelle.id','=','tperso_affectation_agent.refMutuelle')
-    ->join('tperso_typecontrat','tperso_typecontrat.id','=','tperso_affectation_agent.refTypeContrat')
-    ->join('tperso_categorie_agent','tperso_categorie_agent.id','=','tperso_affectation_agent.refCategorieAgent')
-    ->join('tperso_service_personnel','tperso_service_personnel.id','=','tperso_affectation_agent.refServicePerso')
-    ->join('tperso_categorie_service','tperso_categorie_service.id','=','tperso_service_personnel.refCatService')
-    ->join('tagent','tagent.id','=','tperso_affectation_agent.refAgent')
-    ->join('avenues' , 'avenues.id','=','tagent.refAvenue_agent')
-    ->join('quartiers' , 'quartiers.id','=','avenues.idQuartier')
-    ->join('communes' , 'communes.id','=','quartiers.idCommune')
-    ->join('villes' , 'villes.id','=','communes.idVille')
-    ->join('provinces' , 'provinces.id','=','villes.idProvince')
-    ->join('pays' , 'pays.id','=','provinces.idPays')
-    ->select("tperso_affectation_agent.id",'refAgent','refServicePerso','refCategorieAgent','refPoste','refLieuAffectation',
-    'refMutuelle','refTypeContrat','dateAffectation','dureecontrat','dureeLettre','dateFin','dateDebutEssaie',
-    'dateFinEssaie','JourTrail1','JourTrail2','heureTrail1','heureTrail2','TempsPause','nbrConge','nbrCongeLettre',
-    'nomOffice','postnomOffice','qualifieOffice','codeAgent','directeur','numCNSS','numImpot','numcpteBanque',
-    'BanqueAgant','autresDetail','conge',"tperso_affectation_agent.author","matricule_agent",
-    "noms_agent","sexe_agent","datenaissance_agent","lieunaissnce_agent","provinceOrigine_agent",
-    "etatcivil_agent","refAvenue_agent","contact_agent","mail_agent","grade_agent","fonction_agent",
-    "specialite_agent","Categorie_agent","niveauEtude_agent","anneeFinEtude_agent","Ecole_agent","tagent.photo as photo_agent",
-    "tagent.slug as slug_agent","name_serv_perso","name_categorie_service","name_categorie_agent",
-    'nom_poste','description_poste','nom_lieu','description_lieu','nom_mutuelle','description_mutuelle',
-    'nom_contrat','code_contrat')
-    ->selectRaw('TIMESTAMPDIFF(YEAR, datenaissance_agent, CURDATE()) as age_agent')   
-    ->selectRaw('TIMESTAMPDIFF(MONTH, CURDATE(), dateFin) as dureerestante')    
-    ->selectRaw("CASE  WHEN (TIMESTAMPDIFF(MONTH, CURDATE(), dateFin))>0 THEN 'Encours' ELSE 'Fini' END as Statut")     
+        ->join('tperso_poste','tperso_poste.id','=','tperso_affectation_agent.refPoste')
+        ->join('tperso_lieuaffectation','tperso_lieuaffectation.id','=','tperso_affectation_agent.refLieuAffectation')
+        ->join('tperso_mutuelle','tperso_mutuelle.id','=','tperso_affectation_agent.refMutuelle')
+        ->join('tperso_typecontrat','tperso_typecontrat.id','=','tperso_affectation_agent.refTypeContrat')
+        ->join('tperso_categorie_agent','tperso_categorie_agent.id','=','tperso_affectation_agent.refCategorieAgent')
+        ->join('tperso_service_personnel','tperso_service_personnel.id','=','tperso_affectation_agent.refServicePerso')
+        ->join('tperso_categorie_service','tperso_categorie_service.id','=','tperso_service_personnel.refCatService')
+        ->join('tagent','tagent.id','=','tperso_affectation_agent.refAgent')
+        ->join('avenues' , 'avenues.id','=','tagent.refAvenue_agent')
+        ->join('quartiers' , 'quartiers.id','=','avenues.idQuartier')
+        ->join('communes' , 'communes.id','=','quartiers.idCommune')
+        ->join('villes' , 'villes.id','=','communes.idVille')
+        ->join('provinces' , 'provinces.id','=','villes.idProvince')
+        ->join('pays' , 'pays.id','=','provinces.idPays')
+        ->join('taxe_site_affect' , 'taxe_site_affect.id','=','tperso_affectation_agent.refSiteAffectation')
+        ->join('taxe_sous_poste_affect' , 'taxe_sous_poste_affect.id','=','taxe_site_affect.id_sous_poste_affect')
+        ->join('taxe_poste_affect' , 'taxe_poste_affect.id','=','taxe_sous_poste_affect.id_poste_affect')
+        ->join('taxe_antene' , 'taxe_antene.id','=','taxe_poste_affect.id_antene')
+        ->select("tperso_affectation_agent.id",'refAgent','refServicePerso','refCategorieAgent','refPoste','refLieuAffectation',
+        'refMutuelle','refTypeContrat','dateAffectation','dureecontrat','dureeLettre','dateFin','dateDebutEssaie',
+        'dateFinEssaie','JourTrail1','JourTrail2','heureTrail1','heureTrail2','TempsPause','nbrConge','nbrCongeLettre',
+        'nomOffice','postnomOffice','qualifieOffice','codeAgent','directeur','numCNSS','numImpot','numcpteBanque',
+        'BanqueAgant','autresDetail','conge',"tperso_affectation_agent.author","matricule_agent",
+        "noms_agent","sexe_agent","datenaissance_agent","lieunaissnce_agent","provinceOrigine_agent",
+        "etatcivil_agent","refAvenue_agent","contact_agent","mail_agent","grade_agent","fonction_agent",
+        "specialite_agent","Categorie_agent","niveauEtude_agent","anneeFinEtude_agent","Ecole_agent","tagent.photo as photo_agent",
+        "tagent.slug as slug_agent","name_serv_perso","name_categorie_service","name_categorie_agent",
+        'tperso_poste.nom_poste','description_poste','nom_lieu','description_lieu','nom_mutuelle','description_mutuelle',
+        'nom_contrat','code_contrat','refSiteAffectation','nom_site_affect','id_sous_poste_affect',
+        'nom_sous_poste','id_poste_affect','taxe_poste_affect.nom_poste as nom_poste_affect','id_antene','nom_antene')
+        // ->selectRaw('CONCAT(YEAR, datenaissance_agent, CURDATE()) as age_agent')
+        ->selectRaw('TIMESTAMPDIFF(YEAR, datenaissance_agent, CURDATE()) as age_agent')   
+        ->selectRaw('TIMESTAMPDIFF(MONTH, CURDATE(), dateFin) as dureerestante')    
+        ->selectRaw("CASE  WHEN (TIMESTAMPDIFF(MONTH, CURDATE(), dateFin))>0 THEN 'Encours' ELSE 'Fini' END as Statut")     
     ->where([
         ['dateAffectation','>=', $date1],
         ['dateAffectation','<=', $date2],
@@ -3695,8 +3731,8 @@ function showRapportContratDateConge($date1, $date2, $conge)
                 <td class="cs86F8EF7F" style="width:41px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$count.'</nobr></td>
                 <td class="csD06EB5B2" colspan="4" style="width:187px;height:22px;line-height:10px;text-align:center;vertical-align:middle;">'.$row->noms_agent.'</td>
                 <td class="csD06EB5B2" colspan="2" style="width:95px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->code_contrat.'</nobr></td>
-                <td class="csD06EB5B2" colspan="2" style="width:124px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_poste.'</nobr></td>
-                <td class="csD06EB5B2" style="width:113px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_lieu.'</nobr></td>
+                <td class="csD06EB5B2" colspan="2" style="width:124px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->fonction_agent.'</nobr></td>
+                <td class="csD06EB5B2" style="width:113px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_site_affect.'</nobr></td>
                 <td class="csD06EB5B2" colspan="2" style="width:92px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_mutuelle.'</nobr></td>
                 <td class="csD06EB5B2" style="width:90px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->dateAffectation.'</nobr></td>
                 <td class="csD06EB5B2" colspan="4" style="width:78px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->dateFin.'</nobr></td>
@@ -4032,8 +4068,8 @@ function printRapportCongeEncoursDate($date1, $date2)
                         <td class="cs91032837" style="width:41px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>N&#176;</nobr></td>
                         <td class="cs479D8C74" colspan="4" style="width:187px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>NOMS</nobr></td>
                         <td class="cs479D8C74" colspan="2" style="width:95px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>TYPE&nbsp;CONTRAT</nobr></td>
-                        <td class="cs479D8C74" colspan="2" style="width:124px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>POSTE</nobr></td>
-                        <td class="cs479D8C74" style="width:113px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>LIEU</nobr></td>
+                        <td class="cs479D8C74" colspan="2" style="width:124px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>FONCTION</nobr></td>
+                        <td class="cs479D8C74" style="width:113px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>AFFECTATION</nobr></td>
                         <td class="cs479D8C74" colspan="2" style="width:121px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>CIRCONSTANCE</nobr></td>
                         <td class="cs479D8C74" style="width:58px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>DEPART</nobr></td>
                         <td class="cs479D8C74" colspan="3" style="width:57px;height:22px;line-height:13px;text-align:center;vertical-align:middle;"><nobr>REPRISE</nobr></td>
@@ -4111,7 +4147,7 @@ function showRapportCongetEncoursDate($date1, $date2)
                     <td class="cs86F8EF7F" style="width:41px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$count.'</nobr></td>
                     <td class="csD06EB5B2" colspan="4" style="width:187px;height:22px;line-height:10px;text-align:center;vertical-align:middle;">'.$row->noms_agent.'</td>
                     <td class="csD06EB5B2" colspan="2" style="width:95px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->code_contrat.'</nobr></td>
-                    <td class="csD06EB5B2" colspan="2" style="width:124px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_poste.'</nobr></td>
+                    <td class="csD06EB5B2" colspan="2" style="width:124px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->fonction_agent.'</nobr></td>
                     <td class="csD06EB5B2" style="width:113px;height:22px;line-height:10px;text-align:center;vertical-align:middle;">'.$row->nom_lieu.'</td>
                     <td class="csD06EB5B2" colspan="2" style="width:121px;height:22px;line-height:10px;text-align:center;vertical-align:middle;">'.$row->nom_circontstance.'</td>
                     <td class="csD06EB5B2" style="width:58px;height:22px;line-height:10px;text-align:center;vertical-align:middle;">'.$row->date_depart.'</td>
@@ -6085,42 +6121,40 @@ function GetContratPrestationAgent($id)
 
             //
             $data2 = DB::table('tperso_affectation_agent')
-            ->join('tperso_parametre_salairebase','tperso_parametre_salairebase.id','=','tperso_affectation_agent.param_salaire_id')
-            ->join('tperso_projets','tperso_projets.id','=','tperso_parametre_salairebase.projet_id')
-            ->join('tperso_partenaire','tperso_partenaire.id','=','tperso_projets.partenaire_id')
-            ->join('tperso_poste','tperso_poste.id','=','tperso_affectation_agent.refPoste')
-            ->join('tperso_lieuaffectation','tperso_lieuaffectation.id','=','tperso_affectation_agent.refLieuAffectation')
-            ->join('tperso_mutuelle','tperso_mutuelle.id','=','tperso_affectation_agent.refMutuelle')
-            ->join('tperso_typecontrat','tperso_typecontrat.id','=','tperso_affectation_agent.refTypeContrat')
-            ->join('tperso_categorie_agent','tperso_categorie_agent.id','=','tperso_affectation_agent.refCategorieAgent')
-            ->join('tperso_service_personnel','tperso_service_personnel.id','=','tperso_affectation_agent.refServicePerso')
-            ->join('tperso_categorie_service','tperso_categorie_service.id','=','tperso_service_personnel.refCatService')
-            ->join('tagent','tagent.id','=','tperso_affectation_agent.refAgent')
-            ->join('avenues' , 'avenues.id','=','tagent.refAvenue_agent')
-            ->join('quartiers' , 'quartiers.id','=','avenues.idQuartier')
-            ->join('communes' , 'communes.id','=','quartiers.idCommune')
-            ->join('villes' , 'villes.id','=','communes.idVille')
-            ->join('provinces' , 'provinces.id','=','villes.idProvince')
-            ->join('pays' , 'pays.id','=','provinces.idPays')
-            ->select("tperso_affectation_agent.id",'refAgent','refServicePerso','refCategorieAgent','refPoste','refLieuAffectation',
-            'refMutuelle','refTypeContrat','dateAffectation','dureecontrat','dureeLettre','dateFin','dateDebutEssaie',
-            'dateFinEssaie','JourTrail1','JourTrail2','heureTrail1','heureTrail2','TempsPause','nbrConge','nbrCongeLettre',
-            'nomOffice','postnomOffice','qualifieOffice','codeAgent','directeur','numCNSS','numImpot','numcpteBanque',
-            'BanqueAgant','autresDetail','conge',"tperso_affectation_agent.author","matricule_agent","nummaison_agent",
-            "noms_agent","sexe_agent","datenaissance_agent","lieunaissnce_agent","provinceOrigine_agent",
-            "etatcivil_agent","refAvenue_agent","contact_agent","mail_agent","grade_agent","fonction_agent",
-            "specialite_agent","Categorie_agent","niveauEtude_agent","anneeFinEtude_agent","Ecole_agent","tagent.photo as photo_agent",
-            "tagent.slug as slug_agent","name_serv_perso","name_categorie_service","name_categorie_agent",
-            'nom_poste','description_poste','nom_lieu','description_lieu','nom_mutuelle','description_mutuelle',
-            'nom_contrat','code_contrat','conjoint_agent','nomMere_agent','nomPere_agent','Nationalite_agent',
-            'Collectivite_agent','Territoire_agent','EmployeurAnt_agent','PersRef_agent','nomAvenue','nomQuartier','nomCommune','nomVille','nomProvince','nomPays',
-            'tperso_affectation_agent.created_at','nomOffice','postnomOffice','qualifieOffice','fammiliale','logement',
-            'tperso_affectation_agent.transport','sal_brut','sal_brut_imposable',
-            'inss_qpo','inss_qpp','cnss','inpp','onem','ipr',"salaire_base")
-            ->selectRaw('TIMESTAMPDIFF(YEAR, datenaissance_agent, CURDATE()) as age_agent')  
-            ->selectRaw('TIMESTAMPDIFF(MONTH, CURDATE(), dateFin) as dureerestante')
-            ->selectRaw('TIMESTAMPDIFF(MONTH, dateDebutEssaie, dateFinEssaie) as dureeessaie')
-            ->selectRaw('((salaire_base + fammiliale + logement + tperso_affectation_agent.transport) - inss_qpo - ipr) as netPaie')
+        ->join('tperso_poste','tperso_poste.id','=','tperso_affectation_agent.refPoste')
+        ->join('tperso_lieuaffectation','tperso_lieuaffectation.id','=','tperso_affectation_agent.refLieuAffectation')
+        ->join('tperso_mutuelle','tperso_mutuelle.id','=','tperso_affectation_agent.refMutuelle')
+        ->join('tperso_typecontrat','tperso_typecontrat.id','=','tperso_affectation_agent.refTypeContrat')
+        ->join('tperso_categorie_agent','tperso_categorie_agent.id','=','tperso_affectation_agent.refCategorieAgent')
+        ->join('tperso_service_personnel','tperso_service_personnel.id','=','tperso_affectation_agent.refServicePerso')
+        ->join('tperso_categorie_service','tperso_categorie_service.id','=','tperso_service_personnel.refCatService')
+        ->join('tagent','tagent.id','=','tperso_affectation_agent.refAgent')
+        ->join('avenues' , 'avenues.id','=','tagent.refAvenue_agent')
+        ->join('quartiers' , 'quartiers.id','=','avenues.idQuartier')
+        ->join('communes' , 'communes.id','=','quartiers.idCommune')
+        ->join('villes' , 'villes.id','=','communes.idVille')
+        ->join('provinces' , 'provinces.id','=','villes.idProvince')
+        ->join('pays' , 'pays.id','=','provinces.idPays')
+        ->join('taxe_site_affect' , 'taxe_site_affect.id','=','tperso_affectation_agent.refSiteAffectation')
+        ->join('taxe_sous_poste_affect' , 'taxe_sous_poste_affect.id','=','taxe_site_affect.id_sous_poste_affect')
+        ->join('taxe_poste_affect' , 'taxe_poste_affect.id','=','taxe_sous_poste_affect.id_poste_affect')
+        ->join('taxe_antene' , 'taxe_antene.id','=','taxe_poste_affect.id_antene')
+        ->select("tperso_affectation_agent.id",'refAgent','refServicePerso','refCategorieAgent','refPoste','refLieuAffectation',
+        'refMutuelle','refTypeContrat','dateAffectation','dureecontrat','dureeLettre','dateFin','dateDebutEssaie',
+        'dateFinEssaie','JourTrail1','JourTrail2','heureTrail1','heureTrail2','TempsPause','nbrConge','nbrCongeLettre',
+        'nomOffice','postnomOffice','qualifieOffice','codeAgent','directeur','numCNSS','numImpot','numcpteBanque',
+        'BanqueAgant','autresDetail','conge',"tperso_affectation_agent.author","matricule_agent",
+        "noms_agent","sexe_agent","datenaissance_agent","lieunaissnce_agent","provinceOrigine_agent",
+        "etatcivil_agent","refAvenue_agent","contact_agent","mail_agent","grade_agent","fonction_agent",
+        "specialite_agent","Categorie_agent","niveauEtude_agent","anneeFinEtude_agent","Ecole_agent","tagent.photo as photo_agent",
+        "tagent.slug as slug_agent","name_serv_perso","name_categorie_service","name_categorie_agent",
+        'tperso_poste.nom_poste','description_poste','nom_lieu','description_lieu','nom_mutuelle','description_mutuelle',
+        'nom_contrat','code_contrat','refSiteAffectation','nom_site_affect','id_sous_poste_affect',
+        'nom_sous_poste','id_poste_affect','taxe_poste_affect.nom_poste as nom_poste_affect','id_antene','nom_antene')
+        // ->selectRaw('CONCAT(YEAR, datenaissance_agent, CURDATE()) as age_agent')
+        ->selectRaw('TIMESTAMPDIFF(YEAR, datenaissance_agent, CURDATE()) as age_agent')   
+        ->selectRaw('TIMESTAMPDIFF(MONTH, CURDATE(), dateFin) as dureerestante')    
+        ->selectRaw("CASE  WHEN (TIMESTAMPDIFF(MONTH, CURDATE(), dateFin))>0 THEN 'Encours' ELSE 'Fini' END as Statut")
             ->where('tperso_affectation_agent.id','=', $id)    
             ->get(); 
             $output='';
@@ -6302,7 +6336,7 @@ function GetContratPrestationAgent($id)
                     <tr style="vertical-align:top;">
                         <td style="width:0px;height:47px;"></td>
                         <td></td>
-                        <td class="csD4852FAF" colspan="10" style="width:622px;height:47px;line-height:17px;text-align:left;vertical-align:top;"><nobr>avenue&nbsp;des&nbsp;&#233;coles,&nbsp;quartier&nbsp;les&nbsp;Volcans,&nbsp;en&nbsp;commune&nbsp;de&nbsp;Goma,&nbsp;repr&#233;sent&#233;e&nbsp;par&nbsp;son&nbsp;Directeur,&nbsp;Monsieur</nobr><br/><nobr> '.$directeur.' (caritas@caritasdegoma.org&nbsp;),&nbsp;d&#233;sign&#233;e&nbsp;&#171;&nbsp;Employeur&nbsp;&#187;&nbsp;;</nobr></td>
+                        <td class="csD4852FAF" colspan="10" style="width:622px;height:47px;line-height:17px;text-align:left;vertical-align:top;"><nobr>avenue&nbsp;des&nbsp;&#233;coles,&nbsp;quartier&nbsp;les&nbsp;Volcans,&nbsp;en&nbsp;commune&nbsp;de&nbsp;Goma,&nbsp;repr&#233;sent&#233;e&nbsp;par&nbsp;son&nbsp;Directeur,&nbsp;Monsieur</nobr><br/><nobr> '.$directeur.' (ffn@ffn.org&nbsp;),&nbsp;d&#233;sign&#233;e&nbsp;&#171;&nbsp;Employeur&nbsp;&#187;&nbsp;;</nobr></td>
                         <td></td>
                         <td></td>
                     </tr>
@@ -6354,7 +6388,7 @@ function GetContratPrestationAgent($id)
                         <td style="width:0px;height:43px;"></td>
                         <td></td>
                         <td></td>
-                        <td class="csD4852FAF" colspan="10" style="width:623px;height:43px;line-height:17px;text-align:left;vertical-align:top;"><nobr>Le&nbsp;premier&nbsp;soussign&#233;&nbsp;s’engage&nbsp;&#224;&nbsp;accorder&nbsp;au&nbsp;second&nbsp;soussign&#233;&nbsp;un&nbsp;service&nbsp;limit&#233;&nbsp;conform&#233;ment&nbsp;aux</nobr><br/><nobr>normes&nbsp;et&nbsp;exigences&nbsp;de&nbsp;la&nbsp;Caritas-D&#233;veloppement&nbsp;Goma.</nobr></td>
+                        <td class="csD4852FAF" colspan="10" style="width:623px;height:43px;line-height:17px;text-align:left;vertical-align:top;"><nobr>Le&nbsp;premier&nbsp;soussign&#233;&nbsp;s’engage&nbsp;&#224;&nbsp;accorder&nbsp;au&nbsp;second&nbsp;soussign&#233;&nbsp;un&nbsp;service&nbsp;limit&#233;&nbsp;conform&#233;ment&nbsp;aux</nobr><br/><nobr>normes&nbsp;et&nbsp;exigences&nbsp;de&nbsp;la&nbsp;Fonds Forestier National.</nobr></td>
                         <td></td>
                     </tr>
                     <tr style="vertical-align:top;">
@@ -6439,7 +6473,7 @@ function GetContratPrestationAgent($id)
                         <td></td>
                         <td></td>
                         <td></td>
-                        <td class="csD4852FAF" colspan="9" style="width:622px;height:23px;line-height:17px;text-align:left;vertical-align:top;"><nobr>La&nbsp;Caritas-D&#233;veloppement&nbsp;Goma&nbsp;prendra&nbsp;en&nbsp;charge&nbsp;le&nbsp;transport.</nobr></td>
+                        <td class="csD4852FAF" colspan="9" style="width:622px;height:23px;line-height:17px;text-align:left;vertical-align:top;"><nobr>Fonds Forestier National&nbsp;prendra&nbsp;en&nbsp;charge&nbsp;le&nbsp;transport.</nobr></td>
                         <td></td>
                     </tr>
                     <tr style="vertical-align:top;">
@@ -6647,42 +6681,40 @@ function GetNotificationFinContrat($id)
 
             //
             $data2 = DB::table('tperso_affectation_agent')
-            ->join('tperso_parametre_salairebase','tperso_parametre_salairebase.id','=','tperso_affectation_agent.param_salaire_id')
-            ->join('tperso_projets','tperso_projets.id','=','tperso_parametre_salairebase.projet_id')
-            ->join('tperso_partenaire','tperso_partenaire.id','=','tperso_projets.partenaire_id')
-            ->join('tperso_poste','tperso_poste.id','=','tperso_affectation_agent.refPoste')
-            ->join('tperso_lieuaffectation','tperso_lieuaffectation.id','=','tperso_affectation_agent.refLieuAffectation')
-            ->join('tperso_mutuelle','tperso_mutuelle.id','=','tperso_affectation_agent.refMutuelle')
-            ->join('tperso_typecontrat','tperso_typecontrat.id','=','tperso_affectation_agent.refTypeContrat')
-            ->join('tperso_categorie_agent','tperso_categorie_agent.id','=','tperso_affectation_agent.refCategorieAgent')
-            ->join('tperso_service_personnel','tperso_service_personnel.id','=','tperso_affectation_agent.refServicePerso')
-            ->join('tperso_categorie_service','tperso_categorie_service.id','=','tperso_service_personnel.refCatService')
-            ->join('tagent','tagent.id','=','tperso_affectation_agent.refAgent')
-            ->join('avenues' , 'avenues.id','=','tagent.refAvenue_agent')
-            ->join('quartiers' , 'quartiers.id','=','avenues.idQuartier')
-            ->join('communes' , 'communes.id','=','quartiers.idCommune')
-            ->join('villes' , 'villes.id','=','communes.idVille')
-            ->join('provinces' , 'provinces.id','=','villes.idProvince')
-            ->join('pays' , 'pays.id','=','provinces.idPays')
-            ->select("tperso_affectation_agent.id",'refAgent','refServicePerso','refCategorieAgent','refPoste','refLieuAffectation',
-            'refMutuelle','refTypeContrat','dateAffectation','dureecontrat','dureeLettre','dateFin','dateDebutEssaie',
-            'dateFinEssaie','JourTrail1','JourTrail2','heureTrail1','heureTrail2','TempsPause','nbrConge','nbrCongeLettre',
-            'nomOffice','postnomOffice','qualifieOffice','codeAgent','directeur','numCNSS','numImpot','numcpteBanque',
-            'BanqueAgant','autresDetail','conge',"tperso_affectation_agent.author","matricule_agent","nummaison_agent",
-            "noms_agent","sexe_agent","datenaissance_agent","lieunaissnce_agent","provinceOrigine_agent",
-            "etatcivil_agent","refAvenue_agent","contact_agent","mail_agent","grade_agent","fonction_agent",
-            "specialite_agent","Categorie_agent","niveauEtude_agent","anneeFinEtude_agent","Ecole_agent","tagent.photo as photo_agent",
-            "tagent.slug as slug_agent","name_serv_perso","name_categorie_service","name_categorie_agent",
-            'nom_poste','description_poste','nom_lieu','description_lieu','nom_mutuelle','description_mutuelle',
-            'nom_contrat','code_contrat','conjoint_agent','nomMere_agent','nomPere_agent','Nationalite_agent',
-            'Collectivite_agent','Territoire_agent','EmployeurAnt_agent','PersRef_agent','nomAvenue','nomQuartier','nomCommune','nomVille','nomProvince','nomPays',
-            'tperso_affectation_agent.created_at','nomOffice','postnomOffice','qualifieOffice','fammiliale','logement',
-            'tperso_affectation_agent.transport','sal_brut','sal_brut_imposable',
-            'inss_qpo','inss_qpp','cnss','inpp','onem','ipr',"salaire_base",'description_projet')
-            ->selectRaw('TIMESTAMPDIFF(YEAR, datenaissance_agent, CURDATE()) as age_agent')  
-            ->selectRaw('TIMESTAMPDIFF(MONTH, CURDATE(), dateFin) as dureerestante')
-            ->selectRaw('TIMESTAMPDIFF(MONTH, dateDebutEssaie, dateFinEssaie) as dureeessaie')
-            ->selectRaw('((salaire_base +fammiliale + logement + tperso_affectation_agent.transport) - inss_qpo - ipr) as netPaie')
+        ->join('tperso_poste','tperso_poste.id','=','tperso_affectation_agent.refPoste')
+        ->join('tperso_lieuaffectation','tperso_lieuaffectation.id','=','tperso_affectation_agent.refLieuAffectation')
+        ->join('tperso_mutuelle','tperso_mutuelle.id','=','tperso_affectation_agent.refMutuelle')
+        ->join('tperso_typecontrat','tperso_typecontrat.id','=','tperso_affectation_agent.refTypeContrat')
+        ->join('tperso_categorie_agent','tperso_categorie_agent.id','=','tperso_affectation_agent.refCategorieAgent')
+        ->join('tperso_service_personnel','tperso_service_personnel.id','=','tperso_affectation_agent.refServicePerso')
+        ->join('tperso_categorie_service','tperso_categorie_service.id','=','tperso_service_personnel.refCatService')
+        ->join('tagent','tagent.id','=','tperso_affectation_agent.refAgent')
+        ->join('avenues' , 'avenues.id','=','tagent.refAvenue_agent')
+        ->join('quartiers' , 'quartiers.id','=','avenues.idQuartier')
+        ->join('communes' , 'communes.id','=','quartiers.idCommune')
+        ->join('villes' , 'villes.id','=','communes.idVille')
+        ->join('provinces' , 'provinces.id','=','villes.idProvince')
+        ->join('pays' , 'pays.id','=','provinces.idPays')
+        ->join('taxe_site_affect' , 'taxe_site_affect.id','=','tperso_affectation_agent.refSiteAffectation')
+        ->join('taxe_sous_poste_affect' , 'taxe_sous_poste_affect.id','=','taxe_site_affect.id_sous_poste_affect')
+        ->join('taxe_poste_affect' , 'taxe_poste_affect.id','=','taxe_sous_poste_affect.id_poste_affect')
+        ->join('taxe_antene' , 'taxe_antene.id','=','taxe_poste_affect.id_antene')
+        ->select("tperso_affectation_agent.id",'refAgent','refServicePerso','refCategorieAgent','refPoste','refLieuAffectation',
+        'refMutuelle','refTypeContrat','dateAffectation','dureecontrat','dureeLettre','dateFin','dateDebutEssaie',
+        'dateFinEssaie','JourTrail1','JourTrail2','heureTrail1','heureTrail2','TempsPause','nbrConge','nbrCongeLettre',
+        'nomOffice','postnomOffice','qualifieOffice','codeAgent','directeur','numCNSS','numImpot','numcpteBanque',
+        'BanqueAgant','autresDetail','conge',"tperso_affectation_agent.author","matricule_agent",
+        "noms_agent","sexe_agent","datenaissance_agent","lieunaissnce_agent","provinceOrigine_agent",
+        "etatcivil_agent","refAvenue_agent","contact_agent","mail_agent","grade_agent","fonction_agent",
+        "specialite_agent","Categorie_agent","niveauEtude_agent","anneeFinEtude_agent","Ecole_agent","tagent.photo as photo_agent",
+        "tagent.slug as slug_agent","name_serv_perso","name_categorie_service","name_categorie_agent",
+        'tperso_poste.nom_poste','description_poste','nom_lieu','description_lieu','nom_mutuelle','description_mutuelle',
+        'nom_contrat','code_contrat','refSiteAffectation','nom_site_affect','id_sous_poste_affect',
+        'nom_sous_poste','id_poste_affect','taxe_poste_affect.nom_poste as nom_poste_affect','id_antene','nom_antene')
+        // ->selectRaw('CONCAT(YEAR, datenaissance_agent, CURDATE()) as age_agent')
+        ->selectRaw('TIMESTAMPDIFF(YEAR, datenaissance_agent, CURDATE()) as age_agent')   
+        ->selectRaw('TIMESTAMPDIFF(MONTH, CURDATE(), dateFin) as dureerestante')    
+        ->selectRaw("CASE  WHEN (TIMESTAMPDIFF(MONTH, CURDATE(), dateFin))>0 THEN 'Encours' ELSE 'Fini' END as Statut")
             ->where('tperso_affectation_agent.id','=', $id)    
             ->get(); 
             $output='';
@@ -6835,7 +6867,7 @@ function GetNotificationFinContrat($id)
                     <tr style="vertical-align:top;">
                         <td style="width:0px;height:214px;"></td>
                         <td></td>
-                        <td class="cs1698ECB3" colspan="4" style="width:633px;height:214px;line-height:18px;text-align:left;vertical-align:top;"><nobr>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Monsieur,</nobr><br/><nobr>	</nobr><br/><nobr>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Par&nbsp;la&nbsp;pr&#233;sente,&nbsp;nous&nbsp;vous&nbsp;notifions&nbsp;l’arriv&#233;e&nbsp;&#224;</nobr><br/><nobr>terme&nbsp;de&nbsp;votre&nbsp;contrat&nbsp;de&nbsp;travail&nbsp;conjointement&nbsp;sign&#233;&nbsp;le&nbsp;..'.$dateAffectation.'..&nbsp;Qui&nbsp;vous&nbsp;liait&nbsp;&#224;&nbsp;la&nbsp;Caritas-</nobr><br/><nobr>D&#233;veloppement&nbsp;et&nbsp;expire&nbsp;le&nbsp;..'.$dateFin.'..</nobr><br/><nobr>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Conform&#233;ment&nbsp;&#224;&nbsp;l’article&nbsp;69&nbsp;du&nbsp;code&nbsp;du&nbsp;travail</nobr><br/><nobr>congolais,&nbsp;un&nbsp;contrat&nbsp;&#224;&nbsp;dur&#233;e&nbsp;d&#233;termin&#233;e&nbsp;prend&nbsp;fin&nbsp;&#224;&nbsp;l’expiration&nbsp;du&nbsp;terme&nbsp;fix&#233;&nbsp;par&nbsp;les&nbsp;deux</nobr><br/><nobr>parties.&nbsp;L’attestation&nbsp;de&nbsp;service&nbsp;rendu&nbsp;vous&nbsp;sera&nbsp;remise&nbsp;conform&#233;ment&nbsp;aux&nbsp;d&#233;lais&nbsp;fix&#233;s&nbsp;par&nbsp;la&nbsp;loi.</nobr><br/><nobr>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;En&nbsp;vous&nbsp;souhaitant&nbsp;bonne&nbsp;chance&nbsp;pour&nbsp;l’avenir,</nobr><br/><nobr>nous&nbsp;vous&nbsp;prions&nbsp;d’agr&#233;er,&nbsp;Monsieur,&nbsp;nos&nbsp;salutations&nbsp;les&nbsp;meilleures.</nobr><br/></td>
+                        <td class="cs1698ECB3" colspan="4" style="width:633px;height:214px;line-height:18px;text-align:left;vertical-align:top;"><nobr>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Monsieur,</nobr><br/><nobr>	</nobr><br/><nobr>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Par&nbsp;la&nbsp;pr&#233;sente,&nbsp;nous&nbsp;vous&nbsp;notifions&nbsp;l’arriv&#233;e&nbsp;&#224;</nobr><br/><nobr>terme&nbsp;de&nbsp;votre&nbsp;contrat&nbsp;de&nbsp;travail&nbsp;conjointement&nbsp;sign&#233;&nbsp;le&nbsp;..'.$dateAffectation.'..&nbsp;Qui&nbsp;vous&nbsp;liait&nbsp;&#224;&nbsp;la&nbsp;FFN-</nobr><br/><nobr>D&#233;veloppement&nbsp;et&nbsp;expire&nbsp;le&nbsp;..'.$dateFin.'..</nobr><br/><nobr>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Conform&#233;ment&nbsp;&#224;&nbsp;l’article&nbsp;69&nbsp;du&nbsp;code&nbsp;du&nbsp;travail</nobr><br/><nobr>congolais,&nbsp;un&nbsp;contrat&nbsp;&#224;&nbsp;dur&#233;e&nbsp;d&#233;termin&#233;e&nbsp;prend&nbsp;fin&nbsp;&#224;&nbsp;l’expiration&nbsp;du&nbsp;terme&nbsp;fix&#233;&nbsp;par&nbsp;les&nbsp;deux</nobr><br/><nobr>parties.&nbsp;L’attestation&nbsp;de&nbsp;service&nbsp;rendu&nbsp;vous&nbsp;sera&nbsp;remise&nbsp;conform&#233;ment&nbsp;aux&nbsp;d&#233;lais&nbsp;fix&#233;s&nbsp;par&nbsp;la&nbsp;loi.</nobr><br/><nobr>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;En&nbsp;vous&nbsp;souhaitant&nbsp;bonne&nbsp;chance&nbsp;pour&nbsp;l’avenir,</nobr><br/><nobr>nous&nbsp;vous&nbsp;prions&nbsp;d’agr&#233;er,&nbsp;Monsieur,&nbsp;nos&nbsp;salutations&nbsp;les&nbsp;meilleures.</nobr><br/></td>
                     </tr>
                     <tr style="vertical-align:top;">
                         <td style="width:0px;height:74px;"></td>
@@ -7199,7 +7231,7 @@ function GetCheckList($id)
                     <tr style="vertical-align:top;">
                         <td style="width:0px;height:684px;"></td>
                         <td></td>
-                        <td class="cs12FE94AA" colspan="5" style="width:602px;height:684px;line-height:16px;text-align:left;vertical-align:top;"><nobr>1.&nbsp;Briefing&nbsp;sur&nbsp;le&nbsp;r&#244;le&nbsp;de&nbsp;la&nbsp;Caritas&nbsp;Goma&nbsp;et&nbsp;ses&nbsp;missions,&nbsp;visions,&nbsp;valeurs&nbsp;?</nobr><br/><nobr>&nbsp;=&gt;&nbsp;'.$briefingmission.'</nobr><br/><nobr>Si&nbsp;Oui,&nbsp;quelles&nbsp;dates/p&#233;riode&nbsp;?.&nbsp;'.$datebriefingmission.'.</nobr><br/><nobr>(Avec&nbsp;le&nbsp;charg&#233;&nbsp;des&nbsp;RH)</nobr><br/><br/><nobr>2.&nbsp;Connaissance&nbsp;de&nbsp;l'.$aps.'organigramme&nbsp;&nbsp;=&gt;&nbsp;&nbsp;'.$organigramme.'</nobr><br/><nobr>Si&nbsp;Oui,&nbsp;quelles&nbsp;dates/p&#233;riode&nbsp;?&nbsp;.'.$dateorganigramme.'&nbsp;.</nobr><br/><br/><nobr>3.&nbsp;Briefing&nbsp;sur&nbsp;le&nbsp;r&#244;le&nbsp;et&nbsp;attentes&nbsp;du&nbsp;poste&nbsp;et&nbsp;sur&nbsp;une&nbsp;meilleure&nbsp;compr&#233;hension&nbsp;de&nbsp;ses&nbsp;taches&nbsp;?=&gt;&nbsp;&nbsp;'.$briefingposte.'</nobr><br/><br/><nobr>4.&nbsp;Pr&#233;sentation&nbsp;du&nbsp;plan&nbsp;strat&#233;gique&nbsp;?</nobr><br/><nobr>=&gt;&nbsp;&nbsp;'.$planstrategique.'</nobr><br/><nobr>Si&nbsp;Oui,&nbsp;quelles&nbsp;dates/p&#233;riode&nbsp;?.&nbsp;'.$dateplanstrategique.'.</nobr><br/><nobr>(Avec&nbsp;le&nbsp;charg&#233;&nbsp;de&nbsp;qualit&#233;)</nobr><br/><br/><nobr>5.&nbsp;Briefing&nbsp;sur&nbsp;les&nbsp;r&#232;gles&nbsp;de&nbsp;bonne&nbsp;gestion&nbsp;(corruption,&nbsp;conflit&nbsp;d'.$aps.'int&#233;r&#234;t,&nbsp;protection&nbsp;de&nbsp;l’enfance,</nobr><br/><nobr>antiterrorisme,&nbsp;etc.)</nobr><br/><nobr>=&gt;&nbsp;'.$briefinggestion.'</nobr><br/><nobr>Si&nbsp;Oui,&nbsp;quelles&nbsp;dates/p&#233;riode&nbsp;?&nbsp;&nbsp;.'.$datebriefinggestion.'.</nobr><br/><nobr>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Avec&nbsp;le&nbsp;charg&#233;&nbsp;de&nbsp;l'.$aps.'administration&nbsp;et&nbsp;Finance)</nobr><br/><br/><nobr>6.&nbsp;Pr&#233;sentation&nbsp;du&nbsp;manuel&nbsp;de&nbsp;gestion&nbsp;et&nbsp;des&nbsp;proc&#233;dures&nbsp;?</nobr><br/><nobr>=&gt;&nbsp;&nbsp;'.$mannuel.'</nobr><br/><nobr>Si&nbsp;Oui,&nbsp;quelles&nbsp;dates/p&#233;riode&nbsp;?&nbsp;.'.$datemannuel.'.</nobr><br/><nobr>(Avec&nbsp;le&nbsp;charg&#233;&nbsp;de&nbsp;l'.$aps.'administration&nbsp;et&nbsp;Finance)</nobr><br/><br/><nobr>7.&nbsp;Evaluation&nbsp;du&nbsp;staff&nbsp;pr&#233;vu&nbsp;?</nobr><br/><nobr>=&gt;&nbsp;'.$evaluationstaff.'</nobr><br/><nobr>A)&nbsp;.&nbsp;'.$datestaff1.'&nbsp;.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B)&nbsp;.&nbsp;'.$datestaff2.'&nbsp;.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C)&nbsp;.&nbsp;'.$datestaff3.'&nbsp;.</nobr><br/><nobr>(Avec&nbsp;le&nbsp;coordonnateur&nbsp;du&nbsp;d&#233;partement)</nobr><br/><br/><nobr>8.&nbsp;P&#233;riodes&nbsp;pr&#233;vues&nbsp;cong&#233;s&nbsp;staff&nbsp;?</nobr><br/><nobr>=&gt;&nbsp;'.$periodeconge.'</nobr><br/><nobr>Si&nbsp;oui&nbsp;quelles&nbsp;dates/p&#233;riodes&nbsp;pr&#233;vues</nobr><br/><nobr>A)&nbsp;.&nbsp;'.$dateconge1.'&nbsp;.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B)&nbsp;.&nbsp;'.$dateconge2.'&nbsp;.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C)&nbsp;.&nbsp;'.$dateconge3.'&nbsp;.</nobr><br/><nobr>(Avec&nbsp;le&nbsp;coordonnateur&nbsp;du&nbsp;d&#233;partement&nbsp;et&nbsp;charg&#233;&nbsp;des&nbsp;RH)</nobr><br/><br/><nobr>9.&nbsp;Briefing&nbsp;sur&nbsp;la&nbsp;s&#233;curit&#233;&nbsp;afin&nbsp;de&nbsp;savoir&nbsp;les&nbsp;mesures&nbsp;de&nbsp;s&#233;curit&#233;&nbsp;mise&nbsp;en&nbsp;place&nbsp;et&nbsp;disposition&nbsp;&#224;&nbsp;prendre&nbsp;?</nobr><br/><nobr>=&gt;&nbsp;&nbsp;'.$briefingsecurite.'</nobr><br/><nobr>Si&nbsp;oui,&nbsp;quelle&nbsp;date/p&#233;riode&nbsp;?&nbsp;&nbsp;.&nbsp;'.$datebriefingsecurite.'&nbsp;.</nobr><br/><nobr>(Avec&nbsp;le&nbsp;charg&#233;&nbsp;de&nbsp;la&nbsp;s&#233;curit&#233;)</nobr></td>
+                        <td class="cs12FE94AA" colspan="5" style="width:602px;height:684px;line-height:16px;text-align:left;vertical-align:top;"><nobr>1.&nbsp;Briefing&nbsp;sur&nbsp;le&nbsp;r&#244;le&nbsp;de&nbsp;&nbsp;FFN&nbsp;et&nbsp;ses&nbsp;missions,&nbsp;visions,&nbsp;valeurs&nbsp;?</nobr><br/><nobr>&nbsp;=&gt;&nbsp;'.$briefingmission.'</nobr><br/><nobr>Si&nbsp;Oui,&nbsp;quelles&nbsp;dates/p&#233;riode&nbsp;?.&nbsp;'.$datebriefingmission.'.</nobr><br/><nobr>(Avec&nbsp;le&nbsp;charg&#233;&nbsp;des&nbsp;RH)</nobr><br/><br/><nobr>2.&nbsp;Connaissance&nbsp;de&nbsp;l'.$aps.'organigramme&nbsp;&nbsp;=&gt;&nbsp;&nbsp;'.$organigramme.'</nobr><br/><nobr>Si&nbsp;Oui,&nbsp;quelles&nbsp;dates/p&#233;riode&nbsp;?&nbsp;.'.$dateorganigramme.'&nbsp;.</nobr><br/><br/><nobr>3.&nbsp;Briefing&nbsp;sur&nbsp;le&nbsp;r&#244;le&nbsp;et&nbsp;attentes&nbsp;du&nbsp;poste&nbsp;et&nbsp;sur&nbsp;une&nbsp;meilleure&nbsp;compr&#233;hension&nbsp;de&nbsp;ses&nbsp;taches&nbsp;?=&gt;&nbsp;&nbsp;'.$briefingposte.'</nobr><br/><br/><nobr>4.&nbsp;Pr&#233;sentation&nbsp;du&nbsp;plan&nbsp;strat&#233;gique&nbsp;?</nobr><br/><nobr>=&gt;&nbsp;&nbsp;'.$planstrategique.'</nobr><br/><nobr>Si&nbsp;Oui,&nbsp;quelles&nbsp;dates/p&#233;riode&nbsp;?.&nbsp;'.$dateplanstrategique.'.</nobr><br/><nobr>(Avec&nbsp;le&nbsp;charg&#233;&nbsp;de&nbsp;qualit&#233;)</nobr><br/><br/><nobr>5.&nbsp;Briefing&nbsp;sur&nbsp;les&nbsp;r&#232;gles&nbsp;de&nbsp;bonne&nbsp;gestion&nbsp;(corruption,&nbsp;conflit&nbsp;d'.$aps.'int&#233;r&#234;t,&nbsp;protection&nbsp;de&nbsp;l’enfance,</nobr><br/><nobr>antiterrorisme,&nbsp;etc.)</nobr><br/><nobr>=&gt;&nbsp;'.$briefinggestion.'</nobr><br/><nobr>Si&nbsp;Oui,&nbsp;quelles&nbsp;dates/p&#233;riode&nbsp;?&nbsp;&nbsp;.'.$datebriefinggestion.'.</nobr><br/><nobr>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Avec&nbsp;le&nbsp;charg&#233;&nbsp;de&nbsp;l'.$aps.'administration&nbsp;et&nbsp;Finance)</nobr><br/><br/><nobr>6.&nbsp;Pr&#233;sentation&nbsp;du&nbsp;manuel&nbsp;de&nbsp;gestion&nbsp;et&nbsp;des&nbsp;proc&#233;dures&nbsp;?</nobr><br/><nobr>=&gt;&nbsp;&nbsp;'.$mannuel.'</nobr><br/><nobr>Si&nbsp;Oui,&nbsp;quelles&nbsp;dates/p&#233;riode&nbsp;?&nbsp;.'.$datemannuel.'.</nobr><br/><nobr>(Avec&nbsp;le&nbsp;charg&#233;&nbsp;de&nbsp;l'.$aps.'administration&nbsp;et&nbsp;Finance)</nobr><br/><br/><nobr>7.&nbsp;Evaluation&nbsp;du&nbsp;staff&nbsp;pr&#233;vu&nbsp;?</nobr><br/><nobr>=&gt;&nbsp;'.$evaluationstaff.'</nobr><br/><nobr>A)&nbsp;.&nbsp;'.$datestaff1.'&nbsp;.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B)&nbsp;.&nbsp;'.$datestaff2.'&nbsp;.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C)&nbsp;.&nbsp;'.$datestaff3.'&nbsp;.</nobr><br/><nobr>(Avec&nbsp;le&nbsp;coordonnateur&nbsp;du&nbsp;d&#233;partement)</nobr><br/><br/><nobr>8.&nbsp;P&#233;riodes&nbsp;pr&#233;vues&nbsp;cong&#233;s&nbsp;staff&nbsp;?</nobr><br/><nobr>=&gt;&nbsp;'.$periodeconge.'</nobr><br/><nobr>Si&nbsp;oui&nbsp;quelles&nbsp;dates/p&#233;riodes&nbsp;pr&#233;vues</nobr><br/><nobr>A)&nbsp;.&nbsp;'.$dateconge1.'&nbsp;.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B)&nbsp;.&nbsp;'.$dateconge2.'&nbsp;.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;C)&nbsp;.&nbsp;'.$dateconge3.'&nbsp;.</nobr><br/><nobr>(Avec&nbsp;le&nbsp;coordonnateur&nbsp;du&nbsp;d&#233;partement&nbsp;et&nbsp;charg&#233;&nbsp;des&nbsp;RH)</nobr><br/><br/><nobr>9.&nbsp;Briefing&nbsp;sur&nbsp;la&nbsp;s&#233;curit&#233;&nbsp;afin&nbsp;de&nbsp;savoir&nbsp;les&nbsp;mesures&nbsp;de&nbsp;s&#233;curit&#233;&nbsp;mise&nbsp;en&nbsp;place&nbsp;et&nbsp;disposition&nbsp;&#224;&nbsp;prendre&nbsp;?</nobr><br/><nobr>=&gt;&nbsp;&nbsp;'.$briefingsecurite.'</nobr><br/><nobr>Si&nbsp;oui,&nbsp;quelle&nbsp;date/p&#233;riode&nbsp;?&nbsp;&nbsp;.&nbsp;'.$datebriefingsecurite.'&nbsp;.</nobr><br/><nobr>(Avec&nbsp;le&nbsp;charg&#233;&nbsp;de&nbsp;la&nbsp;s&#233;curit&#233;)</nobr></td>
                     </tr>
                     <tr style="vertical-align:top;">
                         <td style="width:0px;height:44px;"></td>
@@ -7219,7 +7251,7 @@ function GetCheckList($id)
                     <tr style="vertical-align:top;">
                         <td style="width:0px;height:267px;"></td>
                         <td></td>
-                        <td class="cs12FE94AA" colspan="5" style="width:602px;height:267px;line-height:16px;text-align:left;vertical-align:top;"><nobr>1.&nbsp;Lettre&nbsp;de&nbsp;notification&nbsp;en&nbsp;avance&nbsp;avec&nbsp;copies&nbsp;avec&nbsp;l'.$aps.'Admin&nbsp;Financier&nbsp;et&nbsp;Logistique&nbsp;?</nobr><br/><nobr>=&gt;&nbsp;&nbsp;&nbsp;'.$notification.'</nobr><br/><nobr>(Avec&nbsp;le&nbsp;charg&#233;&nbsp;des&nbsp;RH)</nobr><br/><br/><nobr>2.&nbsp;Note&nbsp;des&nbsp;finances&nbsp;indiquant&nbsp;le&nbsp;solde&nbsp;et&nbsp;tout&nbsp;compte&nbsp;et&nbsp;confirmant&nbsp;la&nbsp;d&#233;tention&nbsp;ou&nbsp;non&nbsp;de&nbsp;toutes</nobr><br/><nobr>avances,&nbsp;&#233;quipement&nbsp;dus&nbsp;&#224;&nbsp;la&nbsp;Caritas&nbsp;Coma</nobr><br/><nobr>=&gt;&nbsp;&nbsp;'.$notefinance.'</nobr><br/><nobr>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Si&nbsp;oui,&nbsp;quelle&nbsp;date/p&#233;riode&nbsp;?&nbsp;&nbsp;'.$datenotefinance.'</nobr><br/><nobr>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Avec&nbsp;le&nbsp;charg&#233;&nbsp;d'.$aps.'Administration&nbsp;et&nbsp;Finances)</nobr><br/><br/><nobr>3.&nbsp;Attestation&nbsp;de&nbsp;services&nbsp;?</nobr><br/><nobr>=&gt;&nbsp;&nbsp;&nbsp;'.$attesteservice.'</nobr><br/><nobr>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Si&nbsp;oui,&nbsp;quelle&nbsp;date/p&#233;riode&nbsp;?&nbsp;&nbsp;.'.$dateattesteservice.'.</nobr><br/><nobr>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Avec&nbsp;le&nbsp;charg&#233;&nbsp;d'.$aps.'Administration&nbsp;et&nbsp;Finances)</nobr><br/></td>
+                        <td class="cs12FE94AA" colspan="5" style="width:602px;height:267px;line-height:16px;text-align:left;vertical-align:top;"><nobr>1.&nbsp;Lettre&nbsp;de&nbsp;notification&nbsp;en&nbsp;avance&nbsp;avec&nbsp;copies&nbsp;avec&nbsp;l'.$aps.'Admin&nbsp;Financier&nbsp;et&nbsp;Logistique&nbsp;?</nobr><br/><nobr>=&gt;&nbsp;&nbsp;&nbsp;'.$notification.'</nobr><br/><nobr>(Avec&nbsp;le&nbsp;charg&#233;&nbsp;des&nbsp;RH)</nobr><br/><br/><nobr>2.&nbsp;Note&nbsp;des&nbsp;finances&nbsp;indiquant&nbsp;le&nbsp;solde&nbsp;et&nbsp;tout&nbsp;compte&nbsp;et&nbsp;confirmant&nbsp;la&nbsp;d&#233;tention&nbsp;ou&nbsp;non&nbsp;de&nbsp;toutes</nobr><br/><nobr>avances,&nbsp;&#233;quipement&nbsp;dus&nbsp;&#224;&nbsp;&nbsp;FFN</nobr><br/><nobr>=&gt;&nbsp;&nbsp;'.$notefinance.'</nobr><br/><nobr>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Si&nbsp;oui,&nbsp;quelle&nbsp;date/p&#233;riode&nbsp;?&nbsp;&nbsp;'.$datenotefinance.'</nobr><br/><nobr>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Avec&nbsp;le&nbsp;charg&#233;&nbsp;d'.$aps.'Administration&nbsp;et&nbsp;Finances)</nobr><br/><br/><nobr>3.&nbsp;Attestation&nbsp;de&nbsp;services&nbsp;?</nobr><br/><nobr>=&gt;&nbsp;&nbsp;&nbsp;'.$attesteservice.'</nobr><br/><nobr>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Si&nbsp;oui,&nbsp;quelle&nbsp;date/p&#233;riode&nbsp;?&nbsp;&nbsp;.'.$dateattesteservice.'.</nobr><br/><nobr>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Avec&nbsp;le&nbsp;charg&#233;&nbsp;d'.$aps.'Administration&nbsp;et&nbsp;Finances)</nobr><br/></td>
                     </tr>
                     <tr style="vertical-align:top;">
                         <td style="width:0px;height:125px;"></td>
@@ -7689,7 +7721,7 @@ function GetContratTravailAgent($id)
 		<td></td>
 		<td></td>
 		<td></td>
-		<td class="cs9E712815" colspan="12" style="width:433px;height:22px;line-height:18px;text-align:left;vertical-align:top;"><nobr>1.&nbsp;LA&nbsp;CARITAS-DEVELOPPEMENT/DIOCESE&nbsp;DE&nbsp;GOMA,</nobr></td>
+		<td class="cs9E712815" colspan="12" style="width:433px;height:22px;line-height:18px;text-align:left;vertical-align:top;"><nobr>1.&nbsp;FONDS FORESTIER NATIONAL,</nobr></td>
 		<td class="cs5DE5F832" colspan="6" style="width:187px;height:22px;line-height:18px;text-align:right;vertical-align:top;"><nobr>ici&nbsp;repr&#233;sent&#233;e&nbsp;par&nbsp;son</nobr></td>
 		<td></td>
 		<td></td>
@@ -7941,7 +7973,7 @@ function GetContratTravailAgent($id)
 		<td></td>
 		<td></td>
 		<td></td>
-		<td class="cs1698ECB3" colspan="17" style="width:624px;height:113px;line-height:18px;text-align:left;vertical-align:top;"><nobr>L'.$aps.'empoy&#233;.e,&nbsp;qui&nbsp;se&nbsp;d&#233;clare&nbsp;libre&nbsp;de&nbsp;toute&nbsp;obligation&nbsp;professionnelle,&nbsp;est&nbsp;engag&#233;.e&nbsp;&#224;&nbsp;la&nbsp;Caritas</nobr><br/><nobr>D&#233;veloppement&nbsp;Dioc&#232;se&nbsp;de&nbsp;Goma&nbsp;en&nbsp;qualit&#233;&nbsp;de&nbsp;.'.$nom_poste.'.sous&nbsp;le&nbsp;contr&#244;le&nbsp;de&nbsp;ses</nobr><br/><nobr>chefs&nbsp;hi&#233;rarchiques.&nbsp;Il/Elle&nbsp;est&nbsp;affect&#233;e&nbsp;&#224;.'.$nom_lieu.'.Il/Elle&nbsp;certifie&nbsp;avoir&nbsp;lu,</nobr><br/><nobr>compris&nbsp;et&nbsp;approuv&#233;&nbsp;les&nbsp;termes&nbsp;et&nbsp;les&nbsp;conditions&nbsp;de&nbsp;sa&nbsp;description&nbsp;de&nbsp;poste&nbsp;et&nbsp;du&nbsp;r&#232;glement</nobr><br/><nobr>d'.$aps.'ordre&nbsp;int&#233;rieur&nbsp;de&nbsp;la&nbsp;Caritas-D&#233;veloppement&nbsp;Goma&nbsp;qui&nbsp;font&nbsp;partie&nbsp;int&#233;grante&nbsp;du&nbsp;pr&#233;sent</nobr><br/><nobr>contrat.</nobr></td>
+		<td class="cs1698ECB3" colspan="17" style="width:624px;height:113px;line-height:18px;text-align:left;vertical-align:top;"><nobr>L'.$aps.'empoy&#233;.e,&nbsp;qui&nbsp;se&nbsp;d&#233;clare&nbsp;libre&nbsp;de&nbsp;toute&nbsp;obligation&nbsp;professionnelle,&nbsp;est&nbsp;engag&#233;.e&nbsp;&#224;&nbsp;la&nbsp;Fonds</nobr><br/><nobr>Forestier&nbsp;en&nbsp;qualit&#233;&nbsp;de&nbsp;.'.$nom_poste.'.sous&nbsp;le&nbsp;contr&#244;le&nbsp;de&nbsp;ses</nobr><br/><nobr>chefs&nbsp;hi&#233;rarchiques.&nbsp;Il/Elle&nbsp;est&nbsp;affect&#233;e&nbsp;&#224;.'.$nom_lieu.'.Il/Elle&nbsp;certifie&nbsp;avoir&nbsp;lu,</nobr><br/><nobr>compris&nbsp;et&nbsp;approuv&#233;&nbsp;les&nbsp;termes&nbsp;et&nbsp;les&nbsp;conditions&nbsp;de&nbsp;sa&nbsp;description&nbsp;de&nbsp;poste&nbsp;et&nbsp;du&nbsp;r&#232;glement</nobr><br/><nobr>d'.$aps.'ordre&nbsp;int&#233;rieur&nbsp;de&nbsp;la&nbsp;Fonds Forestier National&nbsp;qui&nbsp;font&nbsp;partie&nbsp;int&#233;grante&nbsp;du&nbsp;pr&#233;sent</nobr><br/><nobr>contrat.</nobr></td>
 		<td></td>
 		<td></td>
 		<td></td>
@@ -7960,7 +7992,7 @@ function GetContratTravailAgent($id)
 		<td></td>
 		<td></td>
 		<td></td>
-		<td class="cs1698ECB3" colspan="17" style="width:624px;height:42px;line-height:18px;text-align:left;vertical-align:top;"><nobr>L'.$aps.'employ&#233;.e&nbsp;est&nbsp;affect&#233;.e&nbsp;&#224;&nbsp;.'.$nom_lieu.'.&nbsp;mais&nbsp;le&nbsp;lieu&nbsp;d'.$aps.'affectation&nbsp;pourrait&nbsp;&#233;tre</nobr><br/><nobr>chang&#233;&nbsp;par&nbsp;la&nbsp;Caritas-D&#233;veloppement&nbsp;Goma&nbsp;selon&nbsp;l'.$aps.'exigence&nbsp;de&nbsp;ses&nbsp;activit&#233;s.</nobr></td>
+		<td class="cs1698ECB3" colspan="17" style="width:624px;height:42px;line-height:18px;text-align:left;vertical-align:top;"><nobr>L'.$aps.'employ&#233;.e&nbsp;est&nbsp;affect&#233;.e&nbsp;&#224;&nbsp;.'.$nom_lieu.'.&nbsp;mais&nbsp;le&nbsp;lieu&nbsp;d'.$aps.'affectation&nbsp;pourrait&nbsp;&#233;tre</nobr><br/><nobr>chang&#233;&nbsp;par&nbsp;la&nbsp;Fonds Forestier National&nbsp;selon&nbsp;l'.$aps.'exigence&nbsp;de&nbsp;ses&nbsp;activit&#233;s.</nobr></td>
 		<td></td>
 		<td></td>
 		<td></td>
@@ -8211,7 +8243,7 @@ function GetContratTravailAgent($id)
 		<td style="width:0px;height:396px;"></td>
 		<td></td>
 		<td></td>
-		<td class="cs1698ECB3" colspan="20" style="width:626px;height:396px;line-height:18px;text-align:left;vertical-align:top;"><nobr>&nbsp;Le&nbsp;pr&#233;sent&nbsp;contrat&nbsp;de&nbsp;travail&nbsp;peut&nbsp;&#234;tre&nbsp;r&#233;sili&#233;&nbsp;de&nbsp;commun&nbsp;accord&nbsp;ou&nbsp;&#224;&nbsp;l'.$aps.'initiative&nbsp;de&nbsp;la&nbsp;partie</nobr><br/><nobr>diligente&nbsp;qui&nbsp;l'.$aps.'en&nbsp;notifiera&nbsp;&#224;&nbsp;l'.$aps.'autre&nbsp;dans&nbsp;le&nbsp;respect&nbsp;des&nbsp;dispositions&nbsp;l&#233;gales.&nbsp;Il&nbsp;est&nbsp;r&#233;put&#233;&nbsp;r&#233;sili&#233;&nbsp;de</nobr><br/><nobr>plein&nbsp;droit&nbsp;&#224;&nbsp;l'.$aps.'expiration&nbsp;du&nbsp;terme&nbsp;convenu.&nbsp;Toutefois,&nbsp;en&nbsp;cas&nbsp;de&nbsp;faute&nbsp;lourde,&nbsp;chacune&nbsp;des&nbsp;parties</nobr><br/><nobr>peut&nbsp;le&nbsp;rompre&nbsp;sans&nbsp;pr&#233;avis&nbsp;ni&nbsp;indemnit&#233;&nbsp;de&nbsp;licenciement.&nbsp;L'.$aps.'employ&#233;&nbsp;est&nbsp;reprochable&nbsp;de&nbsp;faute</nobr><br/><nobr>lourde&nbsp;pouvant&nbsp;entra&#238;ner&nbsp;la&nbsp;r&#233;siliation&nbsp;sans&nbsp;pr&#233;avis&nbsp;ni&nbsp;indemnit&#233;&nbsp;de&nbsp;son&nbsp;contrat&nbsp;de&nbsp;travail,&nbsp;dans&nbsp;les</nobr><br/><nobr>cas&nbsp;non&nbsp;exhaustifs&nbsp;ci-apr&#232;s&nbsp;:</nobr><br/><nobr>-&nbsp;Improbit&#233;,&nbsp;injures,&nbsp;voies&nbsp;de&nbsp;fait&nbsp;&#224;&nbsp;l'.$aps.'&#233;gard&nbsp;de&nbsp;l'.$aps.'employeur&nbsp;ou&nbsp;d'.$aps.'un&nbsp;membre&nbsp;du&nbsp;personnel</nobr><br/><nobr>-&nbsp;Usage&nbsp;d'.$aps.'alcool&nbsp;ou&nbsp;de&nbsp;drogue&nbsp;au&nbsp;lieu&nbsp;du&nbsp;travail</nobr><br/><nobr>-&nbsp;Fraude,&nbsp;malhonn&#234;tet&#233;.&nbsp;Falsification&nbsp;des&nbsp;documents</nobr><br/><nobr>-&nbsp;Menace.&nbsp;Bagarre&nbsp;et&nbsp;port&nbsp;d'.$aps.'armes</nobr><br/><nobr>-&nbsp;Se&nbsp;livrer&nbsp;&#224;&nbsp;des&nbsp;actions&nbsp;immorales&nbsp;au&nbsp;lieu&nbsp;du&nbsp;travail</nobr><br/><nobr>-&nbsp;S'.$aps.'approprier&nbsp;le&nbsp;mat&#233;riel&nbsp;de&nbsp;travail&nbsp;sans&nbsp;autorisation</nobr><br/><nobr>-&nbsp;Divulgation&nbsp;des&nbsp;secrets&nbsp;professionnels&nbsp;ou&nbsp;des&nbsp;informations&nbsp;internes&nbsp;&#224;&nbsp;la&nbsp;Caritas-</nobr><br/><nobr>D&#233;veloppement&nbsp;Goma</nobr><br/><nobr>-&nbsp;Abandon&nbsp;de&nbsp;poste&nbsp;ou&nbsp;absence&nbsp;prolong&#233;e&nbsp;pendant&nbsp;4&nbsp;jours&nbsp;cons&#233;cutifs&nbsp;:</nobr><br/><nobr>-&nbsp;Manque&nbsp;de&nbsp;discipline&nbsp;et&nbsp;d'.$aps.'application&nbsp;au&nbsp;travail&nbsp;de&nbsp;fa&#231;on&nbsp;r&#233;p&#233;titive&nbsp;;</nobr><br/><nobr>-&nbsp;Insuffisance&nbsp;ou&nbsp;inaptitude&nbsp;professionnelle&nbsp;av&#233;r&#233;e&nbsp;et&nbsp;notifi&#233;e&nbsp;d'.$aps.'un&nbsp;avertissement&nbsp;;</nobr><br/><nobr>-&nbsp;Comportement&nbsp;public&nbsp;dommageable&nbsp;&#224;&nbsp;l'.$aps.'employeur&nbsp;et/ou&nbsp;&#224;&nbsp;son&nbsp;partenaire</nobr><br/><nobr>-&nbsp;D&#233;tournement&nbsp;des&nbsp;biens&nbsp;destin&#233;s&nbsp;&#224;&nbsp;l'.$aps.'organisation&nbsp;ou&nbsp;aux&nbsp;b&#233;n&#233;ficiaires</nobr><br/><nobr>-&nbsp;P&#233;dophilie,&nbsp;polygamie,</nobr><br/><nobr>-&nbsp;Non-respect&nbsp;de&nbsp;la&nbsp;PEAS&nbsp;(Pr&#233;vention&nbsp;contre&nbsp;I&nbsp;‘exploitation&nbsp;et&nbsp;les&nbsp;abus&nbsp;sexuels).</nobr></td>
+		<td class="cs1698ECB3" colspan="20" style="width:626px;height:396px;line-height:18px;text-align:left;vertical-align:top;"><nobr>&nbsp;Le&nbsp;pr&#233;sent&nbsp;contrat&nbsp;de&nbsp;travail&nbsp;peut&nbsp;&#234;tre&nbsp;r&#233;sili&#233;&nbsp;de&nbsp;commun&nbsp;accord&nbsp;ou&nbsp;&#224;&nbsp;l'.$aps.'initiative&nbsp;de&nbsp;la&nbsp;partie</nobr><br/><nobr>diligente&nbsp;qui&nbsp;l'.$aps.'en&nbsp;notifiera&nbsp;&#224;&nbsp;l'.$aps.'autre&nbsp;dans&nbsp;le&nbsp;respect&nbsp;des&nbsp;dispositions&nbsp;l&#233;gales.&nbsp;Il&nbsp;est&nbsp;r&#233;put&#233;&nbsp;r&#233;sili&#233;&nbsp;de</nobr><br/><nobr>plein&nbsp;droit&nbsp;&#224;&nbsp;l'.$aps.'expiration&nbsp;du&nbsp;terme&nbsp;convenu.&nbsp;Toutefois,&nbsp;en&nbsp;cas&nbsp;de&nbsp;faute&nbsp;lourde,&nbsp;chacune&nbsp;des&nbsp;parties</nobr><br/><nobr>peut&nbsp;le&nbsp;rompre&nbsp;sans&nbsp;pr&#233;avis&nbsp;ni&nbsp;indemnit&#233;&nbsp;de&nbsp;licenciement.&nbsp;L'.$aps.'employ&#233;&nbsp;est&nbsp;reprochable&nbsp;de&nbsp;faute</nobr><br/><nobr>lourde&nbsp;pouvant&nbsp;entra&#238;ner&nbsp;la&nbsp;r&#233;siliation&nbsp;sans&nbsp;pr&#233;avis&nbsp;ni&nbsp;indemnit&#233;&nbsp;de&nbsp;son&nbsp;contrat&nbsp;de&nbsp;travail,&nbsp;dans&nbsp;les</nobr><br/><nobr>cas&nbsp;non&nbsp;exhaustifs&nbsp;ci-apr&#232;s&nbsp;:</nobr><br/><nobr>-&nbsp;Improbit&#233;,&nbsp;injures,&nbsp;voies&nbsp;de&nbsp;fait&nbsp;&#224;&nbsp;l'.$aps.'&#233;gard&nbsp;de&nbsp;l'.$aps.'employeur&nbsp;ou&nbsp;d'.$aps.'un&nbsp;membre&nbsp;du&nbsp;personnel</nobr><br/><nobr>-&nbsp;Usage&nbsp;d'.$aps.'alcool&nbsp;ou&nbsp;de&nbsp;drogue&nbsp;au&nbsp;lieu&nbsp;du&nbsp;travail</nobr><br/><nobr>-&nbsp;Fraude,&nbsp;malhonn&#234;tet&#233;.&nbsp;Falsification&nbsp;des&nbsp;documents</nobr><br/><nobr>-&nbsp;Menace.&nbsp;Bagarre&nbsp;et&nbsp;port&nbsp;d'.$aps.'armes</nobr><br/><nobr>-&nbsp;Se&nbsp;livrer&nbsp;&#224;&nbsp;des&nbsp;actions&nbsp;immorales&nbsp;au&nbsp;lieu&nbsp;du&nbsp;travail</nobr><br/><nobr>-&nbsp;S'.$aps.'approprier&nbsp;le&nbsp;mat&#233;riel&nbsp;de&nbsp;travail&nbsp;sans&nbsp;autorisation</nobr><br/><nobr>-&nbsp;Divulgation&nbsp;des&nbsp;secrets&nbsp;professionnels&nbsp;ou&nbsp;des&nbsp;informations&nbsp;internes&nbsp;&#224;&nbsp;la&nbsp;Fonds-</nobr><br/><nobr>Forestier National</nobr><br/><nobr>-&nbsp;Abandon&nbsp;de&nbsp;poste&nbsp;ou&nbsp;absence&nbsp;prolong&#233;e&nbsp;pendant&nbsp;4&nbsp;jours&nbsp;cons&#233;cutifs&nbsp;:</nobr><br/><nobr>-&nbsp;Manque&nbsp;de&nbsp;discipline&nbsp;et&nbsp;d'.$aps.'application&nbsp;au&nbsp;travail&nbsp;de&nbsp;fa&#231;on&nbsp;r&#233;p&#233;titive&nbsp;;</nobr><br/><nobr>-&nbsp;Insuffisance&nbsp;ou&nbsp;inaptitude&nbsp;professionnelle&nbsp;av&#233;r&#233;e&nbsp;et&nbsp;notifi&#233;e&nbsp;d'.$aps.'un&nbsp;avertissement&nbsp;;</nobr><br/><nobr>-&nbsp;Comportement&nbsp;public&nbsp;dommageable&nbsp;&#224;&nbsp;l'.$aps.'employeur&nbsp;et/ou&nbsp;&#224;&nbsp;son&nbsp;partenaire</nobr><br/><nobr>-&nbsp;D&#233;tournement&nbsp;des&nbsp;biens&nbsp;destin&#233;s&nbsp;&#224;&nbsp;l'.$aps.'organisation&nbsp;ou&nbsp;aux&nbsp;b&#233;n&#233;ficiaires</nobr><br/><nobr>-&nbsp;P&#233;dophilie,&nbsp;polygamie,</nobr><br/><nobr>-&nbsp;Non-respect&nbsp;de&nbsp;la&nbsp;PEAS&nbsp;(Pr&#233;vention&nbsp;contre&nbsp;I&nbsp;‘exploitation&nbsp;et&nbsp;les&nbsp;abus&nbsp;sexuels).</nobr></td>
 		<td></td>
 	</tr>
 	<tr style="vertical-align:top;">
@@ -8252,7 +8284,7 @@ function GetContratTravailAgent($id)
 	<tr style="vertical-align:top;">
 		<td style="width:0px;height:65px;"></td>
 		<td></td>
-		<td class="cs1698ECB3" colspan="22" style="width:628px;height:65px;line-height:18px;text-align:left;vertical-align:top;"><nobr>&nbsp;Pour&nbsp;des&nbsp;cas&nbsp;qui&nbsp;ne&nbsp;sont&nbsp;pr&#233;cis&#233;s&nbsp;dans&nbsp;le&nbsp;pr&#233;sent&nbsp;contrat&nbsp;de&nbsp;travail,&nbsp;les&nbsp;parties&nbsp;se&nbsp;r&#233;f&#233;reront&nbsp;aux</nobr><br/><nobr>dispositions&nbsp;l&#233;gales&nbsp;et&nbsp;r&#233;glementaires&nbsp;en&nbsp;vigueur&nbsp;en&nbsp;R&#233;publique&nbsp;d&#233;mocratique&nbsp;du&nbsp;Congo&nbsp;et&nbsp;au</nobr><br/><nobr>R&#232;glement&nbsp;d'.$aps.'ordre&nbsp;int&#233;rieur&nbsp;de&nbsp;la&nbsp;Caritas-D&#233;veloppement&nbsp;Goma.</nobr></td>
+		<td class="cs1698ECB3" colspan="22" style="width:628px;height:65px;line-height:18px;text-align:left;vertical-align:top;"><nobr>&nbsp;Pour&nbsp;des&nbsp;cas&nbsp;qui&nbsp;ne&nbsp;sont&nbsp;pr&#233;cis&#233;s&nbsp;dans&nbsp;le&nbsp;pr&#233;sent&nbsp;contrat&nbsp;de&nbsp;travail,&nbsp;les&nbsp;parties&nbsp;se&nbsp;r&#233;f&#233;reront&nbsp;aux</nobr><br/><nobr>dispositions&nbsp;l&#233;gales&nbsp;et&nbsp;r&#233;glementaires&nbsp;en&nbsp;vigueur&nbsp;en&nbsp;R&#233;publique&nbsp;d&#233;mocratique&nbsp;du&nbsp;Congo&nbsp;et&nbsp;au</nobr><br/><nobr>R&#232;glement&nbsp;d'.$aps.'ordre&nbsp;int&#233;rieur&nbsp;de&nbsp;la&nbsp;Fonds Forestier National.</nobr></td>
 	</tr>
 	<tr style="vertical-align:top;">
 		<td style="width:0px;height:11px;"></td>
@@ -8284,7 +8316,7 @@ function GetContratTravailAgent($id)
 		<td style="width:0px;height:148px;"></td>
 		<td></td>
 		<td></td>
-		<td class="cs1698ECB3" colspan="21" style="width:627px;height:148px;line-height:18px;text-align:left;vertical-align:top;"><nobr>Fait&nbsp;&#224;&nbsp;Goma,&nbsp;Le&nbsp;....../....../20....</nobr><br/><br/><nobr>Pour&nbsp;l'.$aps.'employ&#233;e&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Pour&nbsp;la&nbsp;Caritas-D&#233;veloppement&nbsp;Goma</nobr><br/><br/><nobr>.................................</nobr><br/><nobr>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Directeur</nobr><br/></td>
+		<td class="cs1698ECB3" colspan="21" style="width:627px;height:148px;line-height:18px;text-align:left;vertical-align:top;"><nobr>Fait&nbsp;&#224;&nbsp;Goma,&nbsp;Le&nbsp;....../....../20....</nobr><br/><br/><nobr>Pour&nbsp;l'.$aps.'employ&#233;e&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Pour&nbsp;&nbsp;Fonds Forestier National</nobr><br/><br/><nobr>.................................</nobr><br/><nobr>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Directeur</nobr><br/></td>
 	</tr>
 	<tr style="vertical-align:top;">
 		<td style="width:0px;height:15px;"></td>
@@ -9507,7 +9539,7 @@ function printRapportPresenceDate($date1, $date2)
                         <td class="cs8CFBEB27" style="width:29px;height:22px;line-height:11px;text-align:center;vertical-align:middle;"><nobr>N&#176;</nobr></td>
                         <td class="cs58C16240" colspan="4" style="width:199px;height:22px;line-height:11px;text-align:center;vertical-align:middle;"><nobr>NOMS</nobr></td>
                         <td class="cs58C16240" colspan="2" style="width:148px;height:22px;line-height:11px;text-align:center;vertical-align:middle;"><nobr>SERVICE</nobr></td>
-                        <td class="cs58C16240" colspan="2" style="width:117px;height:22px;line-height:11px;text-align:center;vertical-align:middle;"><nobr>LIEU</nobr></td>
+                        <td class="cs58C16240" colspan="2" style="width:117px;height:22px;line-height:11px;text-align:center;vertical-align:middle;"><nobr>AFFECTATION</nobr></td>
                         <td class="cs58C16240" style="width:61px;height:22px;line-height:11px;text-align:center;vertical-align:middle;"><nobr>DATE</nobr></td>
                         <td class="cs58C16240" style="width:68px;height:22px;line-height:11px;text-align:center;vertical-align:middle;"><nobr>JOUR</nobr></td>
                         <td class="cs58C16240" colspan="2" style="width:63px;height:22px;line-height:11px;text-align:center;vertical-align:middle;"><nobr>Heure&nbsp;Entr&#233;e</nobr></td>
@@ -9975,7 +10007,7 @@ function printRapportPresenceServiceDate($date1, $date2,$refServicePerso)
                         <td class="cs8CFBEB27" style="width:29px;height:22px;line-height:11px;text-align:center;vertical-align:middle;"><nobr>N&#176;</nobr></td>
                         <td class="cs58C16240" colspan="4" style="width:199px;height:22px;line-height:11px;text-align:center;vertical-align:middle;"><nobr>NOMS</nobr></td>
                         <td class="cs58C16240" colspan="2" style="width:148px;height:22px;line-height:11px;text-align:center;vertical-align:middle;"><nobr>SERVICE</nobr></td>
-                        <td class="cs58C16240" colspan="2" style="width:117px;height:22px;line-height:11px;text-align:center;vertical-align:middle;"><nobr>LIEU</nobr></td>
+                        <td class="cs58C16240" colspan="2" style="width:117px;height:22px;line-height:11px;text-align:center;vertical-align:middle;"><nobr>AFFECTATION</nobr></td>
                         <td class="cs58C16240" style="width:61px;height:22px;line-height:11px;text-align:center;vertical-align:middle;"><nobr>DATE</nobr></td>
                         <td class="cs58C16240" style="width:68px;height:22px;line-height:11px;text-align:center;vertical-align:middle;"><nobr>JOUR</nobr></td>
                         <td class="cs58C16240" colspan="2" style="width:63px;height:22px;line-height:11px;text-align:center;vertical-align:middle;"><nobr>Heure&nbsp;Entr&#233;e</nobr></td>
@@ -10445,7 +10477,7 @@ function printRapportPresenceLieuDate($date1, $date2,$refLieuAffectation)
                         <td class="cs8CFBEB27" style="width:29px;height:22px;line-height:11px;text-align:center;vertical-align:middle;"><nobr>N&#176;</nobr></td>
                         <td class="cs58C16240" colspan="4" style="width:199px;height:22px;line-height:11px;text-align:center;vertical-align:middle;"><nobr>NOMS</nobr></td>
                         <td class="cs58C16240" colspan="2" style="width:148px;height:22px;line-height:11px;text-align:center;vertical-align:middle;"><nobr>SERVICE</nobr></td>
-                        <td class="cs58C16240" colspan="2" style="width:117px;height:22px;line-height:11px;text-align:center;vertical-align:middle;"><nobr>LIEU</nobr></td>
+                        <td class="cs58C16240" colspan="2" style="width:117px;height:22px;line-height:11px;text-align:center;vertical-align:middle;"><nobr>AFFECTATION</nobr></td>
                         <td class="cs58C16240" style="width:61px;height:22px;line-height:11px;text-align:center;vertical-align:middle;"><nobr>DATE</nobr></td>
                         <td class="cs58C16240" style="width:68px;height:22px;line-height:11px;text-align:center;vertical-align:middle;"><nobr>JOUR</nobr></td>
                         <td class="cs58C16240" colspan="2" style="width:63px;height:22px;line-height:11px;text-align:center;vertical-align:middle;"><nobr>Heure&nbsp;Entr&#233;e</nobr></td>
@@ -11146,7 +11178,7 @@ function GetBulletinPaieSalaire($id)
                 <tr style="vertical-align:top;">
                     <td style="width:0px;height:19px;"></td>
                     <td></td>
-                    <td class="csE1C721DA" colspan="7" style="width:214px;height:19px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>CARITAS&nbsp;GOMA</nobr></td>
+                    <td class="csE1C721DA" colspan="7" style="width:214px;height:19px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>FFN&nbsp;</nobr></td>
                     <td class="csE1C721DA" colspan="6" style="width:200px;height:19px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>Matricule&nbsp;N&#176;&nbsp;:&nbsp;GOMA</nobr></td>
                     <td class="cs1D279BBD" colspan="6" style="width:221px;height:19px;"><!--[if lte IE 7]><div class="csF7D3565D"></div><![endif]--></td>
                 </tr>
@@ -11380,7 +11412,7 @@ function GetBulletinPaieSalaire($id)
                 <tr style="vertical-align:top;">
                     <td style="width:0px;height:20px;"></td>
                     <td></td>
-                    <td class="csE1C721DA" colspan="19" style="width:642px;height:20px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>Signature&nbsp;de&nbsp;l'.$aps.'employ&#233;&nbsp;(e)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Directeur&nbsp;de&nbsp;la&nbsp;Caritas</nobr></td>
+                    <td class="csE1C721DA" colspan="19" style="width:642px;height:20px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>Signature&nbsp;de&nbsp;l'.$aps.'employ&#233;&nbsp;(e)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Directeur&nbsp;de&nbsp;la&nbsp;FFN</nobr></td>
                 </tr>
                 <tr style="vertical-align:top;">
                     <td style="width:0px;height:19px;"></td>
@@ -11503,34 +11535,41 @@ function printRapportTimeSheetDate($date1, $date2,$affectation_id)
          $categorie_agent='';
          //  
          $data2 =  DB::table('tperso_affectation_agent')
-         ->join('tperso_parametre_salairebase','tperso_parametre_salairebase.id','=','tperso_affectation_agent.param_salaire_id')
-         ->join('tperso_projets','tperso_projets.id','=','tperso_parametre_salairebase.projet_id')
-         ->join('tperso_partenaire','tperso_partenaire.id','=','tperso_projets.partenaire_id')
-         ->join('tperso_poste','tperso_poste.id','=','tperso_affectation_agent.refPoste')
-         ->join('tperso_lieuaffectation','tperso_lieuaffectation.id','=','tperso_affectation_agent.refLieuAffectation')
-         ->join('tperso_mutuelle','tperso_mutuelle.id','=','tperso_affectation_agent.refMutuelle')
-         ->join('tperso_typecontrat','tperso_typecontrat.id','=','tperso_affectation_agent.refTypeContrat')
-         ->join('tperso_categorie_agent','tperso_categorie_agent.id','=','tperso_affectation_agent.refCategorieAgent')
-         ->join('tperso_service_personnel','tperso_service_personnel.id','=','tperso_affectation_agent.refServicePerso')
-         ->join('tperso_categorie_service','tperso_categorie_service.id','=','tperso_service_personnel.refCatService')
-         ->join('tagent','tagent.id','=','tperso_affectation_agent.refAgent')
-         ->select("tperso_affectation_agent.id",'refAgent','refServicePerso','refCategorieAgent','refPoste','refLieuAffectation',
-         'refMutuelle','refTypeContrat','dateAffectation','dureecontrat','dureeLettre','dateFin','dateDebutEssaie',
-         'dateFinEssaie','JourTrail1','JourTrail2','heureTrail1','heureTrail2','TempsPause','nbrConge','nbrCongeLettre',
-         'nomOffice','postnomOffice','qualifieOffice','codeAgent','directeur','numCNSS','numImpot','numcpteBanque',
-         'BanqueAgant','autresDetail','conge',"tperso_affectation_agent.author","matricule_agent","nummaison_agent",
-         "noms_agent","sexe_agent","datenaissance_agent","lieunaissnce_agent","provinceOrigine_agent",
-         "etatcivil_agent","refAvenue_agent","contact_agent","mail_agent","grade_agent","fonction_agent",
-         "specialite_agent","Categorie_agent","niveauEtude_agent","anneeFinEtude_agent","Ecole_agent",
-         "tagent.photo as photo_agent","tagent.slug as slug_agent","name_serv_perso","name_categorie_service",
-         "name_categorie_agent",'nom_poste','description_poste','nom_lieu','description_lieu',
-         'nom_mutuelle','description_mutuelle','nom_contrat','code_contrat','param_salaire_id','fammiliale',
-         'logement','tperso_affectation_agent.transport','sal_brut','sal_brut_imposable',
-         'inss_qpo','inss_qpp','cnss','inpp','onem','ipr','mission',"categorie_id","projet_id","salaire_base",
-         "partenaire_id","description_projet","chef_projet","date_debut_projet","date_fin_projet","nom_org",
-         "adresse_org","contact_org","rccm_org", "idnat_org","etat_contrat","salaire_prevu")
-         ->selectRaw('TIMESTAMPDIFF(YEAR, datenaissance_agent, CURDATE()) as age_agent')
-         ->selectRaw('TIMESTAMPDIFF(MONTH, CURDATE(), dateFin) as dureerestante') 
+        ->join('tperso_poste','tperso_poste.id','=','tperso_affectation_agent.refPoste')
+        ->join('tperso_lieuaffectation','tperso_lieuaffectation.id','=','tperso_affectation_agent.refLieuAffectation')
+        ->join('tperso_mutuelle','tperso_mutuelle.id','=','tperso_affectation_agent.refMutuelle')
+        ->join('tperso_typecontrat','tperso_typecontrat.id','=','tperso_affectation_agent.refTypeContrat')
+        ->join('tperso_categorie_agent','tperso_categorie_agent.id','=','tperso_affectation_agent.refCategorieAgent')
+        ->join('tperso_service_personnel','tperso_service_personnel.id','=','tperso_affectation_agent.refServicePerso')
+        ->join('tperso_categorie_service','tperso_categorie_service.id','=','tperso_service_personnel.refCatService')
+        ->join('tagent','tagent.id','=','tperso_affectation_agent.refAgent')
+        ->join('avenues' , 'avenues.id','=','tagent.refAvenue_agent')
+        ->join('quartiers' , 'quartiers.id','=','avenues.idQuartier')
+        ->join('communes' , 'communes.id','=','quartiers.idCommune')
+        ->join('villes' , 'villes.id','=','communes.idVille')
+        ->join('provinces' , 'provinces.id','=','villes.idProvince')
+        ->join('pays' , 'pays.id','=','provinces.idPays')
+        ->join('taxe_site_affect' , 'taxe_site_affect.id','=','tperso_affectation_agent.refSiteAffectation')
+        ->join('taxe_sous_poste_affect' , 'taxe_sous_poste_affect.id','=','taxe_site_affect.id_sous_poste_affect')
+        ->join('taxe_poste_affect' , 'taxe_poste_affect.id','=','taxe_sous_poste_affect.id_poste_affect')
+        ->join('taxe_antene' , 'taxe_antene.id','=','taxe_poste_affect.id_antene')
+        ->select("tperso_affectation_agent.id",'refAgent','refServicePerso','refCategorieAgent','refPoste','refLieuAffectation',
+        'refMutuelle','refTypeContrat','dateAffectation','dureecontrat','dureeLettre','dateFin','dateDebutEssaie',
+        'dateFinEssaie','JourTrail1','JourTrail2','heureTrail1','heureTrail2','TempsPause','nbrConge','nbrCongeLettre',
+        'nomOffice','postnomOffice','qualifieOffice','codeAgent','directeur','numCNSS','numImpot','numcpteBanque',
+        'BanqueAgant','autresDetail','conge',"tperso_affectation_agent.author","matricule_agent",
+        "noms_agent","sexe_agent","datenaissance_agent","lieunaissnce_agent","provinceOrigine_agent",
+        "etatcivil_agent","refAvenue_agent","contact_agent","mail_agent","grade_agent","fonction_agent",
+        "specialite_agent","Categorie_agent","niveauEtude_agent","anneeFinEtude_agent","Ecole_agent","tagent.photo as photo_agent",
+        "tagent.slug as slug_agent","name_serv_perso","name_categorie_service","name_categorie_agent",
+        'tperso_poste.nom_poste','description_poste','nom_lieu','description_lieu','nom_mutuelle','description_mutuelle',
+        'nom_contrat','code_contrat','refSiteAffectation','nom_site_affect','id_sous_poste_affect',
+        'nom_sous_poste','id_poste_affect','taxe_poste_affect.nom_poste as nom_poste_affect','id_antene','nom_antene')
+        // ->selectRaw('CONCAT(YEAR, datenaissance_agent, CURDATE()) as age_agent')
+        ->selectRaw('TIMESTAMPDIFF(YEAR, datenaissance_agent, CURDATE()) as age_agent')   
+        ->selectRaw('TIMESTAMPDIFF(MONTH, CURDATE(), dateFin) as dureerestante')    
+        ->selectRaw("CASE  WHEN (TIMESTAMPDIFF(MONTH, CURDATE(), dateFin))>0 THEN 'Encours' ELSE 'Fini' END as Statut")
+        //  ->selectRaw('TIMESTAMPDIFF(MONTH, CURDATE(), dateFin) as dureerestante') 
         //  ->selectRaw('((salaire_base +fammiliale + logement + tperso_affectation_agent.transport) - inss_qpo - ipr) as netPaie')
          ->where([
             ['tperso_affectation_agent.id','=', $affectation_id]
@@ -12017,7 +12056,7 @@ function showRapportTimeSheetDate($date1, $date2,$affectation_id)
                     <td class="cs86F8EF7F" style="width:78px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->jour_presence.'</nobr></td>
                     <td class="csD06EB5B2" style="width:52px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->jour_preste.'</nobr></td>
                     <td class="csD06EB5B2" colspan="3" style="width:68px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->perdieme.'</nobr></td>
-                    <td class="csD06EB5B2" colspan="2" style="width:138px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_lieu.'</nobr></td>
+                    <td class="csD06EB5B2" colspan="2" style="width:138px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_site_affect.'</nobr></td>
                     <td class="csD06EB5B2" colspan="3" style="width:405px;height:22px;line-height:10px;text-align:left;vertical-align:middle;">'.$row->activite.'</td>
                     <td class="csD06EB5B2" colspan="5" style="width:70px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->heure_entree.'</nobr></td>
                     <td class="csD06EB5B2" style="width:54px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->heure_sortie.'</nobr></td>
@@ -12029,6 +12068,8 @@ function showRapportTimeSheetDate($date1, $date2,$affectation_id)
     return $output;
 
 }
+
+
 
 
 
