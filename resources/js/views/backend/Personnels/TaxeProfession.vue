@@ -112,14 +112,14 @@
                           <span>Modifier</span>
                         </v-tooltip>
   
-                        <!-- <v-tooltip top   color="black">
+                        <v-tooltip top   color="black">
                           <template v-slot:activator="{ on, attrs }">
                             <span v-bind="attrs" v-on="on">
                               <v-btn @click="clearP(item.id)" fab small><v-icon color="  red">delete</v-icon></v-btn>
                             </span>
                           </template>
                           <span>Supprimer</span>
-                        </v-tooltip> -->
+                        </v-tooltip>
                       </td>
                     </tr>
                   </tbody>

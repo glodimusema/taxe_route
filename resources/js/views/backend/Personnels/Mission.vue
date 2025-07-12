@@ -161,7 +161,7 @@
                                       <span>Modifier</span>
                                     </v-tooltip>
   
-                                    <!-- <v-tooltip top   color="black">
+                                    <v-tooltip top   color="black">
                                       <template v-slot:activator="{ on, attrs }">
                                         <span v-bind="attrs" v-on="on">
                                           <v-btn @click="desactiverData(item.id, item.author, item.created_at, item.noms,item.montant_avance)" fab small>
@@ -170,7 +170,7 @@
                                         </span>
                                       </template>
                                       <span>Suppression</span>
-                                    </v-tooltip> -->
+                                    </v-tooltip>
   
                                     <v-tooltip top color="black">
                                       <template v-slot:activator="{ on, attrs }">
