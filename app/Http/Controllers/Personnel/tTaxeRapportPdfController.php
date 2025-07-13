@@ -714,7 +714,44 @@ class tTaxeRapportPdfController extends Controller
 
 //==================== RAPPORT JOURNALIER SELON LE COMPTE =================================
 
+public function fetch_rapport_entree_compte_date(Request $request)
+{
+    //
 
+    if ($request->get('date1') && $request->get('date2') && $request->get('refCompte'))  {
+        // code...
+        $date1 = $request->get('date1');
+        $date2 = $request->get('date2');
+        $refCompte = $request->get('refCompte');
+
+        $html = "";
+        $html .= '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>';
+        $html .= $this->printDataListCompte($date1, $date2,$refCompte);
+        $html .= '<script>window.print()</script>';
+
+        echo ($html);          
+
+    }
+    else if ($request->get('date1') && $request->get('date2'))
+    {
+        $date1 = $request->get('date1');
+        $date2 = $request->get('date2');
+        
+        $html = $this->printDataList($date1, $date2);
+        $pdf = \App::make('dompdf.wrapper');
+
+        // echo($html);
+
+
+        // $pdf->loadHTML($html);
+        $pdf->loadHTML($html)->setPaper('a4', 'landscape');
+        return $pdf->stream();  
+    }
+     else {
+        // code...
+    }
+    
+}
 function printDataListCompte($date1, $date2, $refCompte)
 {
 
@@ -774,21 +811,28 @@ function printDataListCompte($date1, $date2, $refCompte)
              $siege=$row->nomForme;         
          }
 
+         $aps = "'";
 
          $totalPaie=0;
+         $totalQuotite=0;
+         $TotalRecouvre=0;
          
-         $data2 = DB::table('ttaxe_paiement')        
-         ->select(DB::raw('SUM(montant) as TotalPaie'))        
-         ->where([
-            ['dateOperation','>=', $date1],
-            ['dateOperation','<=', $date2],
-            ['refCompte','=', $refCompte]
-        ])       
-         ->get();
+         $data2 = DB::table('ttaxe_paiement')   
+         ->join('ttaxe_categorie' , 'ttaxe_categorie.id','=','ttaxe_paiement.refCompte')     
+        ->selectRaw('
+            SUM(qte * montant) AS TotalPaie, 
+            SUM((qte * montant * quotite) / 100) AS TotalQuotite,
+            SUM(recouvrement) AS TotalRecouvre
+        ')
+        ->whereBetween('dateOperation', [$date1, $date2])
+        ->where('refCompte', $refCompte)
+        ->get();
          $output='';
          foreach ($data2 as $row) 
          {                                
-             $totalPaie=$row->TotalPaie;                
+             $totalPaie=$row->TotalPaie; 
+             $totalQuotite=$row->TotalQuotite;
+             $TotalRecouvre=$row->TotalRecouvre;               
          }
 
 
@@ -797,345 +841,365 @@ function printDataListCompte($date1, $date2, $refCompte)
          $agence='';
          $code_agence='';
 
-         $data3=DB::table('ttaxe_paiement')
-         ->join('ttaxe_categorie' , 'ttaxe_categorie.id','=','ttaxe_paiement.refCompte')
-         ->select('ttaxe_categorie.designation as Compte','refCompte')       
+         $data3 = DB::table('ttaxe_categorie')
+        ->join('taxe_unite' , 'taxe_unite.id','=','ttaxe_categorie.id_unite')
+        ->select("ttaxe_categorie.id",'designation','prix_categorie','prix_categorie2',
+        'id_unite','quotite','nom_unite',"ttaxe_categorie.created_at")       
          ->where([
-            ['dateOperation','>=', $date1],
-            ['dateOperation','<=', $date2],
-            ['refCompte','=', $refCompte]
+            ['ttaxe_categorie.id','=', $refCompte]
         ])      
         ->get();      
         $output='';
         foreach ($data3 as $row) 
         {
-            $agence=$row->Compte;
-            $code_agence=$row->refCompte;                   
+            $agence=$row->designation;
+            $code_agence=$row->nom_unite;                   
         }
 
 
 
     
 
-        $output='<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-        <!-- saved from url=(0016)http://localhost -->
-        <html>
-        <head>
-            <title>rpt_Depense</title>
-            <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8"/>
-            <style type="text/css">
-                .csB6F858D0 {color:#000000;background-color:#D6E5F4;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:24px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
-                .cs9FE9304F {color:#000000;background-color:#E0E0E0;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; }
-                .csEAC52FCD {color:#000000;background-color:#E0E0E0;border-left-style: none;border-top:#000000 1px solid;border-right-style: none;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; }
-                .cs56F73198 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:16px; font-weight:normal; font-style:normal; padding-left:2px;}
-                .csE14C81B5 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right-style: none;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:16px; font-weight:bold; font-style:normal; padding-left:2px;}
-                .cs6E02D7D2 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:14px; font-weight:normal; font-style:normal; }
-                .cs18C8C797 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:16px; font-weight:normal; font-style:normal; padding-left:2px;}
-                .cs6C28398D {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right-style: none;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:14px; font-weight:normal; font-style:normal; }
-                .cs101A94F7 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; }
-                .cs12FE94AA {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:14px; font-weight:normal; font-style:normal; padding-left:2px;}
-                .cs5DE5F832 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:16px; font-weight:normal; font-style:normal; padding-left:2px;padding-right:2px;}
-                .csA67C9637 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:18px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
-                .csECF45065 {color:#0000FF;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:14px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
-                .csAFF8CC7 {color:#0000FF;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:18px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
-                .cs739196BC {color:#5C5C5C;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Segoe UI; font-size:11px; font-weight:normal; font-style:normal; }
-                .cs92CE5FDD {color:#FF0000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:18px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
-                .csF7D3565D {height:0px;width:0px;overflow:hidden;font-size:0px;line-height:0px;}
-            </style>
-        </head>
-        <body leftMargin=10 topMargin=10 rightMargin=10 bottomMargin=10 style="background-color:#FFFFFF">
-        <table cellpadding="0" cellspacing="0" border="0" style="border-width:0px;empty-cells:show;width:916px;height:383px;position:relative;">
-            <tr>
-                <td style="width:0px;height:0px;"></td>
-                <td style="height:0px;width:10px;"></td>
-                <td style="height:0px;width:6px;"></td>
-                <td style="height:0px;width:68px;"></td>
-                <td style="height:0px;width:45px;"></td>
-                <td style="height:0px;width:31px;"></td>
-                <td style="height:0px;width:13px;"></td>
-                <td style="height:0px;width:12px;"></td>
-                <td style="height:0px;width:34px;"></td>
-                <td style="height:0px;width:59px;"></td>
-                <td style="height:0px;width:131px;"></td>
-                <td style="height:0px;width:59px;"></td>
-                <td style="height:0px;width:98px;"></td>
-                <td style="height:0px;width:177px;"></td>
-                <td style="height:0px;width:20px;"></td>
-                <td style="height:0px;width:10px;"></td>
-                <td style="height:0px;width:37px;"></td>
-                <td style="height:0px;width:25px;"></td>
-                <td style="height:0px;width:73px;"></td>
-                <td style="height:0px;width:8px;"></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:23px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:16px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:23px;"></td>
-                <td></td>
-                <td></td>
-                <td class="cs101A94F7" colspan="3" rowspan="6" style="width:144px;height:128px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:144px;height:128px;">
-                    <!--[if lt IE 7]><img alt="" src="'.$pic.'" style="width:144px;height:128px;filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src="",sizingMethod="");" /><div style="display:none"><![endif]--><img alt="" src="'.$pic.'" style="width:144px;height:128px;" /><!--[if lt IE 7]></div><![endif]--></div>
-                </td>
-                <td></td>
-                <td class="csA67C9637" colspan="7" style="width:566px;height:23px;line-height:21px;text-align:center;vertical-align:middle;"><nobr>REPUBLIQUE&nbsp;DEMOBCRATIQUE&nbsp;DU&nbsp;CONGO</nobr></td>
-                <td></td>
-                <td class="cs101A94F7" colspan="4" rowspan="4" style="width:145px;height:92px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:145px;height:92px;">
-                    <img alt="" src="'.$pic2.'" style="width:145px;height:92px;" /></div>
-                </td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:23px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="cs92CE5FDD" colspan="7" style="width:566px;height:23px;line-height:21px;text-align:center;vertical-align:middle;"><nobr>&quot;'.$nomEse.'&quot;</nobr></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:25px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="csAFF8CC7" colspan="7" style="width:566px;height:25px;line-height:21px;text-align:center;vertical-align:middle;"><nobr>Si&#232;ge&nbsp;Sociale&nbsp;et&nbsp;Administratif&nbsp;&#224;&nbsp;'.$siege.'</nobr></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:21px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="cs5DE5F832" colspan="7" style="width:566px;height:21px;line-height:18px;text-align:center;vertical-align:middle;">Adresse&nbsp;:'.$adresseEse.'</td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:25px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="csECF45065" colspan="7" style="width:566px;height:25px;line-height:16px;text-align:center;vertical-align:middle;"><nobr>Contact&nbsp;:'.$Tel1Ese.','.$Tel2Ese.'</nobr></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:11px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="csECF45065" colspan="7" rowspan="2" style="width:566px;height:24px;line-height:16px;text-align:center;vertical-align:middle;">Email&nbsp;:&nbsp;'.$emailEse.'</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:13px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:9px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:32px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="csB6F858D0" colspan="13" style="width:702px;height:32px;line-height:28px;text-align:center;vertical-align:middle;"><nobr>RAPPORT&nbsp;JOURNALIER&nbsp;DES&nbsp;RECETTES&nbsp;A&nbsp;LA&nbsp;CAISSE</nobr></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:17px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:22px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="cs56F73198" colspan="7" style="width:335px;height:20px;line-height:18px;text-align:left;vertical-align:top;"><nobr>&nbsp;PERIODE&nbsp;:&nbsp;&nbsp;Du&nbsp;&nbsp;'.$date1.'&nbsp;&nbsp;au&nbsp;'.$date2.'</nobr></td>
-                <td class="csE14C81B5" style="width:95px;height:20px;line-height:18px;text-align:left;vertical-align:top;"><nobr>SECTEUR&nbsp;:</nobr></td>
-                <td class="cs18C8C797" colspan="4" style="width:241px;height:20px;line-height:18px;text-align:left;vertical-align:top;"><nobr>'.$agence.'</nobr></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:20px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:24px;"></td>
-                <td></td>
-                <td class="cs9FE9304F" colspan="2" style="width:73px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>N&#176;&nbsp;BS</nobr></td>
-                <td class="cs9FE9304F" colspan="4" style="width:100px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>MONTANT&nbsp;(FC)</nobr></td>
-                <td class="cs9FE9304F" colspan="2" style="width:92px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>DATE</nobr></td>
-                <td class="cs9FE9304F" colspan="3" style="width:287px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Contribuable</nobr></td>
-                <td class="cs9FE9304F" colspan="3" style="width:206px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>CATEGORIE TAXE</nobr></td>
-                <td class="csEAC52FCD" colspan="4" style="width:143px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>CAISSIER(E)</nobr></td>
-            </tr>
-            ';
+        $output='
+            <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+            <!-- saved from url=(0016)http://localhost -->
+            <html>
+            <head>
+                <title>rptRapportTaxe</title>
+                <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8"/>
+                <style type="text/css">
+                    .cs1E4BB091 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:11px; font-weight:bold; font-style:normal; }
+                    .csDB0B2364 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:bold; font-style:normal; }
+                    .cs463A9CD7 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:normal; font-style:normal; }
+                    .csEE1F9023 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:11px; font-weight:bold; font-style:normal; }
+                    .cs5A34C077 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:bold; font-style:normal; }
+                    .cs6AEC9C2 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:normal; font-style:normal; }
+                    .cs8BD51C12 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs101A94F7 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; }
+                    .cs5EA817F2 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs2C853136 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:19px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs6CA35B49 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Vivaldi; font-size:19px; font-weight:bold; font-style:italic; padding-left:2px;padding-right:2px;}
+                    .cs5682A5DF {color:#228B22;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:16px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs739196BC {color:#5C5C5C;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Segoe UI; font-size:11px; font-weight:normal; font-style:normal; }
+                    .csF7D3565D {height:0px;width:0px;overflow:hidden;font-size:0px;line-height:0px;}
+                </style>
+            </head>
+            <body leftMargin=10 topMargin=10 rightMargin=10 bottomMargin=10 style="background-color:#FFFFFF">
+            <table cellpadding="0" cellspacing="0" border="0" style="border-width:0px;empty-cells:show;width:901px;height:340px;position:relative;">
+                <tr>
+                    <td style="width:0px;height:0px;"></td>
+                    <td style="height:0px;width:10px;"></td>
+                    <td style="height:0px;width:40px;"></td>
+                    <td style="height:0px;width:50px;"></td>
+                    <td style="height:0px;width:41px;"></td>
+                    <td style="height:0px;width:21px;"></td>
+                    <td style="height:0px;width:54px;"></td>
+                    <td style="height:0px;width:33px;"></td>
+                    <td style="height:0px;width:40px;"></td>
+                    <td style="height:0px;width:82px;"></td>
+                    <td style="height:0px;width:38px;"></td>
+                    <td style="height:0px;width:14px;"></td>
+                    <td style="height:0px;width:133px;"></td>
+                    <td style="height:0px;width:22px;"></td>
+                    <td style="height:0px;width:66px;"></td>
+                    <td style="height:0px;width:40px;"></td>
+                    <td style="height:0px;width:28px;"></td>
+                    <td style="height:0px;width:40px;"></td>
+                    <td style="height:0px;width:11px;"></td>
+                    <td style="height:0px;width:7px;"></td>
+                    <td style="height:0px;width:8px;"></td>
+                    <td style="height:0px;width:122px;"></td>
+                    <td style="height:0px;width:1px;"></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:23px;"></td>
+                    <td class="cs739196BC" colspan="10" style="width:409px;height:23px;line-height:14px;text-align:center;vertical-align:middle;"><nobr></nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:12px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:1px;"></td>
+                    <td></td>
+                    <td class="cs101A94F7" colspan="3" rowspan="6" style="width:131px;height:110px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:131px;height:110px;">
+                        <img alt="" src="'.$pic2.'" style="width:131px;height:110px;" /></div>
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs8BD51C12" colspan="11" rowspan="2" style="width:532px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>REPUBLIQUE&nbsp;DEMOCRATIQUE&nbsp;DU&nbsp;CONGO</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:21px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs101A94F7" colspan="3" rowspan="6" style="width:131px;height:111px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:131px;height:111px;">
+                        <img alt="" src="'.$pic2.'" style="width:131px;height:111px;" /></div>
+                    </td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs8BD51C12" colspan="11" style="width:532px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>MINISTRE&nbsp;DE&nbsp;L'.$aps.'ENVIRONNEMENT&nbsp;ET&nbsp;DEVELOPPEMENT&nbsp;DURABLE</nobr></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:25px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs6CA35B49" colspan="11" style="width:532px;height:25px;line-height:23px;text-align:center;vertical-align:middle;"><nobr>Le&nbsp;Chef&nbsp;d'.$aps.'Antenne&nbsp;Provinciale&nbsp;a&nbsp;l'.$aps.'interim&nbsp;de&nbsp;la&nbsp;Tshopo&nbsp;et&nbsp;Bas-Uel&#233;</nobr></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs5682A5DF" colspan="11" style="width:532px;height:22px;line-height:18px;text-align:center;vertical-align:middle;"><nobr>Fonds&nbsp;Forestier&nbsp;National</nobr></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:19px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs5EA817F2" colspan="11" rowspan="3" style="width:532px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>E-mail&nbsp;:&nbsp;'.$emailEse.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:2px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:1px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs8BD51C12" colspan="11" style="width:532px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Tel&#233;phone&nbsp;:&nbsp;'.$Tel1Ese.',&nbsp;'.$Tel2Ese.',&nbsp;'.$Tel1Ese.',</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:18px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:23px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs2C853136" colspan="13" style="width:597px;height:23px;line-height:22px;text-align:center;vertical-align:middle;"><nobr>RAPPORT&nbsp;JOURNALIER&nbsp;DES&nbsp;PAIEMENTS&nbsp;DE&nbsp;LA&nbsp;TAXE</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:23px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs5EA817F2" colspan="4" style="width:203px;height:23px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Du&nbsp;'.$date1.'&nbsp;&nbsp;au&nbsp;&nbsp;'.$date2.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs8BD51C12" colspan="8" style="width:431px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Valeur&nbsp;Filtr&#233;e&nbsp;:&nbsp;'.$agence.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:12px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:24px;"></td>
+                    <td></td>
+                    <td class="cs1E4BB091" style="width:38px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>N&#176;</nobr></td>
+                    <td class="csEE1F9023" style="width:49px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Date</nobr></td>
+                    <td class="csEE1F9023" colspan="5" style="width:188px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Assigetis</nobr></td>
+                    <td class="csEE1F9023" colspan="3" style="width:133px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Cat&#233;gorie&nbsp;Taxe</nobr></td>
+                    <td class="csEE1F9023" style="width:132px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Exploitation</nobr></td>
+                    <td class="csEE1F9023" colspan="2" style="width:87px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Montant&nbsp;Pay&#233;</nobr></td>
+                    <td class="csEE1F9023" colspan="2" style="width:67px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Quotit&#233;</nobr></td>
+                    <td class="csEE1F9023" colspan="4" style="width:65px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>&#224;&nbsp;Recouvrer</nobr></td>
+                    <td class="csEE1F9023" style="width:121px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Recouvreur</nobr></td>
+                    <td></td>
+                </tr>
+                ';
 
-            $output .= $this->showDetailPaieCompte($date1,$date2,$refCompte); 
+                        $output .= $this->showDetailPaieCompte($date1,$date2,$refCompte); 
 
-            $output.='
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:24px;"></td>
-                <td></td>
-                <td class="cs9FE9304F" colspan="2" style="width:73px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>TOTAL(FC)&nbsp;:</nobr></td>
-                <td class="csEAC52FCD" colspan="16" style="width:832px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>'.$totalPaie.'FC</nobr></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:9px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:22px;"></td>
-                <td></td>
-                <td class="cs12FE94AA" colspan="7" style="width:207px;height:22px;line-height:16px;text-align:left;vertical-align:top;"><nobr>Fait&nbsp;&#224;&nbsp;Goma&nbsp;le&nbsp;&nbsp;'.date('Y-m-d').'</nobr></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-        </table>
-        </body>
-        </html>';  
+                        $output.='
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:24px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="csDB0B2364" style="width:131px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>TOTAL</nobr></td>
+                    <td class="cs5A34C077" colspan="2" style="width:87px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$totalPaie.'&nbsp;FC</nobr></td>
+                    <td class="cs5A34C077" colspan="2" style="width:67px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$totalQuotite.'FC</nobr></td>
+                    <td class="cs5A34C077" colspan="4" style="width:65px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$TotalRecouvre.'&nbsp;FC</nobr></td>
+                    <td class="cs5A34C077" style="width:121px;height:22px;"><!--[if lte IE 7]><div class="csF7D3565D"></div><![endif]--></td>
+                    <td></td>
+                </tr>
+            </table>
+            </body>
+            </html>
+        ';  
        
         return $output; 
 
@@ -1144,15 +1208,26 @@ function showDetailPaieCompte($date1, $date2,$refCompte)
 {
     $refMvt=1;
     $data=DB::table('ttaxe_paiement')
+    ->join('taxe_exploitation','taxe_exploitation.id','=','ttaxe_paiement.refExploitation')
     ->join('ttaxe_contribuable','ttaxe_contribuable.id','=','ttaxe_paiement.refEse')
     ->join('ttaxe_categorie' , 'ttaxe_categorie.id','=','ttaxe_paiement.refCompte')
     ->join('tagent' , 'tagent.id','=','ttaxe_paiement.refAgent')
-    ->select("ttaxe_paiement.id",'montant','montantLettre','motif','dateOperation',
+    ->join('tperso_annee' , 'tperso_annee.id','=','ttaxe_paiement.refAnnee')
+    ->join('tperso_mois' , 'tperso_mois.id','=','ttaxe_paiement.refMois')
+    ->select("ttaxe_paiement.id",'montant','montantLettre','motif',
     'refEse','ttaxe_paiement.refCompte','refAgent','ttaxe_paiement.author',"matricule_agent",
-    "noms_agent","sexe_agent",'ttaxe_categorie.designation as categorietaxe','prix_categorie',
+    "noms_agent","sexe_agent",'ttaxe_categorie.designation as categorietaxe','prix_categorie','prix_categorie2',
     'colId_Ese','colIdNat_Ese','colRCCM_Ese','colNom_Ese','colRaisonSociale_Ese','colFormeJuridique_Ese',
     'colGenreActivite_Ese','ColRefCat','ColRefQuartier','colQuartier_Ese','colAdresseEntreprise_Ese',
-    'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus')
+    'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
+    ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
+    'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
+    "tperso_annee.active",'qte','recouvrement','refExploitation','marque_vehicule',
+    'lieu_chargement','destination','bordereau','observations','id_unite','quotite',
+    'nom_exploitation')
+    ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")
+    ->selectRaw("(qte * montant) as montant_total")
+    ->selectRaw("(((qte * montant) * quotite)/100) as montant_quotite")
     ->where([
         ['dateOperation','>=', $date1],
         ['dateOperation','<=', $date2],
@@ -1166,16 +1241,24 @@ function showDetailPaieCompte($date1, $date2,$refCompte)
     foreach ($data as $row) 
     {  
     
-        $output.='<tr style="vertical-align:top;">
-        <td style="width:0px;height:24px;"></td>
-        <td></td>
-        <td class="cs6E02D7D2" colspan="2" style="width:73px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">00'.$row->id.'</td>
-        <td class="cs6E02D7D2" colspan="4" style="width:100px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row->montant.'FC</td>
-        <td class="cs6E02D7D2" colspan="2" style="width:92px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row->dateOperation.'</td>
-        <td class="cs6E02D7D2" colspan="3" style="width:287px;height:22px;line-height:15px;text-align:left;vertical-align:middle;">'.$row->colNom_Ese.'</td>
-        <td class="cs6E02D7D2" colspan="3" style="width:206px;height:22px;line-height:15px;text-align:left;vertical-align:middle;">'.$row->categorietaxe.'</td>
-        <td class="cs6C28398D" colspan="4" style="width:143px;height:22px;line-height:15px;text-align:left;vertical-align:middle;">'.$row->author.'</td>
-    </tr>';       
+        $output .='
+
+            	<tr style="vertical-align:top;">
+                    <td style="width:0px;height:24px;"></td>
+                    <td></td>
+                    <td class="cs463A9CD7" style="width:38px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->id.'</nobr></td>
+                    <td class="cs6AEC9C2" style="width:49px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->dateOperation.'</nobr></td>
+                    <td class="cs6AEC9C2" colspan="5" style="width:188px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->colProprietaire_Ese.'</nobr></td>
+                    <td class="cs6AEC9C2" colspan="3" style="width:133px;height:22px;line-height:10px;text-align:left;vertical-align:middle;"><nobr>'.$row->categorietaxe.'</nobr></td>
+                    <td class="cs6AEC9C2" style="width:132px;height:22px;line-height:10px;text-align:left;vertical-align:middle;"><nobr>'.$row->nom_exploitation.'</nobr></td>
+                    <td class="cs6AEC9C2" colspan="2" style="width:87px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->montant_total.'&nbsp;FC</nobr></td>
+                    <td class="cs6AEC9C2" colspan="2" style="width:67px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->montant_quotite.'FC</nobr></td>
+                    <td class="cs6AEC9C2" colspan="4" style="width:65px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->recouvrement.'&nbsp;FC</nobr></td>
+                    <td class="cs6AEC9C2" style="width:121px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->noms_agent.'</nobr></td>
+                    <td></td>
+                </tr>
+
+        ';     
     
     }
 
@@ -1183,9 +1266,9 @@ function showDetailPaieCompte($date1, $date2,$refCompte)
 
 }
 
-
 //======== RAPPORT JOURNALIER GLOBAL ===================================================================================================
 //================================================================================================================================================
+
 
 function printDataList($date1, $date2)
 {
@@ -1246,353 +1329,395 @@ function printDataList($date1, $date2)
              $siege=$row->nomForme;         
          }
 
+         $aps = "'";
 
          $totalPaie=0;
+         $totalQuotite=0;
+         $TotalRecouvre=0;
          
-         $data2 = DB::table('ttaxe_paiement')        
-         ->select(DB::raw('SUM(montant) as TotalPaie'))        
-         ->where([
-            ['dateOperation','>=', $date1],
-            ['dateOperation','<=', $date2]
-        ])       
-         ->get();
+         $data2 = DB::table('ttaxe_paiement')  
+         ->join('ttaxe_categorie' , 'ttaxe_categorie.id','=','ttaxe_paiement.refCompte')      
+        ->selectRaw('
+            SUM(qte * montant) AS TotalPaie, 
+            SUM((qte * montant * quotite) / 100) AS TotalQuotite,
+            SUM(recouvrement) AS TotalRecouvre
+        ')
+        ->whereBetween('dateOperation', [$date1, $date2])
+        // ->where('refCompte', $refCompte)
+        ->get();
          $output='';
          foreach ($data2 as $row) 
          {                                
-             $totalPaie=$row->TotalPaie;                
+             $totalPaie=$row->TotalPaie; 
+             $totalQuotite=$row->TotalQuotite;
+             $TotalRecouvre=$row->TotalRecouvre;               
          }
 
 
          $datedebut=$date1;
          $datefin=$date2;
-         $agence='GLOGAL';
-         $code_agence='0';
+         $agence='GLOBAL';
+         $code_agence='--';
+
+        //  $data3 = DB::table('ttaxe_categorie')
+        // ->join('taxe_unite' , 'taxe_unite.id','=','ttaxe_categorie.id_unite')
+        // ->select("ttaxe_categorie.id",'designation','prix_categorie','prix_categorie2',
+        // 'id_unite','quotite','nom_unite',"ttaxe_categorie.created_at")       
+        //  ->where([
+        //     ['ttaxe_categorie.id','=', $refCompte]
+        // ])      
+        // ->get();      
+        // $output='';
+        // foreach ($data3 as $row) 
+        // {
+        //     $agence=$row->designation;
+        //     $code_agence=$row->nom_unite;                   
+        // }
 
 
 
+    
 
+        $output='
+            <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+            <!-- saved from url=(0016)http://localhost -->
+            <html>
+            <head>
+                <title>rptRapportTaxe</title>
+                <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8"/>
+                <style type="text/css">
+                    .cs1E4BB091 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:11px; font-weight:bold; font-style:normal; }
+                    .csDB0B2364 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:bold; font-style:normal; }
+                    .cs463A9CD7 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:normal; font-style:normal; }
+                    .csEE1F9023 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:11px; font-weight:bold; font-style:normal; }
+                    .cs5A34C077 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:bold; font-style:normal; }
+                    .cs6AEC9C2 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:normal; font-style:normal; }
+                    .cs8BD51C12 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs101A94F7 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; }
+                    .cs5EA817F2 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs2C853136 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:19px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs6CA35B49 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Vivaldi; font-size:19px; font-weight:bold; font-style:italic; padding-left:2px;padding-right:2px;}
+                    .cs5682A5DF {color:#228B22;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:16px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs739196BC {color:#5C5C5C;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Segoe UI; font-size:11px; font-weight:normal; font-style:normal; }
+                    .csF7D3565D {height:0px;width:0px;overflow:hidden;font-size:0px;line-height:0px;}
+                </style>
+            </head>
+            <body leftMargin=10 topMargin=10 rightMargin=10 bottomMargin=10 style="background-color:#FFFFFF">
+            <table cellpadding="0" cellspacing="0" border="0" style="border-width:0px;empty-cells:show;width:901px;height:340px;position:relative;">
+                <tr>
+                    <td style="width:0px;height:0px;"></td>
+                    <td style="height:0px;width:10px;"></td>
+                    <td style="height:0px;width:40px;"></td>
+                    <td style="height:0px;width:50px;"></td>
+                    <td style="height:0px;width:41px;"></td>
+                    <td style="height:0px;width:21px;"></td>
+                    <td style="height:0px;width:54px;"></td>
+                    <td style="height:0px;width:33px;"></td>
+                    <td style="height:0px;width:40px;"></td>
+                    <td style="height:0px;width:82px;"></td>
+                    <td style="height:0px;width:38px;"></td>
+                    <td style="height:0px;width:14px;"></td>
+                    <td style="height:0px;width:133px;"></td>
+                    <td style="height:0px;width:22px;"></td>
+                    <td style="height:0px;width:66px;"></td>
+                    <td style="height:0px;width:40px;"></td>
+                    <td style="height:0px;width:28px;"></td>
+                    <td style="height:0px;width:40px;"></td>
+                    <td style="height:0px;width:11px;"></td>
+                    <td style="height:0px;width:7px;"></td>
+                    <td style="height:0px;width:8px;"></td>
+                    <td style="height:0px;width:122px;"></td>
+                    <td style="height:0px;width:1px;"></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:23px;"></td>
+                    <td class="cs739196BC" colspan="10" style="width:409px;height:23px;line-height:14px;text-align:center;vertical-align:middle;"><nobr></nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:12px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:1px;"></td>
+                    <td></td>
+                    <td class="cs101A94F7" colspan="3" rowspan="6" style="width:131px;height:110px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:131px;height:110px;">
+                        <img alt="" src="'.$pic2.'" style="width:131px;height:110px;" /></div>
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs8BD51C12" colspan="11" rowspan="2" style="width:532px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>REPUBLIQUE&nbsp;DEMOCRATIQUE&nbsp;DU&nbsp;CONGO</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:21px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs101A94F7" colspan="3" rowspan="6" style="width:131px;height:111px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:131px;height:111px;">
+                        <img alt="" src="'.$pic2.'" style="width:131px;height:111px;" /></div>
+                    </td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs8BD51C12" colspan="11" style="width:532px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>MINISTRE&nbsp;DE&nbsp;L'.$aps.'ENVIRONNEMENT&nbsp;ET&nbsp;DEVELOPPEMENT&nbsp;DURABLE</nobr></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:25px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs6CA35B49" colspan="11" style="width:532px;height:25px;line-height:23px;text-align:center;vertical-align:middle;"><nobr>Le&nbsp;Chef&nbsp;d'.$aps.'Antenne&nbsp;Provinciale&nbsp;a&nbsp;l'.$aps.'interim&nbsp;de&nbsp;la&nbsp;Tshopo&nbsp;et&nbsp;Bas-Uel&#233;</nobr></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs5682A5DF" colspan="11" style="width:532px;height:22px;line-height:18px;text-align:center;vertical-align:middle;"><nobr>Fonds&nbsp;Forestier&nbsp;National</nobr></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:19px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs5EA817F2" colspan="11" rowspan="3" style="width:532px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>E-mail&nbsp;:&nbsp;'.$emailEse.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:2px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:1px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs8BD51C12" colspan="11" style="width:532px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Tel&#233;phone&nbsp;:&nbsp;'.$Tel1Ese.',&nbsp;'.$Tel2Ese.',&nbsp;'.$Tel1Ese.',</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:18px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:23px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs2C853136" colspan="13" style="width:597px;height:23px;line-height:22px;text-align:center;vertical-align:middle;"><nobr>RAPPORT&nbsp;JOURNALIER&nbsp;DES&nbsp;PAIEMENTS&nbsp;DE&nbsp;LA&nbsp;TAXE</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:23px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs5EA817F2" colspan="4" style="width:203px;height:23px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Du&nbsp;'.$date1.'&nbsp;&nbsp;au&nbsp;&nbsp;'.$date2.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs8BD51C12" colspan="8" style="width:431px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Valeur&nbsp;Filtr&#233;e&nbsp;:&nbsp;'.$agence.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:12px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:24px;"></td>
+                    <td></td>
+                    <td class="cs1E4BB091" style="width:38px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>N&#176;</nobr></td>
+                    <td class="csEE1F9023" style="width:49px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Date</nobr></td>
+                    <td class="csEE1F9023" colspan="5" style="width:188px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Assigetis</nobr></td>
+                    <td class="csEE1F9023" colspan="3" style="width:133px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Cat&#233;gorie&nbsp;Taxe</nobr></td>
+                    <td class="csEE1F9023" style="width:132px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Exploitation</nobr></td>
+                    <td class="csEE1F9023" colspan="2" style="width:87px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Montant&nbsp;Pay&#233;</nobr></td>
+                    <td class="csEE1F9023" colspan="2" style="width:67px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Quotit&#233;</nobr></td>
+                    <td class="csEE1F9023" colspan="4" style="width:65px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>&#224;&nbsp;Recouvrer</nobr></td>
+                    <td class="csEE1F9023" style="width:121px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Recouvreur</nobr></td>
+                    <td></td>
+                </tr>
+                ';
 
-    //
+                        $output .= $this->showDetailPaie($date1,$date2); 
 
-        $output='<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-        <!-- saved from url=(0016)http://localhost -->
-        <html>
-        <head>
-            <title>rpt_Depense</title>
-            <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8"/>
-            <style type="text/css">
-                .csB6F858D0 {color:#000000;background-color:#D6E5F4;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:24px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
-                .cs9FE9304F {color:#000000;background-color:#E0E0E0;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; }
-                .csEAC52FCD {color:#000000;background-color:#E0E0E0;border-left-style: none;border-top:#000000 1px solid;border-right-style: none;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; }
-                .cs56F73198 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:16px; font-weight:normal; font-style:normal; padding-left:2px;}
-                .csE14C81B5 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right-style: none;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:16px; font-weight:bold; font-style:normal; padding-left:2px;}
-                .cs6E02D7D2 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:14px; font-weight:normal; font-style:normal; }
-                .cs18C8C797 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:16px; font-weight:normal; font-style:normal; padding-left:2px;}
-                .cs6C28398D {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right-style: none;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:14px; font-weight:normal; font-style:normal; }
-                .cs101A94F7 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; }
-                .cs12FE94AA {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:14px; font-weight:normal; font-style:normal; padding-left:2px;}
-                .cs5DE5F832 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:16px; font-weight:normal; font-style:normal; padding-left:2px;padding-right:2px;}
-                .csA67C9637 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:18px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
-                .csECF45065 {color:#0000FF;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:14px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
-                .csAFF8CC7 {color:#0000FF;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:18px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
-                .cs739196BC {color:#5C5C5C;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Segoe UI; font-size:11px; font-weight:normal; font-style:normal; }
-                .cs92CE5FDD {color:#FF0000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:18px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
-                .csF7D3565D {height:0px;width:0px;overflow:hidden;font-size:0px;line-height:0px;}
-            </style>
-        </head>
-        <body leftMargin=10 topMargin=10 rightMargin=10 bottomMargin=10 style="background-color:#FFFFFF">
-        <table cellpadding="0" cellspacing="0" border="0" style="border-width:0px;empty-cells:show;width:916px;height:383px;position:relative;">
-            <tr>
-                <td style="width:0px;height:0px;"></td>
-                <td style="height:0px;width:10px;"></td>
-                <td style="height:0px;width:6px;"></td>
-                <td style="height:0px;width:68px;"></td>
-                <td style="height:0px;width:45px;"></td>
-                <td style="height:0px;width:31px;"></td>
-                <td style="height:0px;width:13px;"></td>
-                <td style="height:0px;width:12px;"></td>
-                <td style="height:0px;width:34px;"></td>
-                <td style="height:0px;width:59px;"></td>
-                <td style="height:0px;width:131px;"></td>
-                <td style="height:0px;width:59px;"></td>
-                <td style="height:0px;width:98px;"></td>
-                <td style="height:0px;width:177px;"></td>
-                <td style="height:0px;width:20px;"></td>
-                <td style="height:0px;width:10px;"></td>
-                <td style="height:0px;width:37px;"></td>
-                <td style="height:0px;width:25px;"></td>
-                <td style="height:0px;width:73px;"></td>
-                <td style="height:0px;width:8px;"></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:23px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:16px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:23px;"></td>
-                <td></td>
-                <td></td>
-                <td class="cs101A94F7" colspan="3" rowspan="6" style="width:144px;height:128px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:144px;height:128px;">
-                    <!--[if lt IE 7]><img alt="" src="'.$pic.'" style="width:144px;height:128px;filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src="",sizingMethod="");" /><div style="display:none"><![endif]--><img alt="" src="'.$pic.'" style="width:144px;height:128px;" /><!--[if lt IE 7]></div><![endif]--></div>
-                </td>
-                <td></td>
-                <td class="csA67C9637" colspan="7" style="width:566px;height:23px;line-height:21px;text-align:center;vertical-align:middle;"><nobr>REPUBLIQUE&nbsp;DEMOBCRATIQUE&nbsp;DU&nbsp;CONGO</nobr></td>
-                <td></td>
-                <td class="cs101A94F7" colspan="4" rowspan="4" style="width:145px;height:92px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:145px;height:92px;">
-                    <img alt="" src="'.$pic2.'" style="width:145px;height:92px;" /></div>
-                </td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:23px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="cs92CE5FDD" colspan="7" style="width:566px;height:23px;line-height:21px;text-align:center;vertical-align:middle;"><nobr>&quot;'.$nomEse.'&quot;</nobr></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:25px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="csAFF8CC7" colspan="7" style="width:566px;height:25px;line-height:21px;text-align:center;vertical-align:middle;"><nobr>Si&#232;ge&nbsp;Sociale&nbsp;et&nbsp;Administratif&nbsp;&#224;&nbsp;'.$siege.'</nobr></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:21px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="cs5DE5F832" colspan="7" style="width:566px;height:21px;line-height:18px;text-align:center;vertical-align:middle;">Adresse&nbsp;:'.$adresseEse.'</td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:25px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="csECF45065" colspan="7" style="width:566px;height:25px;line-height:16px;text-align:center;vertical-align:middle;"><nobr>Contact&nbsp;:'.$Tel1Ese.','.$Tel2Ese.'</nobr></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:11px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="csECF45065" colspan="7" rowspan="2" style="width:566px;height:24px;line-height:16px;text-align:center;vertical-align:middle;">Email&nbsp;:&nbsp;'.$emailEse.'</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:13px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:9px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:32px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="csB6F858D0" colspan="13" style="width:702px;height:32px;line-height:28px;text-align:center;vertical-align:middle;"><nobr>RAPPORT&nbsp;JOURNALIER&nbsp;DES&nbsp;RECETTES&nbsp;A&nbsp;LA&nbsp;CAISSE</nobr></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:17px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:22px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="cs56F73198" colspan="7" style="width:335px;height:20px;line-height:18px;text-align:left;vertical-align:top;"><nobr>&nbsp;PERIODE&nbsp;:&nbsp;&nbsp;Du&nbsp;&nbsp;'.$date1.'&nbsp;&nbsp;au&nbsp;'.$date2.'</nobr></td>
-                <td class="csE14C81B5" style="width:95px;height:20px;line-height:18px;text-align:left;vertical-align:top;"><nobr>SECTEUR&nbsp;:</nobr></td>
-                <td class="cs18C8C797" colspan="4" style="width:241px;height:20px;line-height:18px;text-align:left;vertical-align:top;"><nobr>'.$agence.'</nobr></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:20px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:24px;"></td>
-                <td></td>
-                <td class="cs9FE9304F" colspan="2" style="width:73px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>N&#176;&nbsp;BS</nobr></td>
-                <td class="cs9FE9304F" colspan="4" style="width:100px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>MONTANT&nbsp;(FC)</nobr></td>
-                <td class="cs9FE9304F" colspan="2" style="width:92px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>DATE</nobr></td>
-                <td class="cs9FE9304F" colspan="3" style="width:287px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>MENAGE</nobr></td>
-                <td class="cs9FE9304F" colspan="3" style="width:206px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>CATEGORIE TAXE</nobr></td>
-                <td class="csEAC52FCD" colspan="4" style="width:143px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>CAISSIER(E)</nobr></td>
-            </tr>
-            ';
-
-            $output .= $this->showDetailPaie($date1,$date2); 
-
-            $output.='
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:24px;"></td>
-                <td></td>
-                <td class="cs9FE9304F" colspan="2" style="width:73px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>TOTAL(FC)&nbsp;:</nobr></td>
-                <td class="csEAC52FCD" colspan="16" style="width:832px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>'.$totalPaie.'FC</nobr></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:9px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:22px;"></td>
-                <td></td>
-                <td class="cs12FE94AA" colspan="7" style="width:207px;height:22px;line-height:16px;text-align:left;vertical-align:top;"><nobr>Fait&nbsp;&#224;&nbsp;Goma&nbsp;le&nbsp;&nbsp;'.date('Y-m-d').'</nobr></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-        </table>
-        </body>
-        </html>';  
+                        $output.='
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:24px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="csDB0B2364" style="width:131px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>TOTAL</nobr></td>
+                    <td class="cs5A34C077" colspan="2" style="width:87px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$totalPaie.'&nbsp;FC</nobr></td>
+                    <td class="cs5A34C077" colspan="2" style="width:67px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$totalQuotite.'FC</nobr></td>
+                    <td class="cs5A34C077" colspan="4" style="width:65px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$TotalRecouvre.'&nbsp;FC</nobr></td>
+                    <td class="cs5A34C077" style="width:121px;height:22px;"><!--[if lte IE 7]><div class="csF7D3565D"></div><![endif]--></td>
+                    <td></td>
+                </tr>
+            </table>
+            </body>
+            </html>
+        ';  
        
         return $output; 
 
@@ -1601,15 +1726,26 @@ function showDetailPaie($date1, $date2)
 {
     $refMvt=1;
     $data=DB::table('ttaxe_paiement')
+    ->join('taxe_exploitation','taxe_exploitation.id','=','ttaxe_paiement.refExploitation')
     ->join('ttaxe_contribuable','ttaxe_contribuable.id','=','ttaxe_paiement.refEse')
     ->join('ttaxe_categorie' , 'ttaxe_categorie.id','=','ttaxe_paiement.refCompte')
     ->join('tagent' , 'tagent.id','=','ttaxe_paiement.refAgent')
-    ->select("ttaxe_paiement.id",'montant','montantLettre','motif','dateOperation',
+    ->join('tperso_annee' , 'tperso_annee.id','=','ttaxe_paiement.refAnnee')
+    ->join('tperso_mois' , 'tperso_mois.id','=','ttaxe_paiement.refMois')
+    ->select("ttaxe_paiement.id",'montant','montantLettre','motif',
     'refEse','ttaxe_paiement.refCompte','refAgent','ttaxe_paiement.author',"matricule_agent",
-    "noms_agent","sexe_agent",'ttaxe_categorie.designation as categorietaxe','prix_categorie',
+    "noms_agent","sexe_agent",'ttaxe_categorie.designation as categorietaxe','prix_categorie','prix_categorie2',
     'colId_Ese','colIdNat_Ese','colRCCM_Ese','colNom_Ese','colRaisonSociale_Ese','colFormeJuridique_Ese',
     'colGenreActivite_Ese','ColRefCat','ColRefQuartier','colQuartier_Ese','colAdresseEntreprise_Ese',
-    'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus')
+    'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
+    ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
+    'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
+    "tperso_annee.active",'qte','recouvrement','refExploitation','marque_vehicule',
+    'lieu_chargement','destination','bordereau','observations','id_unite','quotite',
+    'nom_exploitation')
+    ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")
+    ->selectRaw("(qte * montant) as montant_total")
+    ->selectRaw("(((qte * montant) * quotite)/100) as montant_quotite")
     ->where([
         ['dateOperation','>=', $date1],
         ['dateOperation','<=', $date2]
@@ -1622,59 +1758,31 @@ function showDetailPaie($date1, $date2)
     foreach ($data as $row) 
     {  
     
-        $output.='<tr style="vertical-align:top;">
-        <td style="width:0px;height:24px;"></td>
-        <td></td>
-        <td class="cs6E02D7D2" colspan="2" style="width:73px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">00'.$row->id.'</td>
-        <td class="cs6E02D7D2" colspan="4" style="width:100px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row->montant.'FC</td>
-        <td class="cs6E02D7D2" colspan="2" style="width:92px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row->dateOperation.'</td>
-        <td class="cs6E02D7D2" colspan="3" style="width:287px;height:22px;line-height:15px;text-align:left;vertical-align:middle;">'.$row->colNom_Ese.'</td>
-        <td class="cs6E02D7D2" colspan="3" style="width:206px;height:22px;line-height:15px;text-align:left;vertical-align:middle;">'.$row->categorietaxe.'</td>
-        <td class="cs6C28398D" colspan="4" style="width:143px;height:22px;line-height:15px;text-align:left;vertical-align:middle;">'.$row->author.'</td>
-    </tr>';       
+        $output .='
+
+            	<tr style="vertical-align:top;">
+                    <td style="width:0px;height:24px;"></td>
+                    <td></td>
+                    <td class="cs463A9CD7" style="width:38px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->id.'</nobr></td>
+                    <td class="cs6AEC9C2" style="width:49px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->dateOperation.'</nobr></td>
+                    <td class="cs6AEC9C2" colspan="5" style="width:188px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->colProprietaire_Ese.'</nobr></td>
+                    <td class="cs6AEC9C2" colspan="3" style="width:133px;height:22px;line-height:10px;text-align:left;vertical-align:middle;"><nobr>'.$row->categorietaxe.'</nobr></td>
+                    <td class="cs6AEC9C2" style="width:132px;height:22px;line-height:10px;text-align:left;vertical-align:middle;"><nobr>'.$row->nom_exploitation.'</nobr></td>
+                    <td class="cs6AEC9C2" colspan="2" style="width:87px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->montant_total.'&nbsp;FC</nobr></td>
+                    <td class="cs6AEC9C2" colspan="2" style="width:67px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->montant_quotite.'FC</nobr></td>
+                    <td class="cs6AEC9C2" colspan="4" style="width:65px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->recouvrement.'&nbsp;FC</nobr></td>
+                    <td class="cs6AEC9C2" style="width:121px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->noms_agent.'</nobr></td>
+                    <td></td>
+                </tr>
+
+        ';     
+    
     }
 
     return $output;
 
 }
-public function fetch_rapport_entree_compte_date(Request $request)
-{
-    //
 
-    if ($request->get('date1') && $request->get('date2') && $request->get('refCompte'))  {
-        // code...
-        $date1 = $request->get('date1');
-        $date2 = $request->get('date2');
-        $refCompte = $request->get('refCompte');
-
-        $html = "";
-        $html .= '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>';
-        $html .= $this->printDataListCompte($date1, $date2,$refCompte);
-        $html .= '<script>window.print()</script>';
-
-        echo ($html);          
-
-    }
-    else if ($request->get('date1') && $request->get('date2'))
-    {
-        $date1 = $request->get('date1');
-        $date2 = $request->get('date2');
-        
-        $html = $this->printDataList($date1, $date2);
-        $pdf = \App::make('dompdf.wrapper');
-
-        // echo($html);
-
-
-        // $pdf->loadHTML($html);
-        $pdf->loadHTML($html)->setPaper('a4', 'landscape');
-        return $pdf->stream();  
-    }
-     else {
-        // code...
-    }
-    
-}
 
 //================== RAPPORT JOURNALIER PAR AGENT ======================================================================
 //=======================================================================================================================
@@ -1705,7 +1813,7 @@ public function fetch_rapport_entree_agent_date(Request $request)
    
     
 }
-function printDataListPaieAgent($date1, $date2, $refAgent)
+function printDataListAgent($date1, $date2, $refAgent)
 {
 
          //Info Entreprise
@@ -1764,21 +1872,28 @@ function printDataListPaieAgent($date1, $date2, $refAgent)
              $siege=$row->nomForme;         
          }
 
+         $aps = "'";
 
          $totalPaie=0;
+         $totalQuotite=0;
+         $TotalRecouvre=0;
          
-         $data2 = DB::table('ttaxe_paiement')        
-         ->select(DB::raw('SUM(montant) as TotalPaie'))        
-         ->where([
-            ['dateOperation','>=', $date1],
-            ['dateOperation','<=', $date2],
-            ['refAgent','=', $refAgent]
-        ])       
-         ->get();
+         $data2 = DB::table('ttaxe_paiement')   
+        ->join('ttaxe_categorie' , 'ttaxe_categorie.id','=','ttaxe_paiement.refCompte')     
+        ->selectRaw('
+            SUM(qte * montant) AS TotalPaie, 
+            SUM((qte * montant * quotite) / 100) AS TotalQuotite,
+            SUM(recouvrement) AS TotalRecouvre
+        ')
+        ->whereBetween('dateOperation', [$date1, $date2])
+        ->where('ttaxe_paiement.refAgent', $refAgent)
+        ->get();
          $output='';
          foreach ($data2 as $row) 
          {                                
-             $totalPaie=$row->TotalPaie;                
+             $totalPaie=$row->TotalPaie; 
+             $totalQuotite=$row->TotalQuotite;
+             $TotalRecouvre=$row->TotalRecouvre;               
          }
 
 
@@ -1787,345 +1902,363 @@ function printDataListPaieAgent($date1, $date2, $refAgent)
          $agence='';
          $code_agence='';
 
-         $data3=DB::table('ttaxe_paiement')
-         ->join('tagent' , 'tagent.id','=','ttaxe_paiement.refAgent')
-         ->select('tagent.noms_agent as noms_agent','refAgent')       
+         $data3 = DB::table('tagent')
+        ->select("tagent.id",'matricule_agent','noms_agent',"tagent.created_at")       
          ->where([
-            ['dateOperation','>=', $date1],
-            ['dateOperation','<=', $date2],
-            ['refAgent','=', $refAgent]
+            ['tagent.id','=', $refCompte]
         ])      
         ->get();      
         $output='';
         foreach ($data3 as $row) 
         {
             $agence=$row->noms_agent;
-            $code_agence=$row->refAgent;                   
+            $code_agence=$row->matricule_agent;                   
         }
 
 
 
     
 
-        $output='<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-        <!-- saved from url=(0016)http://localhost -->
-        <html>
-        <head>
-            <title>rpt_Depense</title>
-            <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8"/>
-            <style type="text/css">
-                .csB6F858D0 {color:#000000;background-color:#D6E5F4;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:24px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
-                .cs9FE9304F {color:#000000;background-color:#E0E0E0;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; }
-                .csEAC52FCD {color:#000000;background-color:#E0E0E0;border-left-style: none;border-top:#000000 1px solid;border-right-style: none;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; }
-                .cs56F73198 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:16px; font-weight:normal; font-style:normal; padding-left:2px;}
-                .csE14C81B5 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right-style: none;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:16px; font-weight:bold; font-style:normal; padding-left:2px;}
-                .cs6E02D7D2 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:14px; font-weight:normal; font-style:normal; }
-                .cs18C8C797 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:16px; font-weight:normal; font-style:normal; padding-left:2px;}
-                .cs6C28398D {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right-style: none;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:14px; font-weight:normal; font-style:normal; }
-                .cs101A94F7 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; }
-                .cs12FE94AA {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:14px; font-weight:normal; font-style:normal; padding-left:2px;}
-                .cs5DE5F832 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:16px; font-weight:normal; font-style:normal; padding-left:2px;padding-right:2px;}
-                .csA67C9637 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:18px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
-                .csECF45065 {color:#0000FF;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:14px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
-                .csAFF8CC7 {color:#0000FF;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:18px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
-                .cs739196BC {color:#5C5C5C;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Segoe UI; font-size:11px; font-weight:normal; font-style:normal; }
-                .cs92CE5FDD {color:#FF0000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:18px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
-                .csF7D3565D {height:0px;width:0px;overflow:hidden;font-size:0px;line-height:0px;}
-            </style>
-        </head>
-        <body leftMargin=10 topMargin=10 rightMargin=10 bottomMargin=10 style="background-color:#FFFFFF">
-        <table cellpadding="0" cellspacing="0" border="0" style="border-width:0px;empty-cells:show;width:916px;height:383px;position:relative;">
-            <tr>
-                <td style="width:0px;height:0px;"></td>
-                <td style="height:0px;width:10px;"></td>
-                <td style="height:0px;width:6px;"></td>
-                <td style="height:0px;width:68px;"></td>
-                <td style="height:0px;width:45px;"></td>
-                <td style="height:0px;width:31px;"></td>
-                <td style="height:0px;width:13px;"></td>
-                <td style="height:0px;width:12px;"></td>
-                <td style="height:0px;width:34px;"></td>
-                <td style="height:0px;width:59px;"></td>
-                <td style="height:0px;width:131px;"></td>
-                <td style="height:0px;width:59px;"></td>
-                <td style="height:0px;width:98px;"></td>
-                <td style="height:0px;width:177px;"></td>
-                <td style="height:0px;width:20px;"></td>
-                <td style="height:0px;width:10px;"></td>
-                <td style="height:0px;width:37px;"></td>
-                <td style="height:0px;width:25px;"></td>
-                <td style="height:0px;width:73px;"></td>
-                <td style="height:0px;width:8px;"></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:23px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:16px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:23px;"></td>
-                <td></td>
-                <td></td>
-                <td class="cs101A94F7" colspan="3" rowspan="6" style="width:144px;height:128px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:144px;height:128px;">
-                    <!--[if lt IE 7]><img alt="" src="'.$pic.'" style="width:144px;height:128px;filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src="",sizingMethod="");" /><div style="display:none"><![endif]--><img alt="" src="'.$pic.'" style="width:144px;height:128px;" /><!--[if lt IE 7]></div><![endif]--></div>
-                </td>
-                <td></td>
-                <td class="csA67C9637" colspan="7" style="width:566px;height:23px;line-height:21px;text-align:center;vertical-align:middle;"><nobr>REPUBLIQUE&nbsp;DEMOBCRATIQUE&nbsp;DU&nbsp;CONGO</nobr></td>
-                <td></td>
-                <td class="cs101A94F7" colspan="4" rowspan="4" style="width:145px;height:92px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:145px;height:92px;">
-                    <img alt="" src="'.$pic2.'" style="width:145px;height:92px;" /></div>
-                </td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:23px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="cs92CE5FDD" colspan="7" style="width:566px;height:23px;line-height:21px;text-align:center;vertical-align:middle;"><nobr>&quot;'.$nomEse.'&quot;</nobr></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:25px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="csAFF8CC7" colspan="7" style="width:566px;height:25px;line-height:21px;text-align:center;vertical-align:middle;"><nobr>Si&#232;ge&nbsp;Sociale&nbsp;et&nbsp;Administratif&nbsp;&#224;&nbsp;'.$siege.'</nobr></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:21px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="cs5DE5F832" colspan="7" style="width:566px;height:21px;line-height:18px;text-align:center;vertical-align:middle;">Adresse&nbsp;:'.$adresseEse.'</td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:25px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="csECF45065" colspan="7" style="width:566px;height:25px;line-height:16px;text-align:center;vertical-align:middle;"><nobr>Contact&nbsp;:'.$Tel1Ese.','.$Tel2Ese.'</nobr></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:11px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="csECF45065" colspan="7" rowspan="2" style="width:566px;height:24px;line-height:16px;text-align:center;vertical-align:middle;">Email&nbsp;:&nbsp;'.$emailEse.'</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:13px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:9px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:32px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="csB6F858D0" colspan="13" style="width:702px;height:32px;line-height:28px;text-align:center;vertical-align:middle;"><nobr>RAPPORT&nbsp;JOURNALIER&nbsp;DES&nbsp;RECETTES&nbsp;A&nbsp;LA&nbsp;CAISSE</nobr></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:17px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:22px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="cs56F73198" colspan="7" style="width:335px;height:20px;line-height:18px;text-align:left;vertical-align:top;"><nobr>&nbsp;PERIODE&nbsp;:&nbsp;&nbsp;Du&nbsp;&nbsp;'.$date1.'&nbsp;&nbsp;au&nbsp;'.$date2.'</nobr></td>
-                <td class="csE14C81B5" style="width:95px;height:20px;line-height:18px;text-align:left;vertical-align:top;"><nobr>SECTEUR&nbsp;:</nobr></td>
-                <td class="cs18C8C797" colspan="4" style="width:241px;height:20px;line-height:18px;text-align:left;vertical-align:top;"><nobr>'.$agence.'</nobr></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:20px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:24px;"></td>
-                <td></td>
-                <td class="cs9FE9304F" colspan="2" style="width:73px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>N&#176;&nbsp;BS</nobr></td>
-                <td class="cs9FE9304F" colspan="4" style="width:100px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>MONTANT&nbsp;(FC)</nobr></td>
-                <td class="cs9FE9304F" colspan="2" style="width:92px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>DATE</nobr></td>
-                <td class="cs9FE9304F" colspan="3" style="width:287px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Contribuable</nobr></td>
-                <td class="cs9FE9304F" colspan="3" style="width:206px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>CATEGORIE TAXE</nobr></td>
-                <td class="csEAC52FCD" colspan="4" style="width:143px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>CAISSIER(E)</nobr></td>
-            </tr>
-            ';
+        $output='
+            <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+            <!-- saved from url=(0016)http://localhost -->
+            <html>
+            <head>
+                <title>rptRapportTaxe</title>
+                <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8"/>
+                <style type="text/css">
+                    .cs1E4BB091 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:11px; font-weight:bold; font-style:normal; }
+                    .csDB0B2364 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:bold; font-style:normal; }
+                    .cs463A9CD7 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:normal; font-style:normal; }
+                    .csEE1F9023 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:11px; font-weight:bold; font-style:normal; }
+                    .cs5A34C077 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:bold; font-style:normal; }
+                    .cs6AEC9C2 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:normal; font-style:normal; }
+                    .cs8BD51C12 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs101A94F7 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; }
+                    .cs5EA817F2 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs2C853136 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:19px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs6CA35B49 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Vivaldi; font-size:19px; font-weight:bold; font-style:italic; padding-left:2px;padding-right:2px;}
+                    .cs5682A5DF {color:#228B22;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:16px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs739196BC {color:#5C5C5C;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Segoe UI; font-size:11px; font-weight:normal; font-style:normal; }
+                    .csF7D3565D {height:0px;width:0px;overflow:hidden;font-size:0px;line-height:0px;}
+                </style>
+            </head>
+            <body leftMargin=10 topMargin=10 rightMargin=10 bottomMargin=10 style="background-color:#FFFFFF">
+            <table cellpadding="0" cellspacing="0" border="0" style="border-width:0px;empty-cells:show;width:901px;height:340px;position:relative;">
+                <tr>
+                    <td style="width:0px;height:0px;"></td>
+                    <td style="height:0px;width:10px;"></td>
+                    <td style="height:0px;width:40px;"></td>
+                    <td style="height:0px;width:50px;"></td>
+                    <td style="height:0px;width:41px;"></td>
+                    <td style="height:0px;width:21px;"></td>
+                    <td style="height:0px;width:54px;"></td>
+                    <td style="height:0px;width:33px;"></td>
+                    <td style="height:0px;width:40px;"></td>
+                    <td style="height:0px;width:82px;"></td>
+                    <td style="height:0px;width:38px;"></td>
+                    <td style="height:0px;width:14px;"></td>
+                    <td style="height:0px;width:133px;"></td>
+                    <td style="height:0px;width:22px;"></td>
+                    <td style="height:0px;width:66px;"></td>
+                    <td style="height:0px;width:40px;"></td>
+                    <td style="height:0px;width:28px;"></td>
+                    <td style="height:0px;width:40px;"></td>
+                    <td style="height:0px;width:11px;"></td>
+                    <td style="height:0px;width:7px;"></td>
+                    <td style="height:0px;width:8px;"></td>
+                    <td style="height:0px;width:122px;"></td>
+                    <td style="height:0px;width:1px;"></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:23px;"></td>
+                    <td class="cs739196BC" colspan="10" style="width:409px;height:23px;line-height:14px;text-align:center;vertical-align:middle;"><nobr></nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:12px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:1px;"></td>
+                    <td></td>
+                    <td class="cs101A94F7" colspan="3" rowspan="6" style="width:131px;height:110px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:131px;height:110px;">
+                        <img alt="" src="'.$pic2.'" style="width:131px;height:110px;" /></div>
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs8BD51C12" colspan="11" rowspan="2" style="width:532px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>REPUBLIQUE&nbsp;DEMOCRATIQUE&nbsp;DU&nbsp;CONGO</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:21px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs101A94F7" colspan="3" rowspan="6" style="width:131px;height:111px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:131px;height:111px;">
+                        <img alt="" src="'.$pic2.'" style="width:131px;height:111px;" /></div>
+                    </td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs8BD51C12" colspan="11" style="width:532px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>MINISTRE&nbsp;DE&nbsp;L'.$aps.'ENVIRONNEMENT&nbsp;ET&nbsp;DEVELOPPEMENT&nbsp;DURABLE</nobr></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:25px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs6CA35B49" colspan="11" style="width:532px;height:25px;line-height:23px;text-align:center;vertical-align:middle;"><nobr>Le&nbsp;Chef&nbsp;d'.$aps.'Antenne&nbsp;Provinciale&nbsp;a&nbsp;l'.$aps.'interim&nbsp;de&nbsp;la&nbsp;Tshopo&nbsp;et&nbsp;Bas-Uel&#233;</nobr></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs5682A5DF" colspan="11" style="width:532px;height:22px;line-height:18px;text-align:center;vertical-align:middle;"><nobr>Fonds&nbsp;Forestier&nbsp;National</nobr></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:19px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs5EA817F2" colspan="11" rowspan="3" style="width:532px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>E-mail&nbsp;:&nbsp;'.$emailEse.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:2px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:1px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs8BD51C12" colspan="11" style="width:532px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Tel&#233;phone&nbsp;:&nbsp;'.$Tel1Ese.',&nbsp;'.$Tel2Ese.',&nbsp;'.$Tel1Ese.',</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:18px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:23px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs2C853136" colspan="13" style="width:597px;height:23px;line-height:22px;text-align:center;vertical-align:middle;"><nobr>RAPPORT&nbsp;JOURNALIER&nbsp;DES&nbsp;PAIEMENTS&nbsp;DE&nbsp;LA&nbsp;TAXE</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:23px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs5EA817F2" colspan="4" style="width:203px;height:23px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Du&nbsp;'.$date1.'&nbsp;&nbsp;au&nbsp;&nbsp;'.$date2.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs8BD51C12" colspan="8" style="width:431px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Valeur&nbsp;Filtr&#233;e&nbsp;:&nbsp;'.$agence.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:12px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:24px;"></td>
+                    <td></td>
+                    <td class="cs1E4BB091" style="width:38px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>N&#176;</nobr></td>
+                    <td class="csEE1F9023" style="width:49px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Date</nobr></td>
+                    <td class="csEE1F9023" colspan="5" style="width:188px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Assigetis</nobr></td>
+                    <td class="csEE1F9023" colspan="3" style="width:133px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Cat&#233;gorie&nbsp;Taxe</nobr></td>
+                    <td class="csEE1F9023" style="width:132px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Exploitation</nobr></td>
+                    <td class="csEE1F9023" colspan="2" style="width:87px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Montant&nbsp;Pay&#233;</nobr></td>
+                    <td class="csEE1F9023" colspan="2" style="width:67px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Quotit&#233;</nobr></td>
+                    <td class="csEE1F9023" colspan="4" style="width:65px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>&#224;&nbsp;Recouvrer</nobr></td>
+                    <td class="csEE1F9023" style="width:121px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Recouvreur</nobr></td>
+                    <td></td>
+                </tr>
+                ';
 
-            $output .= $this->showDetailPaieAgent($date1,$date2,$refAgent); 
+                        $output .= $this->showDetailPaieAgent($date1,$date2,$refAgent); 
 
-            $output.='
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:24px;"></td>
-                <td></td>
-                <td class="cs9FE9304F" colspan="2" style="width:73px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>TOTAL(FC)&nbsp;:</nobr></td>
-                <td class="csEAC52FCD" colspan="16" style="width:832px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>'.$totalPaie.'FC</nobr></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:9px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:22px;"></td>
-                <td></td>
-                <td class="cs12FE94AA" colspan="7" style="width:207px;height:22px;line-height:16px;text-align:left;vertical-align:top;"><nobr>Fait&nbsp;&#224;&nbsp;Goma&nbsp;le&nbsp;&nbsp;'.date('Y-m-d').'</nobr></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-        </table>
-        </body>
-        </html>';  
+                        $output.='
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:24px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="csDB0B2364" style="width:131px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>TOTAL</nobr></td>
+                    <td class="cs5A34C077" colspan="2" style="width:87px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$totalPaie.'&nbsp;FC</nobr></td>
+                    <td class="cs5A34C077" colspan="2" style="width:67px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$totalQuotite.'FC</nobr></td>
+                    <td class="cs5A34C077" colspan="4" style="width:65px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$TotalRecouvre.'&nbsp;FC</nobr></td>
+                    <td class="cs5A34C077" style="width:121px;height:22px;"><!--[if lte IE 7]><div class="csF7D3565D"></div><![endif]--></td>
+                    <td></td>
+                </tr>
+            </table>
+            </body>
+            </html>
+        ';  
        
         return $output; 
 
@@ -2134,19 +2267,30 @@ function showDetailPaieAgent($date1, $date2,$refAgent)
 {
     $refMvt=1;
     $data=DB::table('ttaxe_paiement')
+    ->join('taxe_exploitation','taxe_exploitation.id','=','ttaxe_paiement.refExploitation')
     ->join('ttaxe_contribuable','ttaxe_contribuable.id','=','ttaxe_paiement.refEse')
     ->join('ttaxe_categorie' , 'ttaxe_categorie.id','=','ttaxe_paiement.refCompte')
     ->join('tagent' , 'tagent.id','=','ttaxe_paiement.refAgent')
-    ->select("ttaxe_paiement.id",'montant','montantLettre','motif','dateOperation',
+    ->join('tperso_annee' , 'tperso_annee.id','=','ttaxe_paiement.refAnnee')
+    ->join('tperso_mois' , 'tperso_mois.id','=','ttaxe_paiement.refMois')
+    ->select("ttaxe_paiement.id",'montant','montantLettre','motif',
     'refEse','ttaxe_paiement.refCompte','refAgent','ttaxe_paiement.author',"matricule_agent",
-    "noms_agent","sexe_agent",'ttaxe_categorie.designation as categorietaxe','prix_categorie',
+    "noms_agent","sexe_agent",'ttaxe_categorie.designation as categorietaxe','prix_categorie','prix_categorie2',
     'colId_Ese','colIdNat_Ese','colRCCM_Ese','colNom_Ese','colRaisonSociale_Ese','colFormeJuridique_Ese',
     'colGenreActivite_Ese','ColRefCat','ColRefQuartier','colQuartier_Ese','colAdresseEntreprise_Ese',
-    'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus')
+    'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
+    ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
+    'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
+    "tperso_annee.active",'qte','recouvrement','refExploitation','marque_vehicule',
+    'lieu_chargement','destination','bordereau','observations','id_unite','quotite',
+    'nom_exploitation')
+    ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")
+    ->selectRaw("(qte * montant) as montant_total")
+    ->selectRaw("(((qte * montant) * quotite)/100) as montant_quotite")
     ->where([
         ['dateOperation','>=', $date1],
         ['dateOperation','<=', $date2],
-        ['refAgent','=', $refAgent]
+        ['ttaxe_paiement.refAgent','=', $refAgent]
     ])    
     ->orderBy("ttaxe_paiement.id", "asc")
     ->get();
@@ -2156,16 +2300,24 @@ function showDetailPaieAgent($date1, $date2,$refAgent)
     foreach ($data as $row) 
     {  
     
-        $output.='<tr style="vertical-align:top;">
-        <td style="width:0px;height:24px;"></td>
-        <td></td>
-        <td class="cs6E02D7D2" colspan="2" style="width:73px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">00'.$row->id.'</td>
-        <td class="cs6E02D7D2" colspan="4" style="width:100px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row->montant.'FC</td>
-        <td class="cs6E02D7D2" colspan="2" style="width:92px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row->dateOperation.'</td>
-        <td class="cs6E02D7D2" colspan="3" style="width:287px;height:22px;line-height:15px;text-align:left;vertical-align:middle;">'.$row->colNom_Ese.'</td>
-        <td class="cs6E02D7D2" colspan="3" style="width:206px;height:22px;line-height:15px;text-align:left;vertical-align:middle;">'.$row->categorietaxe.'</td>
-        <td class="cs6C28398D" colspan="4" style="width:143px;height:22px;line-height:15px;text-align:left;vertical-align:middle;">'.$row->author.'</td>
-    </tr>';       
+        $output .='
+
+            	<tr style="vertical-align:top;">
+                    <td style="width:0px;height:24px;"></td>
+                    <td></td>
+                    <td class="cs463A9CD7" style="width:38px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->id.'</nobr></td>
+                    <td class="cs6AEC9C2" style="width:49px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->dateOperation.'</nobr></td>
+                    <td class="cs6AEC9C2" colspan="5" style="width:188px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->colProprietaire_Ese.'</nobr></td>
+                    <td class="cs6AEC9C2" colspan="3" style="width:133px;height:22px;line-height:10px;text-align:left;vertical-align:middle;"><nobr>'.$row->categorietaxe.'</nobr></td>
+                    <td class="cs6AEC9C2" style="width:132px;height:22px;line-height:10px;text-align:left;vertical-align:middle;"><nobr>'.$row->nom_exploitation.'</nobr></td>
+                    <td class="cs6AEC9C2" colspan="2" style="width:87px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->montant_total.'&nbsp;FC</nobr></td>
+                    <td class="cs6AEC9C2" colspan="2" style="width:67px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->montant_quotite.'FC</nobr></td>
+                    <td class="cs6AEC9C2" colspan="4" style="width:65px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->recouvrement.'&nbsp;FC</nobr></td>
+                    <td class="cs6AEC9C2" style="width:121px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->noms_agent.'</nobr></td>
+                    <td></td>
+                </tr>
+
+        ';     
     
     }
 
@@ -2196,7 +2348,7 @@ public function fetch_rapport_entree_quartier_date(Request $request)
    
     
 }
-function printDataListPaieQuartier($date1, $date2, $ColRefQuartier)
+function printDataListPaieQuartier($date1, $date2,$ColRefQuartier)
 {
 
          //Info Entreprise
@@ -2255,22 +2407,28 @@ function printDataListPaieQuartier($date1, $date2, $ColRefQuartier)
              $siege=$row->nomForme;         
          }
 
+         $aps = "'";
 
          $totalPaie=0;
+         $totalQuotite=0;
+         $TotalRecouvre=0;
          
          $data2 = DB::table('ttaxe_paiement')   
-         ->join('ttaxe_contribuable','ttaxe_contribuable.id','=','ttaxe_paiement.refEse')     
-         ->select(DB::raw('SUM(montant) as TotalPaie'))        
-         ->where([
-            ['dateOperation','>=', $date1],
-            ['dateOperation','<=', $date2],
-            ['ColRefQuartier','=', $ColRefQuartier]
-        ])       
-         ->get();
+        ->join('ttaxe_contribuable','ttaxe_contribuable.id','=','ttaxe_paiement.refEse')     
+        ->selectRaw('
+            SUM(qte * montant) AS TotalPaie, 
+            SUM((qte * montant * quotite) / 100) AS TotalQuotite,
+            SUM(recouvrement) AS TotalRecouvre
+        ')
+        ->whereBetween('dateOperation', [$date1, $date2])
+        ->where('ColRefQuartier', $ColRefQuartier)
+        ->get();
          $output='';
          foreach ($data2 as $row) 
          {                                
-             $totalPaie=$row->TotalPaie;                
+             $totalPaie=$row->TotalPaie; 
+             $totalQuotite=$row->TotalQuotite;
+             $TotalRecouvre=$row->TotalRecouvre;               
          }
 
 
@@ -2279,14 +2437,12 @@ function printDataListPaieQuartier($date1, $date2, $ColRefQuartier)
          $agence='';
          $code_agence='';
 
-         $data3=DB::table('ttaxe_paiement')
-         ->join('ttaxe_contribuable','ttaxe_contribuable.id','=','ttaxe_paiement.refEse')
-         ->select('ttaxe_contribuable.colQuartier_Ese','ColRefQuartier')       
-         ->where([
-            ['dateOperation','>=', $date1],
-            ['dateOperation','<=', $date2],
-            ['ColRefQuartier','=', $ColRefQuartier]
-        ])      
+
+        $data3 = DB::table('ttaxe_paiement')
+        ->join('ttaxe_contribuable','ttaxe_contribuable.id','=','ttaxe_paiement.refEse')
+        ->select('ttaxe_contribuable.colQuartier_Ese','ColRefQuartier')       
+        ->whereBetween('dateOperation', [$date1, $date2])
+        ->where('ColRefQuartier', $ColRefQuartier)     
         ->get();      
         $output='';
         foreach ($data3 as $row) 
@@ -2299,325 +2455,346 @@ function printDataListPaieQuartier($date1, $date2, $ColRefQuartier)
 
     
 
-        $output='<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-        <!-- saved from url=(0016)http://localhost -->
-        <html>
-        <head>
-            <title>rpt_Depense</title>
-            <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8"/>
-            <style type="text/css">
-                .csB6F858D0 {color:#000000;background-color:#D6E5F4;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:24px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
-                .cs9FE9304F {color:#000000;background-color:#E0E0E0;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; }
-                .csEAC52FCD {color:#000000;background-color:#E0E0E0;border-left-style: none;border-top:#000000 1px solid;border-right-style: none;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; }
-                .cs56F73198 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:16px; font-weight:normal; font-style:normal; padding-left:2px;}
-                .csE14C81B5 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right-style: none;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:16px; font-weight:bold; font-style:normal; padding-left:2px;}
-                .cs6E02D7D2 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:14px; font-weight:normal; font-style:normal; }
-                .cs18C8C797 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:16px; font-weight:normal; font-style:normal; padding-left:2px;}
-                .cs6C28398D {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right-style: none;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:14px; font-weight:normal; font-style:normal; }
-                .cs101A94F7 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; }
-                .cs12FE94AA {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:14px; font-weight:normal; font-style:normal; padding-left:2px;}
-                .cs5DE5F832 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:16px; font-weight:normal; font-style:normal; padding-left:2px;padding-right:2px;}
-                .csA67C9637 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:18px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
-                .csECF45065 {color:#0000FF;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:14px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
-                .csAFF8CC7 {color:#0000FF;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:18px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
-                .cs739196BC {color:#5C5C5C;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Segoe UI; font-size:11px; font-weight:normal; font-style:normal; }
-                .cs92CE5FDD {color:#FF0000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:18px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
-                .csF7D3565D {height:0px;width:0px;overflow:hidden;font-size:0px;line-height:0px;}
-            </style>
-        </head>
-        <body leftMargin=10 topMargin=10 rightMargin=10 bottomMargin=10 style="background-color:#FFFFFF">
-        <table cellpadding="0" cellspacing="0" border="0" style="border-width:0px;empty-cells:show;width:916px;height:383px;position:relative;">
-            <tr>
-                <td style="width:0px;height:0px;"></td>
-                <td style="height:0px;width:10px;"></td>
-                <td style="height:0px;width:6px;"></td>
-                <td style="height:0px;width:68px;"></td>
-                <td style="height:0px;width:45px;"></td>
-                <td style="height:0px;width:31px;"></td>
-                <td style="height:0px;width:13px;"></td>
-                <td style="height:0px;width:12px;"></td>
-                <td style="height:0px;width:34px;"></td>
-                <td style="height:0px;width:59px;"></td>
-                <td style="height:0px;width:131px;"></td>
-                <td style="height:0px;width:59px;"></td>
-                <td style="height:0px;width:98px;"></td>
-                <td style="height:0px;width:177px;"></td>
-                <td style="height:0px;width:20px;"></td>
-                <td style="height:0px;width:10px;"></td>
-                <td style="height:0px;width:37px;"></td>
-                <td style="height:0px;width:25px;"></td>
-                <td style="height:0px;width:73px;"></td>
-                <td style="height:0px;width:8px;"></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:23px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:16px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:23px;"></td>
-                <td></td>
-                <td></td>
-                <td class="cs101A94F7" colspan="3" rowspan="6" style="width:144px;height:128px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:144px;height:128px;">
-                    <!--[if lt IE 7]><img alt="" src="'.$pic.'" style="width:144px;height:128px;filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src="",sizingMethod="");" /><div style="display:none"><![endif]--><img alt="" src="'.$pic.'" style="width:144px;height:128px;" /><!--[if lt IE 7]></div><![endif]--></div>
-                </td>
-                <td></td>
-                <td class="csA67C9637" colspan="7" style="width:566px;height:23px;line-height:21px;text-align:center;vertical-align:middle;"><nobr>REPUBLIQUE&nbsp;DEMOBCRATIQUE&nbsp;DU&nbsp;CONGO</nobr></td>
-                <td></td>
-                <td class="cs101A94F7" colspan="4" rowspan="4" style="width:145px;height:92px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:145px;height:92px;">
-                    <img alt="" src="'.$pic2.'" style="width:145px;height:92px;" /></div>
-                </td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:23px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="cs92CE5FDD" colspan="7" style="width:566px;height:23px;line-height:21px;text-align:center;vertical-align:middle;"><nobr>&quot;'.$nomEse.'&quot;</nobr></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:25px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="csAFF8CC7" colspan="7" style="width:566px;height:25px;line-height:21px;text-align:center;vertical-align:middle;"><nobr>Si&#232;ge&nbsp;Sociale&nbsp;et&nbsp;Administratif&nbsp;&#224;&nbsp;'.$siege.'</nobr></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:21px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="cs5DE5F832" colspan="7" style="width:566px;height:21px;line-height:18px;text-align:center;vertical-align:middle;">Adresse&nbsp;:'.$adresseEse.'</td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:25px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="csECF45065" colspan="7" style="width:566px;height:25px;line-height:16px;text-align:center;vertical-align:middle;"><nobr>Contact&nbsp;:'.$Tel1Ese.','.$Tel2Ese.'</nobr></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:11px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="csECF45065" colspan="7" rowspan="2" style="width:566px;height:24px;line-height:16px;text-align:center;vertical-align:middle;">Email&nbsp;:&nbsp;'.$emailEse.'</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:13px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:9px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:32px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="csB6F858D0" colspan="13" style="width:702px;height:32px;line-height:28px;text-align:center;vertical-align:middle;"><nobr>RAPPORT&nbsp;JOURNALIER&nbsp;DES&nbsp;RECETTES&nbsp;A&nbsp;LA&nbsp;CAISSE</nobr></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:17px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:22px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td class="cs56F73198" colspan="7" style="width:335px;height:20px;line-height:18px;text-align:left;vertical-align:top;"><nobr>&nbsp;PERIODE&nbsp;:&nbsp;&nbsp;Du&nbsp;&nbsp;'.$date1.'&nbsp;&nbsp;au&nbsp;'.$date2.'</nobr></td>
-                <td class="csE14C81B5" style="width:95px;height:20px;line-height:18px;text-align:left;vertical-align:top;"><nobr>SECTEUR&nbsp;:</nobr></td>
-                <td class="cs18C8C797" colspan="4" style="width:241px;height:20px;line-height:18px;text-align:left;vertical-align:top;"><nobr>'.$agence.'</nobr></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:20px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:24px;"></td>
-                <td></td>
-                <td class="cs9FE9304F" colspan="2" style="width:73px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>N&#176;&nbsp;BS</nobr></td>
-                <td class="cs9FE9304F" colspan="4" style="width:100px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>MONTANT&nbsp;(FC)</nobr></td>
-                <td class="cs9FE9304F" colspan="2" style="width:92px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>DATE</nobr></td>
-                <td class="cs9FE9304F" colspan="3" style="width:287px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Contribuable</nobr></td>
-                <td class="cs9FE9304F" colspan="3" style="width:206px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>CATEGORIE TAXE</nobr></td>
-                <td class="csEAC52FCD" colspan="4" style="width:143px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>CAISSIER(E)</nobr></td>
-            </tr>
-            ';
+        $output='
+            <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+            <!-- saved from url=(0016)http://localhost -->
+            <html>
+            <head>
+                <title>rptRapportTaxe</title>
+                <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8"/>
+                <style type="text/css">
+                    .cs1E4BB091 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:11px; font-weight:bold; font-style:normal; }
+                    .csDB0B2364 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:bold; font-style:normal; }
+                    .cs463A9CD7 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:normal; font-style:normal; }
+                    .csEE1F9023 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:11px; font-weight:bold; font-style:normal; }
+                    .cs5A34C077 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:bold; font-style:normal; }
+                    .cs6AEC9C2 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:normal; font-style:normal; }
+                    .cs8BD51C12 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs101A94F7 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; }
+                    .cs5EA817F2 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs2C853136 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:19px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs6CA35B49 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Vivaldi; font-size:19px; font-weight:bold; font-style:italic; padding-left:2px;padding-right:2px;}
+                    .cs5682A5DF {color:#228B22;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:16px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs739196BC {color:#5C5C5C;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Segoe UI; font-size:11px; font-weight:normal; font-style:normal; }
+                    .csF7D3565D {height:0px;width:0px;overflow:hidden;font-size:0px;line-height:0px;}
+                </style>
+            </head>
+            <body leftMargin=10 topMargin=10 rightMargin=10 bottomMargin=10 style="background-color:#FFFFFF">
+            <table cellpadding="0" cellspacing="0" border="0" style="border-width:0px;empty-cells:show;width:901px;height:340px;position:relative;">
+                <tr>
+                    <td style="width:0px;height:0px;"></td>
+                    <td style="height:0px;width:10px;"></td>
+                    <td style="height:0px;width:40px;"></td>
+                    <td style="height:0px;width:50px;"></td>
+                    <td style="height:0px;width:41px;"></td>
+                    <td style="height:0px;width:21px;"></td>
+                    <td style="height:0px;width:54px;"></td>
+                    <td style="height:0px;width:33px;"></td>
+                    <td style="height:0px;width:40px;"></td>
+                    <td style="height:0px;width:82px;"></td>
+                    <td style="height:0px;width:38px;"></td>
+                    <td style="height:0px;width:14px;"></td>
+                    <td style="height:0px;width:133px;"></td>
+                    <td style="height:0px;width:22px;"></td>
+                    <td style="height:0px;width:66px;"></td>
+                    <td style="height:0px;width:40px;"></td>
+                    <td style="height:0px;width:28px;"></td>
+                    <td style="height:0px;width:40px;"></td>
+                    <td style="height:0px;width:11px;"></td>
+                    <td style="height:0px;width:7px;"></td>
+                    <td style="height:0px;width:8px;"></td>
+                    <td style="height:0px;width:122px;"></td>
+                    <td style="height:0px;width:1px;"></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:23px;"></td>
+                    <td class="cs739196BC" colspan="10" style="width:409px;height:23px;line-height:14px;text-align:center;vertical-align:middle;"><nobr></nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:12px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:1px;"></td>
+                    <td></td>
+                    <td class="cs101A94F7" colspan="3" rowspan="6" style="width:131px;height:110px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:131px;height:110px;">
+                        <img alt="" src="'.$pic2.'" style="width:131px;height:110px;" /></div>
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs8BD51C12" colspan="11" rowspan="2" style="width:532px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>REPUBLIQUE&nbsp;DEMOCRATIQUE&nbsp;DU&nbsp;CONGO</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:21px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs101A94F7" colspan="3" rowspan="6" style="width:131px;height:111px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:131px;height:111px;">
+                        <img alt="" src="'.$pic2.'" style="width:131px;height:111px;" /></div>
+                    </td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs8BD51C12" colspan="11" style="width:532px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>MINISTRE&nbsp;DE&nbsp;L'.$aps.'ENVIRONNEMENT&nbsp;ET&nbsp;DEVELOPPEMENT&nbsp;DURABLE</nobr></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:25px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs6CA35B49" colspan="11" style="width:532px;height:25px;line-height:23px;text-align:center;vertical-align:middle;"><nobr>Le&nbsp;Chef&nbsp;d'.$aps.'Antenne&nbsp;Provinciale&nbsp;a&nbsp;l'.$aps.'interim&nbsp;de&nbsp;la&nbsp;Tshopo&nbsp;et&nbsp;Bas-Uel&#233;</nobr></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs5682A5DF" colspan="11" style="width:532px;height:22px;line-height:18px;text-align:center;vertical-align:middle;"><nobr>Fonds&nbsp;Forestier&nbsp;National</nobr></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:19px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs5EA817F2" colspan="11" rowspan="3" style="width:532px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>E-mail&nbsp;:&nbsp;'.$emailEse.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:2px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:1px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs8BD51C12" colspan="11" style="width:532px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Tel&#233;phone&nbsp;:&nbsp;'.$Tel1Ese.',&nbsp;'.$Tel2Ese.',&nbsp;'.$Tel1Ese.',</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:18px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:23px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs2C853136" colspan="13" style="width:597px;height:23px;line-height:22px;text-align:center;vertical-align:middle;"><nobr>RAPPORT&nbsp;JOURNALIER&nbsp;DES&nbsp;PAIEMENTS&nbsp;DE&nbsp;LA&nbsp;TAXE</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:23px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs5EA817F2" colspan="4" style="width:203px;height:23px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Du&nbsp;'.$date1.'&nbsp;&nbsp;au&nbsp;&nbsp;'.$date2.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs8BD51C12" colspan="8" style="width:431px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Valeur&nbsp;Filtr&#233;e&nbsp;:&nbsp;'.$agence.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:12px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:24px;"></td>
+                    <td></td>
+                    <td class="cs1E4BB091" style="width:38px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>N&#176;</nobr></td>
+                    <td class="csEE1F9023" style="width:49px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Date</nobr></td>
+                    <td class="csEE1F9023" colspan="5" style="width:188px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Assigetis</nobr></td>
+                    <td class="csEE1F9023" colspan="3" style="width:133px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Cat&#233;gorie&nbsp;Taxe</nobr></td>
+                    <td class="csEE1F9023" style="width:132px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Exploitation</nobr></td>
+                    <td class="csEE1F9023" colspan="2" style="width:87px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Montant&nbsp;Pay&#233;</nobr></td>
+                    <td class="csEE1F9023" colspan="2" style="width:67px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Quotit&#233;</nobr></td>
+                    <td class="csEE1F9023" colspan="4" style="width:65px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>&#224;&nbsp;Recouvrer</nobr></td>
+                    <td class="csEE1F9023" style="width:121px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Recouvreur</nobr></td>
+                    <td></td>
+                </tr>
+                ';
 
-            $output .= $this->showDetailPaieQuartier($date1,$date2,$ColRefQuartier); 
+                        $output .= $this->showDetailPaieQuartier($date1,$date2,$ColRefQuartier); 
 
-            $output.='
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:24px;"></td>
-                <td></td>
-                <td class="cs9FE9304F" colspan="2" style="width:73px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>TOTAL(FC)&nbsp;:</nobr></td>
-                <td class="csEAC52FCD" colspan="16" style="width:832px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>'.$totalPaie.'FC</nobr></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:9px;"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr style="vertical-align:top;">
-                <td style="width:0px;height:22px;"></td>
-                <td></td>
-                <td class="cs12FE94AA" colspan="7" style="width:207px;height:22px;line-height:16px;text-align:left;vertical-align:top;"><nobr>Fait&nbsp;&#224;&nbsp;Goma&nbsp;le&nbsp;&nbsp;'.date('Y-m-d').'</nobr></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-        </table>
-        </body>
-        </html>';  
+                        $output.='
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:24px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="csDB0B2364" style="width:131px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>TOTAL</nobr></td>
+                    <td class="cs5A34C077" colspan="2" style="width:87px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$totalPaie.'&nbsp;FC</nobr></td>
+                    <td class="cs5A34C077" colspan="2" style="width:67px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$totalQuotite.'FC</nobr></td>
+                    <td class="cs5A34C077" colspan="4" style="width:65px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$TotalRecouvre.'&nbsp;FC</nobr></td>
+                    <td class="cs5A34C077" style="width:121px;height:22px;"><!--[if lte IE 7]><div class="csF7D3565D"></div><![endif]--></td>
+                    <td></td>
+                </tr>
+            </table>
+            </body>
+            </html>
+        ';  
        
         return $output; 
 
@@ -2626,15 +2803,26 @@ function showDetailPaieQuartier($date1,$date2,$ColRefQuartier)
 {
     $refMvt=1;
     $data=DB::table('ttaxe_paiement')
+    ->join('taxe_exploitation','taxe_exploitation.id','=','ttaxe_paiement.refExploitation')
     ->join('ttaxe_contribuable','ttaxe_contribuable.id','=','ttaxe_paiement.refEse')
     ->join('ttaxe_categorie' , 'ttaxe_categorie.id','=','ttaxe_paiement.refCompte')
     ->join('tagent' , 'tagent.id','=','ttaxe_paiement.refAgent')
-    ->select("ttaxe_paiement.id",'montant','montantLettre','motif','dateOperation',
+    ->join('tperso_annee' , 'tperso_annee.id','=','ttaxe_paiement.refAnnee')
+    ->join('tperso_mois' , 'tperso_mois.id','=','ttaxe_paiement.refMois')
+    ->select("ttaxe_paiement.id",'montant','montantLettre','motif',
     'refEse','ttaxe_paiement.refCompte','refAgent','ttaxe_paiement.author',"matricule_agent",
-    "noms_agent","sexe_agent",'ttaxe_categorie.designation as categorietaxe','prix_categorie',
+    "noms_agent","sexe_agent",'ttaxe_categorie.designation as categorietaxe','prix_categorie','prix_categorie2',
     'colId_Ese','colIdNat_Ese','colRCCM_Ese','colNom_Ese','colRaisonSociale_Ese','colFormeJuridique_Ese',
     'colGenreActivite_Ese','ColRefCat','ColRefQuartier','colQuartier_Ese','colAdresseEntreprise_Ese',
-    'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus')
+    'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
+    ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
+    'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
+    "tperso_annee.active",'qte','recouvrement','refExploitation','marque_vehicule',
+    'lieu_chargement','destination','bordereau','observations','id_unite','quotite',
+    'nom_exploitation')
+    ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")
+    ->selectRaw("(qte * montant) as montant_total")
+    ->selectRaw("(((qte * montant) * quotite)/100) as montant_quotite")
     ->where([
         ['dateOperation','>=', $date1],
         ['dateOperation','<=', $date2],
@@ -2648,16 +2836,24 @@ function showDetailPaieQuartier($date1,$date2,$ColRefQuartier)
     foreach ($data as $row) 
     {  
     
-        $output.='<tr style="vertical-align:top;">
-        <td style="width:0px;height:24px;"></td>
-        <td></td>
-        <td class="cs6E02D7D2" colspan="2" style="width:73px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">00'.$row->id.'</td>
-        <td class="cs6E02D7D2" colspan="4" style="width:100px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row->montant.'FC</td>
-        <td class="cs6E02D7D2" colspan="2" style="width:92px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row->dateOperation.'</td>
-        <td class="cs6E02D7D2" colspan="3" style="width:287px;height:22px;line-height:15px;text-align:left;vertical-align:middle;">'.$row->colNom_Ese.'</td>
-        <td class="cs6E02D7D2" colspan="3" style="width:206px;height:22px;line-height:15px;text-align:left;vertical-align:middle;">'.$row->categorietaxe.'</td>
-        <td class="cs6C28398D" colspan="4" style="width:143px;height:22px;line-height:15px;text-align:left;vertical-align:middle;">'.$row->author.'</td>
-    </tr>';       
+        $output .='
+
+            	<tr style="vertical-align:top;">
+                    <td style="width:0px;height:24px;"></td>
+                    <td></td>
+                    <td class="cs463A9CD7" style="width:38px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->id.'</nobr></td>
+                    <td class="cs6AEC9C2" style="width:49px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->dateOperation.'</nobr></td>
+                    <td class="cs6AEC9C2" colspan="5" style="width:188px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->colProprietaire_Ese.'</nobr></td>
+                    <td class="cs6AEC9C2" colspan="3" style="width:133px;height:22px;line-height:10px;text-align:left;vertical-align:middle;"><nobr>'.$row->categorietaxe.'</nobr></td>
+                    <td class="cs6AEC9C2" style="width:132px;height:22px;line-height:10px;text-align:left;vertical-align:middle;"><nobr>'.$row->nom_exploitation.'</nobr></td>
+                    <td class="cs6AEC9C2" colspan="2" style="width:87px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->montant_total.'&nbsp;FC</nobr></td>
+                    <td class="cs6AEC9C2" colspan="2" style="width:67px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->montant_quotite.'FC</nobr></td>
+                    <td class="cs6AEC9C2" colspan="4" style="width:65px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->recouvrement.'&nbsp;FC</nobr></td>
+                    <td class="cs6AEC9C2" style="width:121px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->noms_agent.'</nobr></td>
+                    <td></td>
+                </tr>
+
+        ';     
     
     }
 
@@ -2688,7 +2884,8 @@ public function fetch_rapport_entree_ville_date(Request $request)
    
     
 }
-function printDataListPaieVille($date1, $date2, $idVille)
+
+function printDataListPaieVille($date1, $date2,$idVille)
 {
 
          //Info Entreprise
@@ -2747,27 +2944,31 @@ function printDataListPaieVille($date1, $date2, $idVille)
              $siege=$row->nomForme;         
          }
 
+         $aps = "'";
 
          $totalPaie=0;
+         $totalQuotite=0;
+         $TotalRecouvre=0;
          
          $data2 = DB::table('ttaxe_paiement')   
-         ->join('ttaxe_contribuable','ttaxe_contribuable.id','=','ttaxe_paiement.refEse')  
+        ->join('ttaxe_contribuable','ttaxe_contribuable.id','=','ttaxe_paiement.refEse')  
          ->join('quartiers' , 'quartiers.id','=','ttaxe_contribuable.ColRefQuartier')
          ->join('communes' , 'communes.id','=','quartiers.idCommune')
-         ->join('villes' , 'villes.id','=','communes.idVille')
-        //  ->join('provinces' , 'provinces.id','=','villes.idProvince')
-        //  ->join('pays' , 'pays.id','=','provinces.idPays')   
-         ->select(DB::raw('SUM(montant) as TotalPaie'))        
-         ->where([
-            ['dateOperation','>=', $date1],
-            ['dateOperation','<=', $date2],
-            ['idVille','=', $idVille]
-        ])       
-         ->get();
+         ->join('villes' , 'villes.id','=','communes.idVille')     
+        ->selectRaw('
+            SUM(qte * montant) AS TotalPaie, 
+            SUM((qte * montant * quotite) / 100) AS TotalQuotite,
+            SUM(recouvrement) AS TotalRecouvre
+        ')
+        ->whereBetween('dateOperation', [$date1, $date2])
+        ->where('idVille', $idVille)
+        ->get();
          $output='';
          foreach ($data2 as $row) 
          {                                
-             $totalPaie=$row->TotalPaie;                
+             $totalPaie=$row->TotalPaie; 
+             $totalQuotite=$row->TotalQuotite;
+             $TotalRecouvre=$row->TotalRecouvre;               
          }
 
 
@@ -2776,13 +2977,12 @@ function printDataListPaieVille($date1, $date2, $idVille)
          $agence='';
          $code_agence='';
 
-         $data3=DB::table('ttaxe_paiement')
+
+        $data3 = DB::table('ttaxe_paiement')
          ->join('ttaxe_contribuable','ttaxe_contribuable.id','=','ttaxe_paiement.refEse')
          ->join('quartiers' , 'quartiers.id','=','ttaxe_contribuable.ColRefQuartier')
          ->join('communes' , 'communes.id','=','quartiers.idCommune')
-         ->join('villes' , 'villes.id','=','communes.idVille')
-        //  ->join('provinces' , 'provinces.id','=','villes.idProvince')
-        //  ->join('pays' , 'pays.id','=','provinces.idPays')  
+         ->join('villes' , 'villes.id','=','communes.idVille')  
          ->select('villes.nomVille','communes.idVille')       
          ->where([
             ['dateOperation','>=', $date1],
@@ -2790,230 +2990,357 @@ function printDataListPaieVille($date1, $date2, $idVille)
             ['idVille','=', $idVille]
         ])      
         ->get();      
-        
+        $output='';
         foreach ($data3 as $row) 
         {
             $agence=$row->nomVille;
             $code_agence=$row->idVille;                   
-        }   
+        }
+
+
+
+    
 
         $output='
-                <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-                <!-- saved from url=(0016)http://localhost -->
-                <html>
-                <head>
-                    <title>Noteperception</title>
-                    <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8"/>
-                    <style type="text/css">
-                        .cs6B240DCD {color:#000000;background-color:transparent;border-left:#0000CD 1px solid;border-top:#0000CD 1px solid;border-right:#0000CD 1px solid;border-bottom-style: none;font-family:Times New Roman; font-size:14px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
-                        .csB3B827C0 {color:#000000;background-color:transparent;border-left:#0000CD 1px solid;border-top-style: none;border-right:#0000CD 1px solid;border-bottom:#0000CD 1px solid;font-family:Times New Roman; font-size:14px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
-                        .cs612ED82F {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:12px; font-weight:bold; font-style:normal; padding-left:2px;}
-                        .csFFC1C457 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:12px; font-weight:normal; font-style:normal; padding-left:2px;}
-                        .cs101A94F7 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; }
-                        .csCE72709D {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:14px; font-weight:bold; font-style:normal; padding-left:2px;}
-                        .cs38AECAED {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:14px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
-                        .csA91E1C0E {color:#0000CD;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:14px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
-                        .cs4625A9B7 {color:#191970;background-color:transparent;border-left:#0000CD 1px solid;border-top:#0000CD 1px solid;border-right:#0000CD 1px solid;border-bottom-style: none;font-family:Times New Roman; font-size:14px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
-                        .csBE62E7CC {color:#191970;background-color:transparent;border-left:#0000CD 1px solid;border-top-style: none;border-right:#0000CD 1px solid;border-bottom:#0000CD 1px solid;font-family:Times New Roman; font-size:14px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
-                        .cs739196BC {color:#5C5C5C;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Segoe UI; font-size:11px; font-weight:normal; font-style:normal; }
-                        .csF7D3565D {height:0px;width:0px;overflow:hidden;font-size:0px;line-height:0px;}
-                    </style>
-                </head>
-                <body leftMargin=10 topMargin=10 rightMargin=10 bottomMargin=10 style="background-color:#FFFFFF">
-                <table cellpadding="0" cellspacing="0" border="0" style="border-width:0px;empty-cells:show;width:452px;height:399px;position:relative;">
-                    <tr>
-                        <td style="width:0px;height:0px;"></td>
-                        <td style="height:0px;width:10px;"></td>
-                        <td style="height:0px;width:57px;"></td>
-                        <td style="height:0px;width:19px;"></td>
-                        <td style="height:0px;width:46px;"></td>
-                        <td style="height:0px;width:48px;"></td>
-                        <td style="height:0px;width:18px;"></td>
-                        <td style="height:0px;width:42px;"></td>
-                        <td style="height:0px;width:101px;"></td>
-                        <td style="height:0px;width:39px;"></td>
-                        <td style="height:0px;width:29px;"></td>
-                        <td style="height:0px;width:19px;"></td>
-                        <td style="height:0px;width:24px;"></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:23px;"></td>
-                        <td class="cs739196BC" colspan="10" style="width:409px;height:23px;line-height:14px;text-align:center;vertical-align:middle;"></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:22px;"></td>
-                        <td></td>
-                        <td></td>
-                        <td class="csCE72709D" colspan="7" style="width:311px;height:22px;line-height:16px;text-align:left;vertical-align:top;"><nobr>REPUBLIQUE&nbsp;DEMOCRATIQUE&nbsp;DU&nbsp;CONGO</nobr></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:10px;"></td>
-                        <td></td>
-                        <td class="cs101A94F7" colspan="2" rowspan="3" style="width:76px;height:55px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:76px;height:55px;">
-                            <img alt="" src="'.$image1.'" style="width:76px;height:55px;" /></div>
-                        </td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td class="cs101A94F7" colspan="3" rowspan="3" style="width:87px;height:54px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:87px;height:54px;">
-                            <img alt="" src="'.$image2.'" style="width:87px;height:54px;" /></div>
-                        </td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:22px;"></td>
-                        <td></td>
-                        <td class="cs38AECAED" colspan="5" style="width:251px;height:22px;line-height:16px;text-align:center;vertical-align:top;"><nobr>PROVINCE&nbsp;DU&nbsp;NORD-KIVU</nobr></td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:22px;"></td>
-                        <td></td>
-                        <td class="cs38AECAED" colspan="5" style="width:251px;height:22px;line-height:16px;text-align:center;vertical-align:top;"><nobr>VILLE&nbsp;DE&nbsp;GOMA</nobr></td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:22px;"></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td class="csCE72709D" colspan="8" style="width:340px;height:22px;line-height:16px;text-align:left;vertical-align:top;"><nobr>FICHE&nbsp;DE&nbsp;RECENSEMENT&nbsp;ANNUEL&nbsp;DE&nbsp;PME-PMI</nobr></td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:22px;"></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td class="cs38AECAED" colspan="6" style="width:290px;height:22px;line-height:16px;text-align:center;vertical-align:middle;"><nobr>N&#176;&nbsp;:&nbsp;00'.$id.'&nbsp;&nbsp;/MGCPTFN12/'.$anneePaie.'</nobr></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:18px;"></td>
-                        <td></td>
-                        <td class="cs38AECAED" colspan="10" style="width:414px;height:18px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Arret&#233;&nbsp;pronvicial&nbsp;N&#176;01&nbsp;/&nbsp;8/8&nbsp;/CAB/GP-NK/&nbsp;'.$anneePaie.'</nobr></td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:33px;"></td>
-                        <td></td>
-                        <td class="cs38AECAED" colspan="10" style="width:414px;height:33px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Portant&nbsp;approbation&nbsp;des&nbsp;pr&#233;vision&nbsp;budg&#233;taires&nbsp;de&nbsp;la&nbsp;Mairie&nbsp;de&nbsp;Goma</nobr><br/><nobr>pour&nbsp;l'.$aps.'exercice&nbsp;'.$anneePaie.'</nobr></td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:16px;"></td>
-                        <td></td>
-                        <td class="cs612ED82F" colspan="3" style="width:120px;height:16px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>Raison&nbsp;Social&nbsp;:</nobr></td>
-                        <td class="csFFC1C457" colspan="7" style="width:294px;height:16px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>'.$colRaisonSociale_Ese.'</nobr></td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:15px;"></td>
-                        <td></td>
-                        <td class="cs612ED82F" colspan="3" style="width:120px;height:15px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>Forme&nbsp;juridique&nbsp;:</nobr></td>
-                        <td class="csFFC1C457" colspan="7" style="width:294px;height:15px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>'.$colFormeJuridique_Ese.'</nobr></td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:15px;"></td>
-                        <td></td>
-                        <td class="cs612ED82F" colspan="3" style="width:120px;height:15px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>Genre&nbsp;d'.$aps.'activt&#233;s&nbsp;:</nobr></td>
-                        <td class="csFFC1C457" colspan="7" style="width:294px;height:15px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>'.$colGenreActivite_Ese.'</nobr></td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:16px;"></td>
-                        <td></td>
-                        <td class="cs612ED82F" colspan="3" style="width:120px;height:16px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>Adresse&nbsp;d'.$aps.'entreprise&nbsp;:</nobr></td>
-                        <td class="csFFC1C457" colspan="7" style="width:294px;height:16px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>'.$colAdresseEntreprise_Ese.'</nobr></td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:15px;"></td>
-                        <td></td>
-                        <td class="cs612ED82F" colspan="3" style="width:120px;height:15px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>Propri&#233;taire&nbsp;:</nobr></td>
-                        <td class="csFFC1C457" colspan="7" style="width:294px;height:15px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>'.$colProprietaire_Ese.'</nobr></td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:15px;"></td>
-                        <td></td>
-                        <td class="cs612ED82F" colspan="3" style="width:120px;height:15px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>Commune&nbsp;:</nobr></td>
-                        <td class="csFFC1C457" colspan="7" style="width:294px;height:15px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>'.$nomCommune.'</nobr></td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:16px;"></td>
-                        <td></td>
-                        <td class="cs612ED82F" colspan="5" style="width:186px;height:16px;line-height:13px;text-align:left;vertical-align:middle;"><nobr>N&#176;&nbsp;des&nbsp;Comptes&nbsp;Bancaires/TMB&nbsp;:</nobr></td>
-                        <td class="csFFC1C457" colspan="5" style="width:228px;height:16px;line-height:13px;text-align:left;vertical-align:middle;"><nobr></nobr></td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:17px;"></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td class="cs38AECAED" colspan="5" style="width:208px;height:17px;line-height:15px;text-align:right;vertical-align:middle;"><nobr>Fait&nbsp;&#224;&nbsp;Goma,&nbsp;le&nbsp;'.$dateOperation.'</nobr></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:17px;"></td>
-                        <td></td>
-                        <td class="csCE72709D" colspan="4" style="width:168px;height:17px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>N&#176;&nbsp;RCCM&nbsp;ou&nbsp;PATENTE</nobr></td>
-                        <td></td>
-                        <td class="csA91E1C0E" colspan="6" rowspan="2" style="width:250px;height:18px;line-height:16px;text-align:right;vertical-align:middle;"><nobr>Cette&nbsp;fiche&nbsp;est&nbsp;valable&nbsp;pour&nbsp;l'.$aps.'ann&#233;e&nbsp;'.$anneePaie.'</nobr></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:1px;"></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:17px;"></td>
-                        <td></td>
-                        <td class="csCE72709D" colspan="4" style="width:168px;height:17px;line-height:15px;text-align:left;vertical-align:middle;"><nobr>N&#176;&nbsp;ID.NATIONALE</nobr></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:23px;"></td>
-                        <td></td>
-                        <td class="cs4625A9B7" colspan="4" style="width:164px;height:22px;line-height:16px;text-align:center;vertical-align:top;"><nobr>A&nbsp;payer</nobr></td>
-                        <td></td>
-                        <td class="cs6B240DCD" colspan="6" style="width:248px;height:22px;"><!--[if lte IE 7]><div class="csF7D3565D"></div><![endif]--></td>
-                    </tr>
-                    <tr style="vertical-align:top;">
-                        <td style="width:0px;height:22px;"></td>
-                        <td></td>
-                        <td class="csBE62E7CC" colspan="4" style="width:164px;height:21px;line-height:16px;text-align:center;vertical-align:top;"><nobr>'.$montant.'&nbsp;FC</nobr></td>
-                        <td></td>
-                        <td class="csB3B827C0" colspan="6" style="width:248px;height:21px;"><!--[if lte IE 7]><div class="csF7D3565D"></div><![endif]--></td>
-                    </tr>
-                </table>
-                </body>
-                </html>';  
+            <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+            <!-- saved from url=(0016)http://localhost -->
+            <html>
+            <head>
+                <title>rptRapportTaxe</title>
+                <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8"/>
+                <style type="text/css">
+                    .cs1E4BB091 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:11px; font-weight:bold; font-style:normal; }
+                    .csDB0B2364 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:bold; font-style:normal; }
+                    .cs463A9CD7 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:normal; font-style:normal; }
+                    .csEE1F9023 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:11px; font-weight:bold; font-style:normal; }
+                    .cs5A34C077 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:bold; font-style:normal; }
+                    .cs6AEC9C2 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:normal; font-style:normal; }
+                    .cs8BD51C12 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs101A94F7 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; }
+                    .cs5EA817F2 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs2C853136 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:19px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs6CA35B49 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Vivaldi; font-size:19px; font-weight:bold; font-style:italic; padding-left:2px;padding-right:2px;}
+                    .cs5682A5DF {color:#228B22;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:16px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs739196BC {color:#5C5C5C;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Segoe UI; font-size:11px; font-weight:normal; font-style:normal; }
+                    .csF7D3565D {height:0px;width:0px;overflow:hidden;font-size:0px;line-height:0px;}
+                </style>
+            </head>
+            <body leftMargin=10 topMargin=10 rightMargin=10 bottomMargin=10 style="background-color:#FFFFFF">
+            <table cellpadding="0" cellspacing="0" border="0" style="border-width:0px;empty-cells:show;width:901px;height:340px;position:relative;">
+                <tr>
+                    <td style="width:0px;height:0px;"></td>
+                    <td style="height:0px;width:10px;"></td>
+                    <td style="height:0px;width:40px;"></td>
+                    <td style="height:0px;width:50px;"></td>
+                    <td style="height:0px;width:41px;"></td>
+                    <td style="height:0px;width:21px;"></td>
+                    <td style="height:0px;width:54px;"></td>
+                    <td style="height:0px;width:33px;"></td>
+                    <td style="height:0px;width:40px;"></td>
+                    <td style="height:0px;width:82px;"></td>
+                    <td style="height:0px;width:38px;"></td>
+                    <td style="height:0px;width:14px;"></td>
+                    <td style="height:0px;width:133px;"></td>
+                    <td style="height:0px;width:22px;"></td>
+                    <td style="height:0px;width:66px;"></td>
+                    <td style="height:0px;width:40px;"></td>
+                    <td style="height:0px;width:28px;"></td>
+                    <td style="height:0px;width:40px;"></td>
+                    <td style="height:0px;width:11px;"></td>
+                    <td style="height:0px;width:7px;"></td>
+                    <td style="height:0px;width:8px;"></td>
+                    <td style="height:0px;width:122px;"></td>
+                    <td style="height:0px;width:1px;"></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:23px;"></td>
+                    <td class="cs739196BC" colspan="10" style="width:409px;height:23px;line-height:14px;text-align:center;vertical-align:middle;"><nobr></nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:12px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:1px;"></td>
+                    <td></td>
+                    <td class="cs101A94F7" colspan="3" rowspan="6" style="width:131px;height:110px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:131px;height:110px;">
+                        <img alt="" src="'.$pic2.'" style="width:131px;height:110px;" /></div>
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs8BD51C12" colspan="11" rowspan="2" style="width:532px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>REPUBLIQUE&nbsp;DEMOCRATIQUE&nbsp;DU&nbsp;CONGO</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:21px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs101A94F7" colspan="3" rowspan="6" style="width:131px;height:111px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:131px;height:111px;">
+                        <img alt="" src="'.$pic2.'" style="width:131px;height:111px;" /></div>
+                    </td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs8BD51C12" colspan="11" style="width:532px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>MINISTRE&nbsp;DE&nbsp;L'.$aps.'ENVIRONNEMENT&nbsp;ET&nbsp;DEVELOPPEMENT&nbsp;DURABLE</nobr></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:25px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs6CA35B49" colspan="11" style="width:532px;height:25px;line-height:23px;text-align:center;vertical-align:middle;"><nobr>Le&nbsp;Chef&nbsp;d'.$aps.'Antenne&nbsp;Provinciale&nbsp;a&nbsp;l'.$aps.'interim&nbsp;de&nbsp;la&nbsp;Tshopo&nbsp;et&nbsp;Bas-Uel&#233;</nobr></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs5682A5DF" colspan="11" style="width:532px;height:22px;line-height:18px;text-align:center;vertical-align:middle;"><nobr>Fonds&nbsp;Forestier&nbsp;National</nobr></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:19px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs5EA817F2" colspan="11" rowspan="3" style="width:532px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>E-mail&nbsp;:&nbsp;'.$emailEse.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:2px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:1px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs8BD51C12" colspan="11" style="width:532px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Tel&#233;phone&nbsp;:&nbsp;'.$Tel1Ese.',&nbsp;'.$Tel2Ese.',&nbsp;'.$Tel1Ese.',</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:18px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:23px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs2C853136" colspan="13" style="width:597px;height:23px;line-height:22px;text-align:center;vertical-align:middle;"><nobr>RAPPORT&nbsp;JOURNALIER&nbsp;DES&nbsp;PAIEMENTS&nbsp;DE&nbsp;LA&nbsp;TAXE</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:23px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs5EA817F2" colspan="4" style="width:203px;height:23px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Du&nbsp;'.$date1.'&nbsp;&nbsp;au&nbsp;&nbsp;'.$date2.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs8BD51C12" colspan="8" style="width:431px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Valeur&nbsp;Filtr&#233;e&nbsp;:&nbsp;'.$agence.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:12px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:24px;"></td>
+                    <td></td>
+                    <td class="cs1E4BB091" style="width:38px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>N&#176;</nobr></td>
+                    <td class="csEE1F9023" style="width:49px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Date</nobr></td>
+                    <td class="csEE1F9023" colspan="5" style="width:188px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Assigetis</nobr></td>
+                    <td class="csEE1F9023" colspan="3" style="width:133px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Cat&#233;gorie&nbsp;Taxe</nobr></td>
+                    <td class="csEE1F9023" style="width:132px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Exploitation</nobr></td>
+                    <td class="csEE1F9023" colspan="2" style="width:87px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Montant&nbsp;Pay&#233;</nobr></td>
+                    <td class="csEE1F9023" colspan="2" style="width:67px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Quotit&#233;</nobr></td>
+                    <td class="csEE1F9023" colspan="4" style="width:65px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>&#224;&nbsp;Recouvrer</nobr></td>
+                    <td class="csEE1F9023" style="width:121px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>Recouvreur</nobr></td>
+                    <td></td>
+                </tr>
+                ';
+
+                        $output .= $this->showDetailPaieVille($date1,$date2,$idVille); 
+
+                        $output.='
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:24px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="csDB0B2364" style="width:131px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>TOTAL</nobr></td>
+                    <td class="cs5A34C077" colspan="2" style="width:87px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$totalPaie.'&nbsp;FC</nobr></td>
+                    <td class="cs5A34C077" colspan="2" style="width:67px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$totalQuotite.'FC</nobr></td>
+                    <td class="cs5A34C077" colspan="4" style="width:65px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$TotalRecouvre.'&nbsp;FC</nobr></td>
+                    <td class="cs5A34C077" style="width:121px;height:22px;"><!--[if lte IE 7]><div class="csF7D3565D"></div><![endif]--></td>
+                    <td></td>
+                </tr>
+            </table>
+            </body>
+            </html>
+        ';  
        
         return $output; 
 
@@ -3021,19 +3348,30 @@ function printDataListPaieVille($date1, $date2, $idVille)
 function showDetailPaieVille($date1,$date2,$idVille)
 {
     $refMvt=1;
-    $data=DB::table('ttaxe_paiement')
+    $data = DB::table('ttaxe_paiement')
+    ->join('taxe_exploitation','taxe_exploitation.id','=','ttaxe_paiement.refExploitation')
     ->join('ttaxe_contribuable','ttaxe_contribuable.id','=','ttaxe_paiement.refEse')
     ->join('ttaxe_categorie' , 'ttaxe_categorie.id','=','ttaxe_paiement.refCompte')
     ->join('tagent' , 'tagent.id','=','ttaxe_paiement.refAgent')
+    ->join('tperso_annee' , 'tperso_annee.id','=','ttaxe_paiement.refAnnee')
+    ->join('tperso_mois' , 'tperso_mois.id','=','ttaxe_paiement.refMois')
     ->join('quartiers' , 'quartiers.id','=','ttaxe_contribuable.ColRefQuartier')
     ->join('communes' , 'communes.id','=','quartiers.idCommune')
     ->join('villes' , 'villes.id','=','communes.idVille')
-    ->select("ttaxe_paiement.id",'montant','montantLettre','motif','dateOperation',
+    ->select("ttaxe_paiement.id",'montant','montantLettre','motif',
     'refEse','ttaxe_paiement.refCompte','refAgent','ttaxe_paiement.author',"matricule_agent",
-    "noms_agent","sexe_agent",'ttaxe_categorie.designation as categorietaxe','prix_categorie',
+    "noms_agent","sexe_agent",'ttaxe_categorie.designation as categorietaxe','prix_categorie','prix_categorie2',
     'colId_Ese','colIdNat_Ese','colRCCM_Ese','colNom_Ese','colRaisonSociale_Ese','colFormeJuridique_Ese',
     'colGenreActivite_Ese','ColRefCat','ColRefQuartier','colQuartier_Ese','colAdresseEntreprise_Ese',
-    'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus')
+    'colProprietaire_Ese','colCreatedBy_Ese','colDateSave_Ese','current_timestamp','colStatus'
+    ,'entreprisePhone1','entreprisePhone2','entrepriseMail','compteur','compteur2','refMois',
+    'refAnnee','tperso_mois.name_mois',"tperso_annee.name_annee",
+    "tperso_annee.active",'qte','recouvrement','refExploitation','marque_vehicule',
+    'lieu_chargement','destination','bordereau','observations','id_unite','quotite',
+    'nom_exploitation')
+    ->selectRaw("DATE_FORMAT(dateOperation,'%d/%M/%Y') as dateOperation")
+    ->selectRaw("(qte * montant) as montant_total")
+    ->selectRaw("(((qte * montant) * quotite)/100) as montant_quotite")
     ->where([
         ['dateOperation','>=', $date1],
         ['dateOperation','<=', $date2],
@@ -3047,16 +3385,24 @@ function showDetailPaieVille($date1,$date2,$idVille)
     foreach ($data as $row) 
     {  
     
-        $output.='<tr style="vertical-align:top;">
-        <td style="width:0px;height:24px;"></td>
-        <td></td>
-        <td class="cs6E02D7D2" colspan="2" style="width:73px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">00'.$row->id.'</td>
-        <td class="cs6E02D7D2" colspan="4" style="width:100px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row->montant.'FC</td>
-        <td class="cs6E02D7D2" colspan="2" style="width:92px;height:22px;line-height:15px;text-align:center;vertical-align:middle;">'.$row->dateOperation.'</td>
-        <td class="cs6E02D7D2" colspan="3" style="width:287px;height:22px;line-height:15px;text-align:left;vertical-align:middle;">'.$row->colNom_Ese.'</td>
-        <td class="cs6E02D7D2" colspan="3" style="width:206px;height:22px;line-height:15px;text-align:left;vertical-align:middle;">'.$row->categorietaxe.'</td>
-        <td class="cs6C28398D" colspan="4" style="width:143px;height:22px;line-height:15px;text-align:left;vertical-align:middle;">'.$row->author.'</td>
-    </tr>';       
+        $output .='
+
+            	<tr style="vertical-align:top;">
+                    <td style="width:0px;height:24px;"></td>
+                    <td></td>
+                    <td class="cs463A9CD7" style="width:38px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->id.'</nobr></td>
+                    <td class="cs6AEC9C2" style="width:49px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->dateOperation.'</nobr></td>
+                    <td class="cs6AEC9C2" colspan="5" style="width:188px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->colProprietaire_Ese.'</nobr></td>
+                    <td class="cs6AEC9C2" colspan="3" style="width:133px;height:22px;line-height:10px;text-align:left;vertical-align:middle;"><nobr>'.$row->categorietaxe.'</nobr></td>
+                    <td class="cs6AEC9C2" style="width:132px;height:22px;line-height:10px;text-align:left;vertical-align:middle;"><nobr>'.$row->nom_exploitation.'</nobr></td>
+                    <td class="cs6AEC9C2" colspan="2" style="width:87px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->montant_total.'&nbsp;FC</nobr></td>
+                    <td class="cs6AEC9C2" colspan="2" style="width:67px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->montant_quotite.'FC</nobr></td>
+                    <td class="cs6AEC9C2" colspan="4" style="width:65px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->recouvrement.'&nbsp;FC</nobr></td>
+                    <td class="cs6AEC9C2" style="width:121px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->noms_agent.'</nobr></td>
+                    <td></td>
+                </tr>
+
+        ';     
     
     }
 
@@ -4624,7 +4970,7 @@ function printDataListReleveAgent($date1, $date2, $refAgent)
                 <td style="width:0px;height:24px;"></td>
                 <td></td>
                 <td class="cs58AC6944" colspan="2" style="width:42px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>N&#176;</nobr></td>
-                <td class="cs36E0C1B8" colspan="4" style="width:167px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Menage</nobr></td>
+                <td class="cs36E0C1B8" colspan="4" style="width:167px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Assigeties</nobr></td>
                 <td class="cs36E0C1B8" colspan="5" style="width:285px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Type&nbsp;d'.$aps.'activit&#233;</nobr></td>
                 <td class="cs36E0C1B8" colspan="3" style="width:85px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Date</nobr></td>
                 <td class="cs36E0C1B8" colspan="3" style="width:113px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Montant&nbsp;(FC)</nobr></td>
@@ -5121,7 +5467,7 @@ function printDataListEncodageAgent($date1, $date2, $nomEncodeur)
                 <td style="width:0px;height:24px;"></td>
                 <td></td>
                 <td class="cs58AC6944" colspan="3" style="width:42px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>N&#176;</nobr></td>
-                <td class="cs36E0C1B8" colspan="3" style="width:150px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Menage</nobr></td>
+                <td class="cs36E0C1B8" colspan="3" style="width:150px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Assigeties</nobr></td>
                 <td class="cs36E0C1B8" colspan="5" style="width:282px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Type&nbsp;Activit&#233;</nobr></td>
                 <td class="cs36E0C1B8" colspan="3" style="width:130px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Propri&#233;taire</nobr></td>
                 <td class="cs36E0C1B8" colspan="3" style="width:88px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Date</nobr></td>
@@ -6559,7 +6905,7 @@ function printDataListMoisAnnee($date1, $date2, $refMois,$refAnnee)
                 <td class="cs9FE9304F" colspan="2" style="width:92px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>DATE</nobr></td>
                 <td class="cs9FE9304F" colspan="3" style="width:287px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Contribuable</nobr></td>
                 <td class="cs9FE9304F" colspan="3" style="width:206px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>CATEGORIE TAXE</nobr></td>
-                <td class="csEAC52FCD" colspan="4" style="width:143px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>CAISSIER(E)</nobr></td>
+                <td class="csEAC52FCD" colspan="4" style="width:143px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Recouvreur(E)</nobr></td>
             </tr>
             ';
 
@@ -7050,7 +7396,7 @@ function printDataListEncodageQuartier($date1, $date2,$colQuartier_Ese)
                 <td style="width:0px;height:24px;"></td>
                 <td></td>
                 <td class="cs58AC6944" colspan="3" style="width:42px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>N&#176;</nobr></td>
-                <td class="cs36E0C1B8" colspan="3" style="width:150px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Menage</nobr></td>
+                <td class="cs36E0C1B8" colspan="3" style="width:150px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Assigeties</nobr></td>
                 <td class="cs36E0C1B8" colspan="5" style="width:282px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Type&nbsp;Activit&#233;</nobr></td>
                 <td class="cs36E0C1B8" colspan="3" style="width:130px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Propri&#233;taire</nobr></td>
                 <td class="cs36E0C1B8" colspan="3" style="width:88px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Date</nobr></td>

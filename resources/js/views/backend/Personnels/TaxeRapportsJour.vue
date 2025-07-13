@@ -133,7 +133,7 @@
                                 <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on">
                                         <v-btn @click="PrintshowStatistiqueByDate" block color="primary">
-                                            <v-icon>print</v-icon> RAPPORT STATISTIQUE/QUARTIER
+                                            <v-icon>print</v-icon> RAPPORT STATISTIQUE/SITE
                                         </v-btn>
                                     </span>
                                 </template>
@@ -203,7 +203,7 @@
 
                                 <v-flex xs12 sm12 md12 lg12>
                                     <div class="mr-1">
-                                        <v-autocomplete label="Selectionnez la province" prepend-inner-icon="map"
+                                        <v-autocomplete label="Selectionnez l'Antenne" prepend-inner-icon="map"
                                             :rules="[(v) => !!v || 'Ce champ est requis']"
                                             :items="stataData.provinceList" item-text="nomProvince" item-value="id"
                                             dense outlined v-model="svData.idProvince" clearable chips
@@ -214,7 +214,7 @@
 
                                 <v-flex xs12 sm12 md12 lg12>
                                     <div class="mr-1">
-                                        <v-autocomplete label="Selectionnez la ville" prepend-inner-icon="explore"
+                                        <v-autocomplete label="Selectionnez la Poste" prepend-inner-icon="explore"
                                             :rules="[(v) => !!v || 'Ce champ est requis']" :items="stataData.villeList"
                                             item-text="nomVille" item-value="id" dense outlined v-model="svData.idVille"
                                             clearable chips @change="get_data_tug_commune(svData.idVille)">
@@ -226,7 +226,7 @@
                                 <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on">
                                         <v-btn @click="PrintshowRecetteByDate_Ville" block color="primary">
-                                            <v-icon>print</v-icon> RAPPORT DES RECETTES/VILLE
+                                            <v-icon>print</v-icon> RAPPORT DES RECETTES/POSTE
                                         </v-btn>
                                     </span>
                                 </template>
@@ -237,7 +237,7 @@
 
                                 <v-flex xs12 sm12 md12 lg12>
                                     <div class="mr-1">
-                                        <v-autocomplete label="Selectionnez la commune" prepend-inner-icon="push_pin"
+                                        <v-autocomplete label="Selectionnez la Sous-Poste" prepend-inner-icon="push_pin"
                                             :rules="[(v) => !!v || 'Ce champ est requis']"
                                             :items="stataData.communeList" item-text="nomCommune" item-value="id" dense
                                             outlined v-model="svData.idCommune" clearable
@@ -249,7 +249,7 @@
 
                                 <v-flex xs12 sm12 md12 lg12>
                                     <div class="mr-1">
-                                        <v-autocomplete label="Selectionnez le quartier" prepend-inner-icon="navigation"
+                                        <v-autocomplete label="Selectionnez le Site" prepend-inner-icon="navigation"
                                             :rules="[(v) => !!v || 'Ce champ est requis']"
                                             :items="stataData.quartierList" item-text="nomQuartier" item-value="id"
                                             dense outlined v-model="svData.ColRefQuartier" clearable chips>
@@ -263,7 +263,7 @@
                                 <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on">
                                         <v-btn @click="PrintshowRecetteByDate_Quartier" block color="primary">
-                                            <v-icon>print</v-icon> RAPPORT DES RECETTES/QUARTIER
+                                            <v-icon>print</v-icon> RAPPORT DES RECETTES/SITE
                                         </v-btn>
                                     </span>
                                 </template>
@@ -272,7 +272,7 @@
                             <br>
                             <v-flex xs12 sm12 md12 lg12>
                                     <div class="mr-1">
-                                        <v-autocomplete label="Selectionnez le quartier" prepend-inner-icon="navigation"
+                                        <v-autocomplete label="Selectionnez le Site" prepend-inner-icon="navigation"
                                             :rules="[(v) => !!v || 'Ce champ est requis']"
                                             :items="stataData.quartierList" item-text="nomQuartier" item-value="nomQuartier"
                                             dense outlined v-model="svData.colQuartier_Ese" clearable chips>
@@ -284,7 +284,7 @@
                                 <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on">
                                         <v-btn @click="PrintshowEncodageByDate_Quartier" block color="primary">
-                                            <v-icon>print</v-icon> RAPPORT DES RESENCEMENTS/QUARTIER
+                                            <v-icon>print</v-icon> RAPPORT DES RESENCEMENTS/SITE
                                         </v-btn>
                                     </span>
                                 </template>

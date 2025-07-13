@@ -269,7 +269,7 @@
                                 </v-flex>
                                 <v-flex xs12 sm12 md6 lg6>
                                     <div class="mr-1">
-                                        <v-autocomplete label="Selectionnez la province" prepend-inner-icon="map"
+                                        <v-autocomplete label="Selectionnez l'antenne" prepend-inner-icon="map"
                                             :rules="[(v) => !!v || 'Ce champ est requis']"
                                             :items="stataData.provinceList" item-text="nomProvince" item-value="id"
                                             dense outlined v-model="svData.idProvince" clearable chips
@@ -280,7 +280,7 @@
 
                                 <v-flex xs12 sm12 md6 lg6>
                                     <div class="mr-1">
-                                        <v-autocomplete label="Selectionnez la ville" prepend-inner-icon="explore"
+                                        <v-autocomplete label="Selectionnez le poste" prepend-inner-icon="explore"
                                             :rules="[(v) => !!v || 'Ce champ est requis']" :items="stataData.villeList"
                                             item-text="nomVille" item-value="id" dense outlined v-model="svData.idVille"
                                             clearable chips @change="get_data_tug_commune(svData.idVille)">
@@ -290,7 +290,7 @@
 
                                 <v-flex xs12 sm12 md6 lg6>
                                     <div class="mr-1">
-                                        <v-autocomplete label="Selectionnez la commune" prepend-inner-icon="push_pin"
+                                        <v-autocomplete label="Selectionnez le sous-poste" prepend-inner-icon="push_pin"
                                             :rules="[(v) => !!v || 'Ce champ est requis']"
                                             :items="stataData.communeList" item-text="nomCommune" item-value="id" dense
                                             outlined v-model="svData.idCommune" clearable
@@ -301,7 +301,7 @@
 
                                 <v-flex xs12 sm12 md6 lg6>
                                     <div class="mr-1">
-                                        <v-autocomplete label="Selectionnez le quartier" prepend-inner-icon="navigation"
+                                        <v-autocomplete label="Selectionnez le site" prepend-inner-icon="navigation"
                                             :rules="[(v) => !!v || 'Ce champ est requis']"
                                             :items="stataData.quartierList" item-text="nomQuartier" item-value="id"
                                             dense outlined v-model="svData.idQuartier"
@@ -310,15 +310,15 @@
                                     </div>
                                 </v-flex>
 
-                                <v-flex xs12 sm12 md6 lg6>
+                                <!-- <v-flex xs12 sm12 md6 lg6>
                                     <div class="mr-1">
-                                        <v-autocomplete label="Selectionnez l'avenue" prepend-inner-icon="domain"
+                                        <v-autocomplete label="Selectionnez sous-site" prepend-inner-icon="domain"
                                             :rules="[(v) => !!v || 'Ce champ est requis']" :items="stataData.avenueList"
                                             item-text="nomAvenue" item-value="id" dense outlined
                                             v-model="svData.refAvenue_agent" clearable chips>
                                         </v-autocomplete>
                                     </div>
-                                </v-flex>
+                                </v-flex> -->
                                 <v-flex xs12 sm12 md6 lg6>
                                     <div class="mr-1">
                                         <v-text-field label="N° de la Maison" prepend-inner-icon="draw" dense
@@ -341,7 +341,7 @@
 
 
 
-                                <v-flex xs12 sm12 md6 lg6>
+                                <!-- <v-flex xs12 sm12 md6 lg6>
                                     <div class="mr-1">
                                         <v-autocomplete label="Selectionnez la Catégorie de Taxe" prepend-inner-icon="mdi-map"
                                             :rules="[(v) => !!v || 'Ce champ est requis']" :items="categorietaxeList"
@@ -349,7 +349,7 @@
                                             v-model="svData.refCompte" chips clearable>
                                         </v-autocomplete>
                                     </div>
-                                </v-flex>
+                                </v-flex> -->
                                 <v-flex xs12 sm12 md6 lg6>
                                     <div class="mr-1">
                                         <v-text-field label="Code Secret" prepend-inner-icon="draw" dense
@@ -450,9 +450,9 @@
                                             <th class="text-left">Catégorie</th>
                                             <th class="text-left">Fonction</th>
                                             <th class="text-left">Spcialité</th>
-                                            <th class="text-left">Province</th>
-                                            <th class="text-left">Ville et Commune</th>
-                                            <th class="text-left">Quartier et Avenue</th>
+                                            <th class="text-left">Antenne</th>
+                                            <th class="text-left">Poste et SPoste</th>
+                                            <th class="text-left">Site</th>
                                             <th class="text-left">Carte</th>
                                             <th class="text-left">Etat</th>
                                             <th class="text-left">CodeSecret</th>
@@ -794,6 +794,8 @@ export default {
             if (this.edit == true) {
                 this.svData.author = this.userData.name;
                 this.svData.grade_agent= this.svData.niveauEtude_agent;
+                this.svData.refCompte = 1;
+                this.svData.refAvenue_agent = this.svData.idQuartier;
                 axios
                     .post(`${this.apiBaseURL}/update_agent`, formData, config)
                     .then(({ data }) => {
@@ -815,6 +817,8 @@ export default {
             } else {
                 this.svData.author = this.userData.name;
                 this.svData.grade_agent= this.svData.niveauEtude_agent;
+                this.svData.refCompte = 1;
+                this.svData.refAvenue_agent = this.svData.idQuartier;
                 axios
                     .post(`${this.apiBaseURL}/insert_agent`, formData, config)
                     .then(({ data }) => {

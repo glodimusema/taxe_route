@@ -69,7 +69,7 @@
                           </v-flex>
 
 
-                          <v-flex xs12 sm12 md6 lg6>
+                          <v-flex xs12 sm12 md12 lg12>
                             <div class="mr-1">
                               <v-autocomplete label="Selectionnez le lieu d'Affectation" prepend-inner-icon="mdi-map"
                                 :rules="[(v) => !!v || 'Ce champ est requis']" :items="lieuList" item-text="nom_lieu"
@@ -77,7 +77,7 @@
                               </v-autocomplete>
                             </div>
                           </v-flex>
-                          <v-flex xs12 sm12 md6 lg6>
+                          <!-- <v-flex xs12 sm12 md6 lg6>
                             <div class="mr-1">
                               <v-autocomplete label="Selectionnez le Mutuelle de Santé" prepend-inner-icon="mdi-map"
                                 :rules="[(v) => !!v || 'Ce champ est requis']" :items="mutuelleList"
@@ -85,7 +85,7 @@
                                 chips clearable>
                               </v-autocomplete>
                             </div>
-                          </v-flex>
+                          </v-flex> -->
 
 
                           <v-flex xs12 sm12 md6 lg6>
@@ -853,6 +853,7 @@ export default {
           this.svData.nomOffice  = "RAS";
           this.svData.postnomOffice  = "RAS";
           this.svData.qualifieOffice= "RAS";
+          this.svData.refMutuelle = 1;
 
           this.insertOrUpdate(
             `${this.apiBaseURL}/update_AffectationAgent/${this.svData.id}`,
@@ -877,6 +878,7 @@ export default {
           this.svData.nomOffice  = "RAS";
           this.svData.postnomOffice  = "RAS";
           this.svData.qualifieOffice= "RAS";
+          this.svData.refMutuelle = 1;
           
           this.insertOrUpdate(
             `${this.apiBaseURL}/insert_AffectationAgent`,

@@ -62,7 +62,7 @@
                                 </v-flex>
                                 <v-flex xs12 sm12 md6 lg6>
                                     <div class="mr-1">
-                                        <v-autocomplete label="Selectionnez la province" prepend-inner-icon="map"
+                                        <v-autocomplete label="Selectionnez l'Antenne" prepend-inner-icon="map"
                                             :rules="[(v) => !!v || 'Ce champ est requis']"
                                             :items="stataData.provinceList" item-text="nomProvince" item-value="id"
                                             dense outlined v-model="svData.idProvince" clearable chips
@@ -74,7 +74,7 @@
 
                                 <v-flex xs12 sm12 md6 lg6>
                                     <div class="mr-1">
-                                        <v-autocomplete label="Selectionnez la ville" prepend-inner-icon="explore"
+                                        <v-autocomplete label="Selectionnez la Poste" prepend-inner-icon="explore"
                                             :rules="[(v) => !!v || 'Ce champ est requis']" :items="stataData.villeList"
                                             item-text="nomVille" item-value="id" dense outlined v-model="svData.idVille"
                                             clearable chips @change="get_data_tug_commune(svData.idVille)">
@@ -83,7 +83,7 @@
                                 </v-flex>
                                 <v-flex xs12 sm12 md6 lg6>
                                     <div class="mr-1">
-                                        <v-autocomplete label="Selectionnez la commune" prepend-inner-icon="push_pin"
+                                        <v-autocomplete label="Selectionnez le sous-poste" prepend-inner-icon="push_pin"
                                             :rules="[(v) => !!v || 'Ce champ est requis']"
                                             :items="stataData.communeList" item-text="nomCommune" item-value="id" dense
                                             outlined v-model="svData.idCommune" clearable
@@ -95,7 +95,7 @@
 
                                 <v-flex xs12 sm12 md6 lg6>
                                     <div class="mr-1">
-                                        <v-autocomplete label="Selectionnez le quartier" prepend-inner-icon="navigation"
+                                        <v-autocomplete label="Selectionnez le Site" prepend-inner-icon="navigation"
                                             :rules="[(v) => !!v || 'Ce champ est requis']"
                                             :items="stataData.quartierList" item-text="nomQuartier" item-value="id"
                                             dense outlined v-model="svData.ColRefQuartier" clearable chips>
@@ -266,9 +266,9 @@
                                             <th class="text-left">N°Permis</th>
                                             <th class="text-left">Details</th>
                                             <th class="text-left">Catégorie</th>                                            
-                                            <th class="text-left">Province</th>
-                                            <th class="text-left">Ville et Commune</th>
-                                            <th class="text-left">Quartier</th>
+                                            <th class="text-left">Antenne</th>
+                                            <th class="text-left">Poste et SPoste</th>
+                                            <th class="text-left">Site</th>
                                             <th class="text-left">Encodeur</th>
                                             <th>Mise à jour</th>
                                             <!-- categorietaxe -->

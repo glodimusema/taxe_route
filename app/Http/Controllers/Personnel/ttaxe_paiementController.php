@@ -92,14 +92,14 @@ class ttaxe_paiementController extends Controller
 
     public function all_jour(Request $request)
     {
-            $current = Carbon::now(); 
+        $current = Carbon::now(); 
             $formattedDate = $current->format('Y-m-d');
             
             if (!is_null($request->get('query'))) 
             {
             
-            $query = $this->Gquery($request);
-            $data = DB::table('ttaxe_paiement')
+        $query = $this->Gquery($request);
+        $data = DB::table('ttaxe_paiement')
         ->join('ttaxe_contribuable','ttaxe_contribuable.id','=','ttaxe_paiement.refEse')
         ->join('ttaxe_categorie' , 'ttaxe_categorie.id','=','ttaxe_paiement.refCompte')
         ->join('tagent' , 'tagent.id','=','ttaxe_paiement.refAgent')
