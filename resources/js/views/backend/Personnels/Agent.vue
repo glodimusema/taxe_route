@@ -319,15 +319,15 @@
                                         </v-autocomplete>
                                     </div>
                                 </v-flex> -->
-                                <v-flex xs12 sm12 md6 lg6>
+                                <!-- <v-flex xs12 sm12 md6 lg6>
                                     <div class="mr-1">
                                         <v-text-field label="N° de la Maison" prepend-inner-icon="draw" dense
                                              outlined
                                             v-model="svData.nummaison_agent">
                                         </v-text-field>
                                     </div>
-                                </v-flex>
-                                <v-flex xs12 sm12 md6 lg6>
+                                </v-flex> -->
+                                <v-flex xs12 sm12 md12 lg12>
                                     <div class="mr-1">
                                         <v-select label="Avoir une Carte de Service" :items="[
                                             { designation: 'NON' },
@@ -795,7 +795,9 @@ export default {
                 this.svData.author = this.userData.name;
                 this.svData.grade_agent= this.svData.niveauEtude_agent;
                 this.svData.refCompte = 1;
-                this.svData.refAvenue_agent = this.svData.idQuartier;
+                // this.svData.refAvenue_agent = this.svData.idQuartier;
+                this.svData.refAvenue_agent = 1;
+                this.svData.nummaison_agent = "0000";
                 axios
                     .post(`${this.apiBaseURL}/update_agent`, formData, config)
                     .then(({ data }) => {
@@ -818,7 +820,9 @@ export default {
                 this.svData.author = this.userData.name;
                 this.svData.grade_agent= this.svData.niveauEtude_agent;
                 this.svData.refCompte = 1;
-                this.svData.refAvenue_agent = this.svData.idQuartier;
+                this.svData.refAvenue_agent = 1;
+                // this.svData.refAvenue_agent = this.svData.idQuartier;
+                this.svData.nummaison_agent = "0000";
                 axios
                     .post(`${this.apiBaseURL}/insert_agent`, formData, config)
                     .then(({ data }) => {

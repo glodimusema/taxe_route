@@ -294,7 +294,7 @@
       </div>
       <div class="container">
         <div class="copyright">
-           <p class="mb-0 text-center">Conçu et développé par <a href="glodimaley@mail.com" rel="nofollow">glodimaley@mail.com</a></p>
+           <p class="mb-0 text-center">Conçu et développé par <a href="i-tec.drc@gmail.com" rel="nofollow">i-tec.drc@gmail.com</a></p>
         </div>
       </div>
     </footer>
