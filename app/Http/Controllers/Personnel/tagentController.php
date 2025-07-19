@@ -220,7 +220,8 @@ class tagentController extends Controller
                 'lieunaissnce_agent'  =>  $formData->lieunaissnce_agent, 
                 'provinceOrigine_agent'  =>  $formData->provinceOrigine_agent,
                 'etatcivil_agent'  =>  $formData->etatcivil_agent,
-                'refAvenue_agent'  =>  $formData->refAvenue_agent,
+                // 'refAvenue_agent'  =>  $formData->refAvenue_agent,
+                'refAvenue_agent'  =>  16,
                 'nummaison_agent'  =>  $formData->nummaison_agent,
                 'contact_agent'  =>  $formData->contact_agent,
                 'mail_agent'  =>  $formData->mail_agent,
@@ -244,7 +245,8 @@ class tagentController extends Controller
                 'cartes'          =>  'NON',
                 'envie'          =>  'OUI',
                 'author'         =>  $formData->author,
-                'refCompte'         =>  $formData->refCompte,
+                'refCompte'         =>  1,
+                // 'refCompte'         =>  $formData->refCompte,
                 'codeSecret'         =>  $formData->codeSecret       
             ]);
             //envie   'refCompte','codeSecret'
@@ -266,7 +268,8 @@ class tagentController extends Controller
                 'lieunaissnce_agent'  =>  $formData->lieunaissnce_agent, 
                 'provinceOrigine_agent'  =>  $formData->provinceOrigine_agent,
                 'etatcivil_agent'  =>  $formData->etatcivil_agent,
-                'refAvenue_agent'  =>  $formData->refAvenue_agent,
+                // 'refAvenue_agent'  =>  $formData->refAvenue_agent,
+                'refAvenue_agent'  =>  16,
                 'nummaison_agent'  =>  $formData->nummaison_agent,
                 'contact_agent'  =>  $formData->contact_agent,
                 'mail_agent'  =>  $formData->mail_agent,
@@ -290,7 +293,8 @@ class tagentController extends Controller
                 'cartes'          =>  'NON',
                 'envie'          =>  'OUI',
                 'author'         =>  $formData->author,
-                'refCompte'         =>  $formData->refCompte,
+                'refCompte'         =>  1,
+                // 'refCompte'         =>  $formData->refCompte,
                 'codeSecret'         =>  $formData->codeSecret
  
             ]);
@@ -321,7 +325,8 @@ class tagentController extends Controller
                 'lieunaissnce_agent'  =>  $formData->lieunaissnce_agent, 
                 'provinceOrigine_agent'  =>  $formData->provinceOrigine_agent,
                 'etatcivil_agent'  =>  $formData->etatcivil_agent,
-                'refAvenue_agent'  =>  $formData->refAvenue_agent,
+                // 'refAvenue_agent'  =>  $formData->refAvenue_agent,
+                'refAvenue_agent'  =>  16,
                 'nummaison_agent'  =>  $formData->nummaison_agent,
                 'contact_agent'  =>  $formData->contact_agent,
                 'mail_agent'  =>  $formData->mail_agent,
@@ -345,7 +350,8 @@ class tagentController extends Controller
                 'cartes'          =>  $formData->cartes,
                 'envie'          =>  $formData->envie,
                 'author'         =>  $formData->author,
-                'refCompte'         =>  $formData->refCompte,
+                'refCompte'         =>  1,
+                // 'refCompte'         =>  $formData->refCompte,
                 'codeSecret'         =>  $formData->codeSecret
             ]);
             return $this->msgJson('Modifcation avec succès');
@@ -366,7 +372,8 @@ class tagentController extends Controller
                 'lieunaissnce_agent'  =>  $formData->lieunaissnce_agent, 
                 'provinceOrigine_agent'  =>  $formData->provinceOrigine_agent,
                 'etatcivil_agent'  =>  $formData->etatcivil_agent,
-                'refAvenue_agent'  =>  $formData->refAvenue_agent,
+                // 'refAvenue_agent'  =>  $formData->refAvenue_agent,
+                'refAvenue_agent'  =>  16,
                 'nummaison_agent'  =>  $formData->nummaison_agent,
                 'contact_agent'  =>  $formData->contact_agent,
                 'mail_agent'  =>  $formData->mail_agent,
@@ -390,7 +397,8 @@ class tagentController extends Controller
                 'cartes'          =>  $formData->cartes,
                 'envie'          =>  $formData->envie,
                 'author'         =>  $formData->author,
-                'refCompte'         =>  $formData->refCompte,
+                'refCompte'         =>  1,
+                // 'refCompte'         =>  $formData->refCompte,
                 'codeSecret'         =>  $formData->codeSecret
             ]);
             return $this->msgJson('Modifcation avec succès');
