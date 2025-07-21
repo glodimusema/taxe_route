@@ -199,7 +199,7 @@
                             <thead>
                               <tr>
                                 <th class="text-left">Agent</th>
-                                <th class="text-left">Menage</th>
+                                <th class="text-left">Assujétie</th>
                                 <th class="text-left">CatTaxe</th>
                                 <th class="text-left">Pu</th>
                                 <th class="text-left">Qté</th>

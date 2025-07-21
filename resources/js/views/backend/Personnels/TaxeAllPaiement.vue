@@ -110,7 +110,7 @@
               <thead>
                 <tr>
                   <th class="text-left">Agent</th>
-                  <th class="text-left">Manage</th>
+                  <th class="text-left">Assujétie</th>
                   <th class="text-left">CatTaxe</th>
                   <th class="text-left">Montant</th>
                   <th class="text-left">DateOperation</th>
@@ -153,7 +153,7 @@
                       <span>Suppression</span>
                     </v-tooltip>
 
-                    <v-tooltip  top color="black">
+                    <!-- <v-tooltip  top color="black">
                       <template v-slot:activator="{ on, attrs }">
                         <span v-bind="attrs" v-on="on">
                           <v-btn @click="printBill(item.id)" fab small><v-icon
@@ -161,9 +161,9 @@
                         </span>
                       </template>
                       <span>Imprimer FIche de Recensement</span>
-                    </v-tooltip>
+                    </v-tooltip> -->
 
-                    <v-tooltip  top color="black">
+                    <!-- <v-tooltip  top color="black">
                       <template v-slot:activator="{ on, attrs }">
                         <span v-bind="attrs" v-on="on">
                           <v-btn @click="printFiche(item.id)" fab small><v-icon
@@ -171,7 +171,7 @@
                         </span>
                       </template>
                       <span>Imprimer Note de Perception</span>
-                    </v-tooltip>
+                    </v-tooltip> -->
 
                   </td>
                 </tr>

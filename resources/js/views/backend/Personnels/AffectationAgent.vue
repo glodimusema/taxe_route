@@ -88,7 +88,7 @@
                           </v-flex> -->
 
 
-                          <v-flex xs12 sm12 md6 lg6>
+                          <!-- <v-flex xs12 sm12 md6 lg6>
                             <div class="mr-1">
                               <v-autocomplete label="Selectionnez le Service" prepend-inner-icon="mdi-map"
                                 :rules="[(v) => !!v || 'Ce champ est requis']" :items="serviceList"
@@ -96,8 +96,8 @@
                                 v-model="svData.refServicePerso" chips clearable>
                               </v-autocomplete>
                             </div>
-                          </v-flex>
-                          <v-flex xs12 sm12 md6 lg6>
+                          </v-flex> -->
+                          <!-- <v-flex xs12 sm12 md6 lg6>
                             <div class="mr-1">
                               <v-autocomplete label="Selectionnez le Projet (Administration)" prepend-inner-icon="mdi-map"
                                 :rules="[(v) => !!v || 'Ce champ est requis']" :items="projetList"
@@ -105,9 +105,9 @@
                                 v-model="svData.projet_id" chips clearable @change="get_projet_for_Categorie(svData.projet_id)">
                               </v-autocomplete>
                             </div>
-                          </v-flex>
+                          </v-flex> -->
 
-                          <v-flex xs12 sm12 md6 lg6>
+                          <!-- <v-flex xs12 sm12 md6 lg6>
                             <div class="mr-1">
                               <v-autocomplete label="Selectionnez le Poste" prepend-inner-icon="mdi-map"
                                 :rules="[(v) => !!v || 'Ce champ est requis']" :items="postessList"
@@ -115,8 +115,8 @@
                                 v-model="svData.param_salaire_id" chips clearable>
                               </v-autocomplete>
                             </div>
-                          </v-flex>
-                          <v-flex xs12 sm12 md6 lg6>
+                          </v-flex> -->
+                          <!-- <v-flex xs12 sm12 md6 lg6>
                             <div class="mr-1">
                               <v-autocomplete label="En Mission" :items="[
                                 { designation: 'NON' },
@@ -125,7 +125,7 @@
                                 dense item-text="designation" item-value="designation"
                                 v-model="svData.mission"></v-autocomplete>
                             </div>
-                          </v-flex>
+                          </v-flex> -->
 
 
                           <v-flex xs12 sm12 md6 lg6>
@@ -386,13 +386,13 @@
                           </v-flex>
 
 
-                          <v-flex xs12 sm12 md6 lg6>
+                          <!-- <v-flex xs12 sm12 md6 lg6>
                             <div class="mr-1">
                               <v-text-field label="N° AGENT " prepend-inner-icon="event" dense
                                 :rules="[(v) => !!v || 'Ce champ est requis']" outlined v-model="svData.codeAgent">
                               </v-text-field>
                             </div>
-                          </v-flex>
+                          </v-flex> -->
                           <v-flex xs12 sm12 md6 lg6>
                             <div class="mr-1">
                               <v-text-field label="N° CNSS" prepend-inner-icon="event" dense
@@ -438,7 +438,7 @@
 
 
 
-                          <v-flex xs12 sm12 md12 lg12>
+                          <v-flex xs12 sm12 md6 lg6>
                             <div class="mr-1">
                               <v-autocomplete label="Etat du Contrat" :items="[
                                 { designation: 'Encours' },
@@ -503,9 +503,9 @@
                               <tr>
                                 <th class="text-left">Agent</th>
                                 <th class="text-left">TrypeContrat</th>
-                                <th class="text-left">Poste</th>
-                                <th class="text-left">LieuAffect</th>
-                                <th class="text-left">Mutuelle</th>
+                                <!-- <th class="text-left">Poste</th> -->
+                                <!-- <th class="text-left">LieuAffect</th> -->
+                                <!-- <th class="text-left">Mutuelle</th> -->
                                 <th class="text-left">DateDebutContrat</th>
                                 <th class="text-left">DateFinContrat</th>
                                 <th class="text-left">DateEssaie</th>
@@ -522,9 +522,9 @@
                               <tr v-for="item in fetchData" :key="item.id">
                                 <td>{{ item.noms_agent }}</td>
                                 <td>{{ item.nom_contrat }}</td>
-                                <td>{{ item.nom_poste }}</td>
-                                <td>{{ item.nom_lieu }}</td>
-                                <td>{{ item.nom_mutuelle }}</td>
+                                <!-- <td>{{ item.nom_poste }}</td> -->
+                                <!-- <td>{{ item.nom_lieu }}</td> -->
+                                <!-- <td>{{ item.nom_mutuelle }}</td> -->
                                 <td>{{ item.dateAffectation | formatDate}}</td>
                                 <td>{{ item.dateFin | formatDate}}</td>
                                 <td>{{ item.dateDebutEssaie | formatDate}}</td>
@@ -597,12 +597,12 @@
                                       </v-list-item>
 
                                       <!-- <v-list-item link @click="showControleConge(item.id, item.noms_agent)">
-                            <v-list-item-icon>
-                              <v-icon color="  blue">description</v-icon>
-                            </v-list-item-icon>
-                            <v-list-item-title style="margin-left: -20px">Congé annuel(Nombre)
-                            </v-list-item-title>
-                          </v-list-item> -->
+                                        <v-list-item-icon>
+                                          <v-icon color="  blue">description</v-icon>
+                                        </v-list-item-icon>
+                                        <v-list-item-title style="margin-left: -20px">Congé annuel(Nombre)
+                                        </v-list-item-title>
+                                      </v-list-item> -->
 
                                       <v-list-item link @click="showDemandeSoinAgent(item.id, item.noms_agent)">
                                         <v-list-item-icon>
@@ -854,6 +854,8 @@ export default {
           this.svData.postnomOffice  = "RAS";
           this.svData.qualifieOffice= "RAS";
           this.svData.refMutuelle = 1;
+          this.svData.mission = "OUI";
+          this.svData.codeAgent = "000";
 
           this.insertOrUpdate(
             `${this.apiBaseURL}/update_AffectationAgent/${this.svData.id}`,
@@ -879,6 +881,8 @@ export default {
           this.svData.postnomOffice  = "RAS";
           this.svData.qualifieOffice= "RAS";
           this.svData.refMutuelle = 1;
+          this.svData.mission = "OUI";
+          this.svData.codeAgent = "000";
           
           this.insertOrUpdate(
             `${this.apiBaseURL}/insert_AffectationAgent`,

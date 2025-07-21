@@ -332,23 +332,8 @@ class tperso_affectation_agentController extends Controller
             # code...
             $query = $this->Gquery($request);
             $data = DB::table('tperso_affectation_agent')
-            ->join('tperso_parametre_salairebase','tperso_parametre_salairebase.id','=','tperso_affectation_agent.param_salaire_id')
-            ->join('tperso_projets','tperso_projets.id','=','tperso_parametre_salairebase.projet_id')
-            ->join('tperso_partenaire','tperso_partenaire.id','=','tperso_projets.partenaire_id')
-            ->join('tperso_poste','tperso_poste.id','=','tperso_affectation_agent.refPoste')
-            ->join('tperso_lieuaffectation','tperso_lieuaffectation.id','=','tperso_affectation_agent.refLieuAffectation')
-            ->join('tperso_mutuelle','tperso_mutuelle.id','=','tperso_affectation_agent.refMutuelle')
             ->join('tperso_typecontrat','tperso_typecontrat.id','=','tperso_affectation_agent.refTypeContrat')
-            ->join('tperso_categorie_agent','tperso_categorie_agent.id','=','tperso_affectation_agent.refCategorieAgent')
-            ->join('tperso_service_personnel','tperso_service_personnel.id','=','tperso_affectation_agent.refServicePerso')
-            ->join('tperso_categorie_service','tperso_categorie_service.id','=','tperso_service_personnel.refCatService')
             ->join('tagent','tagent.id','=','tperso_affectation_agent.refAgent')
-            ->join('avenues' , 'avenues.id','=','tagent.refAvenue_agent')
-            ->join('quartiers' , 'quartiers.id','=','avenues.idQuartier')
-            ->join('communes' , 'communes.id','=','quartiers.idCommune')
-            ->join('villes' , 'villes.id','=','communes.idVille')
-            ->join('provinces' , 'provinces.id','=','villes.idProvince')
-            ->join('pays' , 'pays.id','=','provinces.idPays')
             ->select("tperso_affectation_agent.id",'refAgent','refServicePerso','refCategorieAgent','refPoste','refLieuAffectation',
             'refMutuelle','refTypeContrat','refSiteAffectation','dateAffectation','dureecontrat','dureeLettre','dateFin','dateDebutEssaie',
             'dateFinEssaie','JourTrail1','JourTrail2','heureTrail1','heureTrail2','TempsPause','nbrConge','nbrCongeLettre',
@@ -357,13 +342,9 @@ class tperso_affectation_agentController extends Controller
             "noms_agent","sexe_agent","datenaissance_agent","lieunaissnce_agent","provinceOrigine_agent",
             "etatcivil_agent","refAvenue_agent","contact_agent","mail_agent","grade_agent","fonction_agent",
             "specialite_agent","Categorie_agent","niveauEtude_agent","anneeFinEtude_agent","Ecole_agent","tagent.photo as photo_agent",
-            "tagent.slug as slug_agent","name_serv_perso","name_categorie_service","name_categorie_agent",
-            'nom_poste','description_poste','nom_lieu','description_lieu','nom_mutuelle','description_mutuelle',
-            'nom_contrat','code_contrat','param_salaire_id','fammiliale','logement','tperso_affectation_agent.transport','sal_brut','sal_brut_imposable',
-            'inss_qpo','inss_qpp','cnss','inpp','onem','ipr','mission',"categorie_id","projet_id","salaire_base",
-            "partenaire_id","description_projet","chef_projet","date_debut_projet","date_fin_projet","nom_org",
-            "adresse_org","contact_org","rccm_org", "idnat_org","etat_contrat","salaire_prevu")
-            ->selectRaw('TIMESTAMPDIFF(YEAR, datenaissance_agent, CURDATE()) as age_agent')
+            "tagent.slug as slug_agent",'fammiliale','logement','tperso_affectation_agent.transport','sal_brut','sal_brut_imposable',
+            'inss_qpo','inss_qpp','cnss','inpp','onem','ipr','mission','nom_contrat','code_contrat')
+            ->selectRaw('TIMESTAMPDIFF(YEAR, datenaissance_agent, CURDATE()) as age_agent')   
             ->selectRaw('TIMESTAMPDIFF(MONTH, CURDATE(), dateFin) as dureerestante')
             //->selectRaw('((salaire_base +fammiliale + logement + tperso_affectation_agent.transport) - inss_qpo - ipr) as netPaie')
             ->where([
@@ -379,23 +360,8 @@ class tperso_affectation_agentController extends Controller
         else{
       
             $data = DB::table('tperso_affectation_agent')
-            ->join('tperso_parametre_salairebase','tperso_parametre_salairebase.id','=','tperso_affectation_agent.param_salaire_id')
-            ->join('tperso_projets','tperso_projets.id','=','tperso_parametre_salairebase.projet_id')
-            ->join('tperso_partenaire','tperso_partenaire.id','=','tperso_projets.partenaire_id')
-            ->join('tperso_poste','tperso_poste.id','=','tperso_affectation_agent.refPoste')
-            ->join('tperso_lieuaffectation','tperso_lieuaffectation.id','=','tperso_affectation_agent.refLieuAffectation')
-            ->join('tperso_mutuelle','tperso_mutuelle.id','=','tperso_affectation_agent.refMutuelle')
             ->join('tperso_typecontrat','tperso_typecontrat.id','=','tperso_affectation_agent.refTypeContrat')
-            ->join('tperso_categorie_agent','tperso_categorie_agent.id','=','tperso_affectation_agent.refCategorieAgent')
-            ->join('tperso_service_personnel','tperso_service_personnel.id','=','tperso_affectation_agent.refServicePerso')
-            ->join('tperso_categorie_service','tperso_categorie_service.id','=','tperso_service_personnel.refCatService')
             ->join('tagent','tagent.id','=','tperso_affectation_agent.refAgent')
-            ->join('avenues' , 'avenues.id','=','tagent.refAvenue_agent')
-            ->join('quartiers' , 'quartiers.id','=','avenues.idQuartier')
-            ->join('communes' , 'communes.id','=','quartiers.idCommune')
-            ->join('villes' , 'villes.id','=','communes.idVille')
-            ->join('provinces' , 'provinces.id','=','villes.idProvince')
-            ->join('pays' , 'pays.id','=','provinces.idPays')
             ->select("tperso_affectation_agent.id",'refAgent','refServicePerso','refCategorieAgent','refPoste','refLieuAffectation',
             'refMutuelle','refTypeContrat','refSiteAffectation','dateAffectation','dureecontrat','dureeLettre','dateFin','dateDebutEssaie',
             'dateFinEssaie','JourTrail1','JourTrail2','heureTrail1','heureTrail2','TempsPause','nbrConge','nbrCongeLettre',
@@ -404,12 +370,8 @@ class tperso_affectation_agentController extends Controller
             "noms_agent","sexe_agent","datenaissance_agent","lieunaissnce_agent","provinceOrigine_agent",
             "etatcivil_agent","refAvenue_agent","contact_agent","mail_agent","grade_agent","fonction_agent",
             "specialite_agent","Categorie_agent","niveauEtude_agent","anneeFinEtude_agent","Ecole_agent","tagent.photo as photo_agent",
-            "tagent.slug as slug_agent","name_serv_perso","name_categorie_service","name_categorie_agent",
-            'nom_poste','description_poste','nom_lieu','description_lieu','nom_mutuelle','description_mutuelle',
-            'nom_contrat','code_contrat','param_salaire_id','fammiliale','logement','tperso_affectation_agent.transport','sal_brut','sal_brut_imposable',
-            'inss_qpo','inss_qpp','cnss','inpp','onem','ipr','mission',"categorie_id","projet_id","salaire_base",
-            "partenaire_id","description_projet","chef_projet","date_debut_projet","date_fin_projet","nom_org",
-            "adresse_org","contact_org","rccm_org", "idnat_org","etat_contrat","salaire_prevu")
+            "tagent.slug as slug_agent",'fammiliale','logement','tperso_affectation_agent.transport','sal_brut','sal_brut_imposable',
+            'inss_qpo','inss_qpp','cnss','inpp','onem','ipr','mission','nom_contrat','code_contrat')
             ->selectRaw('TIMESTAMPDIFF(YEAR, datenaissance_agent, CURDATE()) as age_agent')   
             ->selectRaw('TIMESTAMPDIFF(MONTH, CURDATE(), dateFin) as dureerestante')
             //->selectRaw('((salaire_base +fammiliale + logement + tperso_affectation_agent.transport) - inss_qpo - ipr) as netPaie')
@@ -548,10 +510,14 @@ class tperso_affectation_agentController extends Controller
         $onem=0;
         $ipr=0;
 
+
+        $param_salaire_id = 1;
+
+
         $data2 =  DB::table('tperso_parametre_salairebase')       
         ->select("tperso_parametre_salairebase.id","tperso_parametre_salairebase.salaire_base",
         "tperso_parametre_salairebase.categorie_id")
-        ->where('tperso_parametre_salairebase.id', '=', $request->param_salaire_id) 
+        ->where('tperso_parametre_salairebase.id', '=', $param_salaire_id) 
         ->get(); 
         $output='';
         foreach ($data2 as $row) 
@@ -618,10 +584,10 @@ class tperso_affectation_agentController extends Controller
         $duree = (int)$request->dureecontrat;
         $newDate = $currentDate->addMonths($duree);
         //
-
+        $refServicePerso = 1;
         $data = tperso_affectation_agent::create([
             'refAgent'       =>  $request->refAgent,
-            'refServicePerso'    =>  $request->refServicePerso,
+            'refServicePerso'    =>  $refServicePerso,
             'refCategorieAgent'    => $request->refCategorieAgent ,
             'refPoste'    =>    $poste_id,
             'refLieuAffectation'    =>  $request->refLieuAffectation,
@@ -629,7 +595,7 @@ class tperso_affectation_agentController extends Controller
             'refTypeContrat'    =>  $request->refTypeContrat,
             'refSiteAffectation'    =>  $request->refSiteAffectation,
 
-            'param_salaire_id' => $request->param_salaire_id,
+            'param_salaire_id' => $param_salaire_id,
             'fammiliale' => $fammiliale,
             'logement' => $logement,
             'transport' => $transport,
@@ -690,10 +656,13 @@ class tperso_affectation_agentController extends Controller
         $onem=0;
         $ipr=0;
 
+        $param_salaire_id = 1;
+
+
         $data2 =  DB::table('tperso_parametre_salairebase')       
         ->select("tperso_parametre_salairebase.id","tperso_parametre_salairebase.salaire_base",
         "tperso_parametre_salairebase.categorie_id")
-        ->where('tperso_parametre_salairebase.id', '=', $request->param_salaire_id) 
+        ->where('tperso_parametre_salairebase.id', '=', $param_salaire_id) 
         ->get(); 
         $output='';
         foreach ($data2 as $row) 
@@ -759,10 +728,11 @@ class tperso_affectation_agentController extends Controller
         $currentDate = Carbon::parse($request->dateAffectation);
         $duree = (int)$request->dureecontrat;
         $newDate = $currentDate->addMonths($duree);
+        $refServicePerso = 1;
 
         $data = tperso_affectation_agent::where('id', $id)->update([
             'refAgent'       =>  $request->refAgent,
-            'refServicePerso'    =>  $request->refServicePerso,
+            'refServicePerso'    =>  $refServicePerso,
             'refCategorieAgent'    => $request->refCategorieAgent,
             'refPoste'    => $poste_id,
             'refLieuAffectation'    =>  $request->refLieuAffectation,
@@ -770,7 +740,7 @@ class tperso_affectation_agentController extends Controller
             'refTypeContrat'    =>  $request->refTypeContrat,
             'refSiteAffectation'    =>  $request->refSiteAffectation,
 
-            'param_salaire_id' => $request->param_salaire_id,
+            'param_salaire_id' => $param_salaire_id,
             'fammiliale' => $fammiliale,
             'logement' => $logement,
             'transport' => $transport,

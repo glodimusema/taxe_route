@@ -98,7 +98,7 @@
                                 </v-flex>
 
 
-                                <v-flex xs12 sm12 md12 lg12>
+                                <v-flex xs12 sm12 md6 lg6>
                                     <div class="mr-1">
                                         <v-text-field label="Nom du (de la) Conjoint(e)" prepend-inner-icon="draw" dense
                                              outlined
@@ -204,7 +204,7 @@
                                 </v-flex>
 
 
-                                <v-flex xs12 sm12 md12 lg12>
+                                <v-flex xs12 sm12 md6 lg6>
                                     <div class="mr-1">
                                         <v-text-field label="Employeur Anterieur " prepend-inner-icon="draw" dense
                                             :rules="[(v) => !!v || 'Ce champ est requis']" outlined
@@ -212,7 +212,7 @@
                                         </v-text-field>
                                     </div>
                                 </v-flex>
-                                <v-flex xs12 sm12 md12 lg12>
+                                <v-flex xs12 sm12 md6 lg6>
                                     <div class="mr-1">
                                         <v-text-field label="Personne contact en cas d'Urgence " prepend-inner-icon="draw" dense
                                             :rules="[(v) => !!v || 'Ce champ est requis']" outlined
@@ -319,15 +319,15 @@
                                         </v-autocomplete>
                                     </div>
                                 </v-flex> -->
-                                <!-- <v-flex xs12 sm12 md6 lg6>
+                                <v-flex xs12 sm12 md12 lg12>
                                     <div class="mr-1">
-                                        <v-text-field label="N° de la Maison" prepend-inner-icon="draw" dense
+                                        <v-text-field label="Adresse Complète" prepend-inner-icon="draw" dense
                                              outlined
                                             v-model="svData.nummaison_agent">
                                         </v-text-field>
                                     </div>
-                                </v-flex> -->
-                                <v-flex xs12 sm12 md12 lg12>
+                                </v-flex>
+                                <v-flex xs12 sm12 md6 lg6>
                                     <div class="mr-1">
                                         <v-select label="Avoir une Carte de Service" :items="[
                                             { designation: 'NON' },
@@ -456,7 +456,7 @@
                                             <th class="text-left">Carte</th>
                                             <th class="text-left">Etat</th>
                                             <th class="text-left">CodeSecret</th>
-                                            <th class="text-left">Cat.Taxe</th>
+                                            <!-- <th class="text-left">Cat.Taxe</th> -->
                                             <th>Mise à jour</th>
                                             <!-- categorietaxe -->
                                             <th class="text-left">Action</th>
@@ -506,7 +506,7 @@
                                             </v-btn>
                                             </td>
                                             <td>{{ item.codeSecret }}</td>
-                                            <td>{{ item.categorietaxe }}</td>
+                                            <!-- <td>{{ item.categorietaxe }}</td> -->
                                             <td>
                                                 {{ item.created_at | formatDate }}
                                                 {{ item.created_at | formatHour }}
@@ -553,13 +553,13 @@
                                                             <v-list-item-title style="margin-left: -20px">Contrat de Travail</v-list-item-title>
                                                         </v-list-item>
 
-                                                        <v-list-item link
+                                                        <!-- <v-list-item link
                                                             @click="showStages(item.id, item.noms_agent)">
                                                             <v-list-item-icon>
                                                                 <v-icon>description</v-icon>
                                                             </v-list-item-icon>
                                                             <v-list-item-title style="margin-left: -20px">Affecter pour le Stage</v-list-item-title>
-                                                        </v-list-item>
+                                                        </v-list-item> -->
 
                                                         <v-list-item    link @click="editData(item.id)">
                                                             <v-list-item-icon>
@@ -797,7 +797,7 @@ export default {
                 this.svData.refCompte = 1;
                 // this.svData.refAvenue_agent = this.svData.idQuartier;
                 this.svData.refAvenue_agent = 1;
-                this.svData.nummaison_agent = "0000";
+                // this.svData.nummaison_agent = "0000";
                 axios
                     .post(`${this.apiBaseURL}/update_agent`, formData, config)
                     .then(({ data }) => {
@@ -822,7 +822,7 @@ export default {
                 this.svData.refCompte = 1;
                 this.svData.refAvenue_agent = 1;
                 // this.svData.refAvenue_agent = this.svData.idQuartier;
-                this.svData.nummaison_agent = "0000";
+                // this.svData.nummaison_agent = "0000";
                 axios
                     .post(`${this.apiBaseURL}/insert_agent`, formData, config)
                     .then(({ data }) => {

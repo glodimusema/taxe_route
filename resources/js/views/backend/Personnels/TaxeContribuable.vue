@@ -319,13 +319,13 @@
                                                             <v-list-item-title style="margin-left: -20px">Enregistrer les Paiements des Taxes</v-list-item-title>
                                                         </v-list-item>
 
-                                                        <v-list-item link
+                                                        <!-- <v-list-item link
                                                             @click="showTaxeDetailProfession(item.id, item.colNom_Ese)">
                                                             <v-list-item-icon>
                                                                 <v-icon>description</v-icon>
                                                             </v-list-item-icon>
                                                             <v-list-item-title style="margin-left: -20px">Enregistrer les Professions du Chef de Menage</v-list-item-title>
-                                                        </v-list-item>
+                                                        </v-list-item> -->
 
                                                         <v-list-item link @click="editData(item.id)">
                                                             <v-list-item-icon>

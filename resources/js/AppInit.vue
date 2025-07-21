@@ -100,19 +100,19 @@ export default {
           links: [
             {
               icon: "mdi-microsoft-windows",
-              text: "Tableau de bord",
+              text: "Les Assujéties",
               href: "/admin/dashboard",
             },
-            {
-              icon: "mdi-chart-pie",
-              text: "Tableau de bord(Ese)",
-              href: "/admin/statistique_entreprise",
-            },
-            {
-              icon: "chat",
-              text: "Chat",
-              href: "/admin/chat",
-            },
+            // {
+            //   icon: "mdi-chart-pie",
+            //   text: "Tableau de bord(Ese)",
+            //   href: "/admin/statistique_entreprise",
+            // },
+            // {
+            //   icon: "chat",
+            //   text: "Chat",
+            //   href: "/admin/chat",
+            // },
           ],
           links_operation_2: [
             {
@@ -617,14 +617,14 @@ export default {
                   text: "Rapports Contrat",
                   href: "/admin/RapportContrat",
                 },
-                {
-                  text: "Rapports Remuneration Agent",
-                  href: "/admin/RapportsJour_Personnel",
-                },
-                {
-                  text: "Param.SalaireBase",
-                  href: "/admin/ParametreSalairebBase",
-                },
+                // {
+                //   text: "Rapports Remuneration Agent",
+                //   href: "/admin/RapportsJour_Personnel",
+                // },
+                // {
+                //   text: "Param.SalaireBase",
+                //   href: "/admin/ParametreSalairebBase",
+                // },
                 // ParametreSalairebBase
               ],
             }
