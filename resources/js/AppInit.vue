@@ -593,10 +593,10 @@ export default {
                 //   text: "Tous les Contrats",
                 //   href: "/admin/AllContrat",
                 // },
-                // {
-                //   text: "Stages Encours",
-                //   href: "/admin/StageEncours",
-                // },
+                {
+                  text: "Stages Encours",
+                  href: "/admin/StageEncours",
+                },
                 // { //AllPresenceAgent
                 //   text: "Tous les Stages",
                 //   href: "/admin/AllStages",
@@ -650,14 +650,14 @@ export default {
                   text: "Les Axes",
                   href: "/admin/TaxeAxes",
                 },
-                {
-                  text: "Les Professions",
-                  href: "/admin/TaxeProfession",
-                },
-                {
-                  text: "Les Secteurs",
-                  href: "/admin/TaxeSecteur",
-                },
+                // {
+                //   text: "Les Professions",
+                //   href: "/admin/TaxeProfession",
+                // },
+                // {
+                //   text: "Les Secteurs",
+                //   href: "/admin/TaxeSecteur",
+                // },
                 {
                   text: "Categorie Taxe",
                   href: "/admin/TaxeCategorieTaxe",

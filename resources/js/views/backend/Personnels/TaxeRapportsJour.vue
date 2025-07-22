@@ -109,7 +109,7 @@
                                 <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on">
                                         <v-btn @click="PrintshowEncodageByDate_Encodeur" block color="primary">
-                                            <v-icon>print</v-icon> RAPPORT DES RESENCEMENTS/ENCODEUR
+                                            <v-icon>print</v-icon> LISTE DES ASSUJETTIS/ENCODEUR
                                         </v-btn>
                                     </span>
                                 </template>
@@ -284,7 +284,7 @@
                                 <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on">
                                         <v-btn @click="PrintshowEncodageByDate_Quartier" block color="primary">
-                                            <v-icon>print</v-icon> RAPPORT DES RESENCEMENTS/SITE
+                                            <v-icon>print</v-icon> LISTE DES ASSUJETTIS/SITE
                                         </v-btn>
                                     </span>
                                 </template>
@@ -321,7 +321,7 @@
                             </v-tooltip>
                             <br>
 
-                            <v-flex xs12 sm12 md12 lg12>
+                            <!-- <v-flex xs12 sm12 md12 lg12>
                               <div class="mr-1">
                                 <v-autocomplete label="Selectionnez la Profession" prepend-inner-icon="mdi-map"
                                   :rules="[(v) => !!v || 'Ce champ est requis']" :items="professionList"
@@ -329,10 +329,10 @@
                                   chips clearable>
                                 </v-autocomplete>
                               </div>
-                            </v-flex>
+                            </v-flex> -->
                             <!-- <br> PrintshowListeTaxeParCategorie -->
 
-                            <v-tooltip bottom color="black">
+                            <!-- <v-tooltip bottom color="black">
                                 <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on">
                                         <v-btn @click="PrintshowListeMembre_Profession" block color="primary">
@@ -342,7 +342,7 @@
                                 </template>
                                 <span>Imprimer le rapport</span>
                             </v-tooltip>
-                            <br>
+                            <br> -->
 
                             <v-tooltip bottom color="black">
                                 <template v-slot:activator="{ on, attrs }">

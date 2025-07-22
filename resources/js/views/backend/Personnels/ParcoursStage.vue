@@ -39,7 +39,7 @@
 
                             <v-flex xs12 sm12 md12 lg12>
                               <div class="mr-1">
-                                <v-autocomplete label="Selectionnez l'Institution" prepend-inner-icon="mdi-map"
+                                <v-autocomplete label="Selectionnez le Service" prepend-inner-icon="mdi-map"
                                   :rules="[(v) => !!v || 'Ce champ est requis']" :items="serviceList"
                                   item-text="name_serv_perso" item-value="id" dense outlined v-model="svData.service_id"
                                   chips clearable>
@@ -177,7 +177,7 @@
                                       <span>Suppression</span>
                                     </v-tooltip>
   
-                                    <v-tooltip top color="black">
+                                    <!-- <v-tooltip top color="black">
                                       <template v-slot:activator="{ on, attrs }">
                                         <span v-bind="attrs" v-on="on">
                                           <v-btn @click="printBill(item.id)" fab small><v-icon
@@ -185,7 +185,7 @@
                                         </span>
                                       </template>
                                       <span>Imprimer Bon de Stage</span>
-                                    </v-tooltip>
+                                    </v-tooltip> -->
   
                                   </td>
                                 </tr>

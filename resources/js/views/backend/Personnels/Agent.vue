@@ -553,13 +553,13 @@
                                                             <v-list-item-title style="margin-left: -20px">Contrat de Travail</v-list-item-title>
                                                         </v-list-item>
 
-                                                        <!-- <v-list-item link
+                                                        <v-list-item link
                                                             @click="showStages(item.id, item.noms_agent)">
                                                             <v-list-item-icon>
                                                                 <v-icon>description</v-icon>
                                                             </v-list-item-icon>
                                                             <v-list-item-title style="margin-left: -20px">Affecter pour le Stage</v-list-item-title>
-                                                        </v-list-item> -->
+                                                        </v-list-item>
 
                                                         <v-list-item    link @click="editData(item.id)">
                                                             <v-list-item-icon>
@@ -1103,6 +1103,7 @@ export default {
           this.$refs.Stages.fetchListPromotion();
           this.$refs.Stages.fetchListOption();
           this.$refs.Stages.fetchListAnnee();
+          this.$refs.Stages.fetchListTypeStage();
           this.onPageChange();
           
           this.$refs.AffectationAgent.$data.titleComponent =

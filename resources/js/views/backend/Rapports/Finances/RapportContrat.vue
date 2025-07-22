@@ -80,7 +80,7 @@
                                 <span>Imprimer le rapport</span>
                             </v-tooltip>
                             <br>
-                            <!-- <v-tooltip bottom color="black">
+                            <v-tooltip bottom color="black">
                                 <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on">
                                         <v-btn @click="showStagiaireByDate" block color="  blue" dark>
@@ -90,7 +90,8 @@
                                 </template>
                                 <span>Imprimer le rapport</span>
                             </v-tooltip>
-                            <br> -->
+                            <br>
+                            <!--  -->
                             <!-- <v-tooltip bottom color="black">
                                 <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on">
@@ -242,13 +243,14 @@
                                 <span>Imprimer le rapport</span>
                             </v-tooltip> -->
                           <!-- <br>
+                           -->
                           <v-autocomplete label="Selectionnez l'Institution" prepend-inner-icon="mdi-map"
                                   :rules="[(v) => !!v || 'Ce champ est requis']" :items="institutionList"
                                   item-text="name_institution" item-value="id" dense outlined v-model="svData.institution_id"
                                   chips clearable>
-                          </v-autocomplete> -->
-                            <!-- <br> -->
-                          <!-- <v-tooltip bottom color="black">
+                          </v-autocomplete>
+                            <br>
+                            <v-tooltip bottom color="black">
                                 <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on">
                                         <v-btn @click="showStagiaireInstitutionByDate" block color="  blue" dark>
@@ -258,14 +260,14 @@
                                 </template>
                                 <span>Imprimer le rapport</span>
                             </v-tooltip>
-                            <br> -->
-                            <!-- <v-autocomplete label="Selectionnez le Type de Stage" prepend-inner-icon="mdi-map"
+                            <br>
+                            <v-autocomplete label="Selectionnez le Type de Stage" prepend-inner-icon="mdi-map"
                                   :rules="[(v) => !!v || 'Ce champ est requis']" :items="typestageList"
                                   item-text="name_typestage" item-value="id" dense outlined v-model="svData.typestage_id"
                                   chips clearable>
-                                </v-autocomplete> -->
-                            <!-- <br> -->
-                          <!-- <v-tooltip bottom color="black">
+                                </v-autocomplete>
+                                <br>
+                                <v-tooltip bottom color="black">
                                 <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on">
                                         <v-btn @click="showStagiaireTypeStageByDate" block color="  blue" dark>
@@ -275,9 +277,7 @@
                                 </template>
                                 <span>Imprimer le rapport</span>
                             </v-tooltip>
-                            <br> -->
-
-
+                         
                             </v-col>
                         </v-row>
                       
