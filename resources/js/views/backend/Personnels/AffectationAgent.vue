@@ -853,7 +853,7 @@ export default {
           this.svData.nomOffice  = "RAS";
           this.svData.postnomOffice  = "RAS";
           this.svData.qualifieOffice= "RAS";
-          this.svData.refMutuelle = 1;
+          //this.svData.refMutuelle = 1;
           this.svData.mission = "OUI";
           this.svData.codeAgent = "000";
 
@@ -880,7 +880,7 @@ export default {
           this.svData.nomOffice  = "RAS";
           this.svData.postnomOffice  = "RAS";
           this.svData.qualifieOffice= "RAS";
-          this.svData.refMutuelle = 1;
+          //this.svData.refMutuelle = 1;
           this.svData.mission = "OUI";
           this.svData.codeAgent = "000";
           

@@ -495,7 +495,7 @@ class tperso_affectation_agentController extends Controller
 
     function insert_data(Request $request)
     {
-        $poste_id=0;
+        
         $salaire_base=0;
         $nombre_enfant=0;
         $fammiliale=0;
@@ -509,9 +509,11 @@ class tperso_affectation_agentController extends Controller
         $inpp=0;
         $onem=0;
         $ipr=0;
-
-
+ 
+        $poste_id=1;
         $param_salaire_id = 1;
+        $refServicePerso = 1;
+        $refMutuelle = 1;
 
 
         $data2 =  DB::table('tperso_parametre_salairebase')       
@@ -584,7 +586,7 @@ class tperso_affectation_agentController extends Controller
         $duree = (int)$request->dureecontrat;
         $newDate = $currentDate->addMonths($duree);
         //
-        $refServicePerso = 1;
+        
         $data = tperso_affectation_agent::create([
             'refAgent'       =>  $request->refAgent,
             'refServicePerso'    =>  $refServicePerso,
@@ -657,6 +659,8 @@ class tperso_affectation_agentController extends Controller
         $ipr=0;
 
         $param_salaire_id = 1;
+        $refMutuelle = 1;
+        $refServicePerso = 1;
 
 
         $data2 =  DB::table('tperso_parametre_salairebase')       
@@ -728,7 +732,7 @@ class tperso_affectation_agentController extends Controller
         $currentDate = Carbon::parse($request->dateAffectation);
         $duree = (int)$request->dureecontrat;
         $newDate = $currentDate->addMonths($duree);
-        $refServicePerso = 1;
+        
 
         $data = tperso_affectation_agent::where('id', $id)->update([
             'refAgent'       =>  $request->refAgent,
