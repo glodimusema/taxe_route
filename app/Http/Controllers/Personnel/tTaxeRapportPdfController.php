@@ -3679,14 +3679,14 @@ function GetNotePerception($id)
                     <tr style="vertical-align:top;">
                         <td style="width:0px;height:22px;"></td>
                         <td></td>
-                        <td class="cs38AECAED" colspan="5" style="width:252px;height:22px;line-height:16px;text-align:center;vertical-align:top;"><nobr>PROVINCE&nbsp;DU&nbsp;NORD-KIVU</nobr></td>
+                        <td class="cs38AECAED" colspan="5" style="width:252px;height:22px;line-height:16px;text-align:center;vertical-align:top;"><nobr>PROVINCE&nbsp;DE TSHOPO & BAS-UELE</nobr></td>
                         <td></td>
                         <td></td>
                     </tr>
                     <tr style="vertical-align:top;">
                         <td style="width:0px;height:22px;"></td>
                         <td></td>
-                        <td class="cs38AECAED" colspan="5" style="width:252px;height:22px;line-height:16px;text-align:center;vertical-align:top;"><nobr>VILLE&nbsp;DE&nbsp;GOMA</nobr></td>
+                        <td class="cs38AECAED" colspan="5" style="width:252px;height:22px;line-height:16px;text-align:center;vertical-align:top;"><nobr>VILLE&nbsp;DE&nbsp;KISANGANI</nobr></td>
                         <td></td>
                         <td></td>
                     </tr>
@@ -3696,7 +3696,7 @@ function GetNotePerception($id)
                         <td></td>
                         <td></td>
                         <td></td>
-                        <td class="csCE72709D" colspan="8" style="width:341px;height:22px;line-height:16px;text-align:left;vertical-align:top;"><nobr>FICHE&nbsp;DE&nbsp;RECENSEMENT&nbsp;ANNUEL&nbsp;DE&nbsp;PME-PMI</nobr></td>
+                        <td class="csCE72709D" colspan="8" style="width:341px;height:22px;line-height:16px;text-align:left;vertical-align:top;"><nobr>FICHE&nbsp;DE&nbsp;ASSUJETTIS&nbsp;ANNUEL&nbsp;DE&nbsp;PME-PMI</nobr></td>
                         <td></td>
                         <td></td>
                     </tr>
@@ -3718,7 +3718,7 @@ function GetNotePerception($id)
                     <tr style="vertical-align:top;">
                         <td style="width:0px;height:17px;"></td>
                         <td></td>
-                        <td class="cs38AECAED" colspan="11" rowspan="2" style="width:415px;height:33px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Portant&nbsp;approbation&nbsp;des&nbsp;pr&#233;vision&nbsp;budg&#233;taires&nbsp;de&nbsp;la&nbsp;Mairie&nbsp;de&nbsp;Goma</nobr><br/><nobr>pour&nbsp;l'.$aps.'exercice&nbsp;'.$anneePaie.'</nobr></td>
+                        <td class="cs38AECAED" colspan="11" rowspan="2" style="width:415px;height:33px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Portant&nbsp;approbation&nbsp;des&nbsp;pr&#233;vision&nbsp;budg&#233;taires&nbsp;de&nbsp;la&nbsp;Mairie&nbsp;de&nbsp;Kisangani</nobr><br/><nobr>pour&nbsp;l'.$aps.'exercice&nbsp;'.$anneePaie.'</nobr></td>
                         <td></td>
                         <td></td>
                     </tr>
@@ -3796,7 +3796,7 @@ function GetNotePerception($id)
                         <td></td>
                         <td></td>
                         <td></td>
-                        <td class="csA803F7DA" colspan="4" style="width:208px;height:15px;line-height:13px;text-align:right;vertical-align:middle;"><nobr>Fait&nbsp;&#224;&nbsp;Goma,&nbsp;le&nbsp;'.date('Y-m-d').'</nobr></td>
+                        <td class="csA803F7DA" colspan="4" style="width:208px;height:15px;line-height:13px;text-align:right;vertical-align:middle;"><nobr>Fait&nbsp;&#224;&nbsp;Kisangani,&nbsp;le&nbsp;'.date('Y-m-d').'</nobr></td>
                         <td></td>
                         <td></td>
                     </tr>
@@ -4138,7 +4138,7 @@ function GetFichePerception($id)
                         <td></td>
                         <td></td>
                         <td></td>
-                        <td class="csDFEBE560" colspan="8" style="width:129px;height:15px;line-height:11px;text-align:left;vertical-align:top;"><nobr>MARIE&nbsp;DE&nbsp;GOMA</nobr></td>
+                        <td class="csDFEBE560" colspan="8" style="width:129px;height:15px;line-height:11px;text-align:left;vertical-align:top;"><nobr>VILLE DE KISANGANI</nobr></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -4397,7 +4397,7 @@ function GetFichePerception($id)
                         <td style="width:0px;height:61px;"></td>
                         <td></td>
                         <td></td>
-                        <td class="cs5B74C6EF" colspan="21" style="width:349px;height:61px;line-height:11px;text-align:center;vertical-align:middle;"><nobr>Le&nbsp;payement&nbsp;doit&nbsp;intervenir&nbsp;au&nbsp;plus&nbsp;tard&nbsp;dans&nbsp;le&nbsp;8&nbsp;(huit)&nbsp;jours&nbsp;de&nbsp;la&nbsp;reception&nbsp;et</nobr><br/><nobr>v&#233;rs&#233;&nbsp;&#224;&nbsp;la&nbsp;&lt;&lt;&nbsp;TRUST&nbsp;MERCHANT&nbsp;BANK&nbsp;&gt;&gt;&nbsp;aux&nbsp;comptes&nbsp;ouverts&nbsp;au&nbsp;nom&nbsp;de&nbsp;la</nobr><br/><nobr>&lt;&lt;Ville&nbsp;de&nbsp;Goma&gt;&gt;,&nbsp;sous&nbsp;les&nbsp;num&#233;ros&nbsp;supra.&nbsp;D&#233;passant&nbsp;ce&nbsp;d&#233;lai,&nbsp;l'.$aps.'assujetti&nbsp;sera</nobr><br/><nobr>soumis&nbsp;au&nbsp;payment&nbsp;des&nbsp;p&#233;nalit&#233;s.</nobr></td>
+                        <td class="cs5B74C6EF" colspan="21" style="width:349px;height:61px;line-height:11px;text-align:center;vertical-align:middle;"><nobr>Le&nbsp;payement&nbsp;doit&nbsp;intervenir&nbsp;au&nbsp;plus&nbsp;tard&nbsp;dans&nbsp;le&nbsp;8&nbsp;(huit)&nbsp;jours&nbsp;de&nbsp;la&nbsp;reception&nbsp;et</nobr><br/><nobr>v&#233;rs&#233;&nbsp;&#224;&nbsp;la&nbsp;&lt;&lt;&nbsp;TRUST&nbsp;MERCHANT&nbsp;BANK&nbsp;&gt;&gt;&nbsp;aux&nbsp;comptes&nbsp;ouverts&nbsp;au&nbsp;nom&nbsp;de&nbsp;la</nobr><br/><nobr>&lt;&lt;Ville&nbsp;de&nbsp;Kisangani&gt;&gt;,&nbsp;sous&nbsp;les&nbsp;num&#233;ros&nbsp;supra.&nbsp;D&#233;passant&nbsp;ce&nbsp;d&#233;lai,&nbsp;l'.$aps.'assujetti&nbsp;sera</nobr><br/><nobr>soumis&nbsp;au&nbsp;payment&nbsp;des&nbsp;p&#233;nalit&#233;s.</nobr></td>
                         <td></td>
                     </tr>
                     <tr style="vertical-align:top;">
@@ -4431,7 +4431,7 @@ function GetFichePerception($id)
                         <td></td>
                         <td></td>
                         <td></td>
-                        <td class="csA803F7DA" colspan="5" rowspan="2" style="width:109px;height:15px;line-height:13px;text-align:right;vertical-align:middle;"><nobr>Goma,&nbsp;'.date('Y-m-d').'</nobr></td>
+                        <td class="csA803F7DA" colspan="5" rowspan="2" style="width:109px;height:15px;line-height:13px;text-align:right;vertical-align:middle;"><nobr>Kisangani,&nbsp;'.date('Y-m-d').'</nobr></td>
                         <td></td>
                     </tr>
                     <tr style="vertical-align:top;">
@@ -4822,7 +4822,7 @@ function printDataListReleveAgent($date1, $date2, $refAgent)
                 <td class="csBDA79072" colspan="2" style="width:41px;height:22px;"></td>
                 <td class="cs101A94F7" style="width:17px;height:22px;"></td>
                 <td class="cs101A94F7" colspan="3" style="width:47px;height:22px;"></td>
-                <td class="cs38AECAED" colspan="2" style="width:251px;height:22px;line-height:16px;text-align:center;vertical-align:top;"><nobr>PROVINCE&nbsp;DU&nbsp;NORD-KIVU</nobr></td>
+                <td class="cs38AECAED" colspan="2" style="width:251px;height:22px;line-height:16px;text-align:center;vertical-align:top;"><nobr>PROVINCE&nbsp;DE TSHOPO & BAS-UELE</nobr></td>
                 <td class="cs101A94F7" colspan="3" style="width:41px;height:22px;"></td>
                 <td class="cs101A94F7" style="width:22px;height:22px;"></td>
                 <td class="cs145AAE8A" colspan="2" style="width:52px;height:22px;"></td>
@@ -4833,7 +4833,7 @@ function printDataListReleveAgent($date1, $date2, $refAgent)
                 <td class="csBDA79072" colspan="2" style="width:41px;height:22px;"></td>
                 <td class="cs101A94F7" style="width:17px;height:22px;"></td>
                 <td class="cs101A94F7" colspan="3" style="width:47px;height:22px;"></td>
-                <td class="cs38AECAED" colspan="2" style="width:251px;height:22px;line-height:16px;text-align:center;vertical-align:top;"><nobr>VILLE&nbsp;DE&nbsp;GOMA</nobr></td>
+                <td class="cs38AECAED" colspan="2" style="width:251px;height:22px;line-height:16px;text-align:center;vertical-align:top;"><nobr>VILLE&nbsp;DE&nbsp;KISANGANI</nobr></td>
                 <td class="cs101A94F7" colspan="3" style="width:41px;height:22px;"></td>
                 <td class="cs101A94F7" style="width:22px;height:22px;"></td>
                 <td class="cs145AAE8A" colspan="2" style="width:52px;height:22px;"></td>
@@ -5010,7 +5010,7 @@ function printDataListReleveAgent($date1, $date2, $refAgent)
             <tr style="vertical-align:top;">
                 <td style="width:0px;height:22px;"></td>
                 <td></td>
-                <td class="cs12FE94AA" colspan="5" style="width:207px;height:22px;line-height:16px;text-align:left;vertical-align:top;"><nobr>Fait&nbsp;&#224;&nbsp;Goma&nbsp;le&nbsp;&nbsp;'.date('Y-m-d').'</nobr></td>
+                <td class="cs12FE94AA" colspan="5" style="width:207px;height:22px;line-height:16px;text-align:left;vertical-align:top;"><nobr>Fait&nbsp;&#224;&nbsp;Kisangani&nbsp;le&nbsp;&nbsp;'.date('Y-m-d').'</nobr></td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -5319,7 +5319,7 @@ function printDataListEncodageAgent($date1, $date2, $nomEncodeur)
                 <td class="csBDA79072" colspan="2" style="width:38px;height:22px;"></td>
                 <td class="cs101A94F7" style="width:18px;height:22px;"></td>
                 <td class="cs101A94F7" colspan="3" style="width:46px;height:22px;"></td>
-                <td class="cs38AECAED" colspan="2" style="width:252px;height:22px;line-height:16px;text-align:center;vertical-align:top;"><nobr>PROVINCE&nbsp;DU&nbsp;NORD-KIVU</nobr></td>
+                <td class="cs38AECAED" colspan="2" style="width:252px;height:22px;line-height:16px;text-align:center;vertical-align:top;"><nobr>PROVINCE&nbsp;DE TSHOPO & BAS-UELE</nobr></td>
                 <td class="cs101A94F7" colspan="2" style="width:40px;height:22px;"></td>
                 <td class="cs101A94F7" style="width:23px;height:22px;"></td>
                 <td class="cs145AAE8A" colspan="2" style="width:55px;height:22px;"></td>
@@ -5330,7 +5330,7 @@ function printDataListEncodageAgent($date1, $date2, $nomEncodeur)
                 <td class="csBDA79072" colspan="2" style="width:38px;height:22px;"></td>
                 <td class="cs101A94F7" style="width:18px;height:22px;"></td>
                 <td class="cs101A94F7" colspan="3" style="width:46px;height:22px;"></td>
-                <td class="cs38AECAED" colspan="2" style="width:252px;height:22px;line-height:16px;text-align:center;vertical-align:top;"><nobr>VILLE&nbsp;DE&nbsp;GOMA</nobr></td>
+                <td class="cs38AECAED" colspan="2" style="width:252px;height:22px;line-height:16px;text-align:center;vertical-align:top;"><nobr>VILLE&nbsp;DE&nbsp;KISANGANI</nobr></td>
                 <td class="cs101A94F7" colspan="2" style="width:40px;height:22px;"></td>
                 <td class="cs101A94F7" style="width:23px;height:22px;"></td>
                 <td class="cs145AAE8A" colspan="2" style="width:55px;height:22px;"></td>
@@ -5391,7 +5391,7 @@ function printDataListEncodageAgent($date1, $date2, $nomEncodeur)
             <tr style="vertical-align:top;">
                 <td style="width:0px;height:33px;"></td>
                 <td></td>
-                <td class="cs7D52592D" colspan="17" style="width:694px;height:33px;line-height:31px;text-align:center;vertical-align:middle;"><nobr>RAPPORT&nbsp;DE&nbsp;RECENSEMENT&nbsp;PAR&nbsp;AGENT</nobr></td>
+                <td class="cs7D52592D" colspan="17" style="width:694px;height:33px;line-height:31px;text-align:center;vertical-align:middle;"><nobr>RAPPORT&nbsp;DES&nbsp;ASSUJETTIS&nbsp;PAR&nbsp;AGENT</nobr></td>
             </tr>
             <tr style="vertical-align:top;">
                 <td style="width:0px;height:5px;"></td>
@@ -5501,7 +5501,7 @@ function printDataListEncodageAgent($date1, $date2, $nomEncodeur)
             <tr style="vertical-align:top;">
                 <td style="width:0px;height:22px;"></td>
                 <td></td>
-                <td class="cs12FE94AA" colspan="7" style="width:207px;height:22px;line-height:16px;text-align:left;vertical-align:top;"><nobr>Fait&nbsp;&#224;&nbsp;Goma&nbsp;le&nbsp;&nbsp;'.date('Y-m-d').'</nobr></td>
+                <td class="cs12FE94AA" colspan="7" style="width:207px;height:22px;line-height:16px;text-align:left;vertical-align:top;"><nobr>Fait&nbsp;&#224;&nbsp;Kisangani&nbsp;le&nbsp;&nbsp;'.date('Y-m-d').'</nobr></td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -5803,7 +5803,7 @@ function printDataListStatQuartier($date1, $date2)
                     <td class="csBDA79072" colspan="3" style="width:42px;height:22px;"></td>
                     <td class="cs101A94F7" style="width:18px;height:22px;"></td>
                     <td class="cs101A94F7" colspan="2" style="width:46px;height:22px;"></td>
-                    <td class="cs38AECAED" colspan="3" style="width:252px;height:22px;line-height:16px;text-align:center;vertical-align:top;"><nobr>PROVINCE&nbsp;DU&nbsp;NORD-KIVU</nobr></td>
+                    <td class="cs38AECAED" colspan="3" style="width:252px;height:22px;line-height:16px;text-align:center;vertical-align:top;"><nobr>PROVINCE&nbsp;DE TSHOPO & BAS-UELE</nobr></td>
                     <td class="cs101A94F7" colspan="2" style="width:40px;height:22px;"></td>
                     <td class="cs101A94F7" style="width:23px;height:22px;"></td>
                     <td class="cs145AAE8A" style="width:51px;height:22px;"></td>
@@ -5814,7 +5814,7 @@ function printDataListStatQuartier($date1, $date2)
                     <td class="csBDA79072" colspan="3" style="width:42px;height:22px;"></td>
                     <td class="cs101A94F7" style="width:18px;height:22px;"></td>
                     <td class="cs101A94F7" colspan="2" style="width:46px;height:22px;"></td>
-                    <td class="cs38AECAED" colspan="3" style="width:252px;height:22px;line-height:16px;text-align:center;vertical-align:top;"><nobr>VILLE&nbsp;DE&nbsp;GOMA</nobr></td>
+                    <td class="cs38AECAED" colspan="3" style="width:252px;height:22px;line-height:16px;text-align:center;vertical-align:top;"><nobr>VILLE&nbsp;DE&nbsp;KISANGANI</nobr></td>
                     <td class="cs101A94F7" colspan="2" style="width:40px;height:22px;"></td>
                     <td class="cs101A94F7" style="width:23px;height:22px;"></td>
                     <td class="cs145AAE8A" style="width:51px;height:22px;"></td>
@@ -5988,7 +5988,7 @@ function printDataListStatQuartier($date1, $date2)
                 <tr style="vertical-align:top;">
                     <td style="width:0px;height:22px;"></td>
                     <td></td>
-                    <td class="cs12FE94AA" colspan="6" style="width:207px;height:22px;line-height:16px;text-align:left;vertical-align:top;"><nobr>Fait&nbsp;&#224;&nbsp;Goma&nbsp;le&nbsp;&nbsp;'.date('Y-m-d').'</nobr></td>
+                    <td class="cs12FE94AA" colspan="6" style="width:207px;height:22px;line-height:16px;text-align:left;vertical-align:top;"><nobr>Fait&nbsp;&#224;&nbsp;Kisangani&nbsp;le&nbsp;&nbsp;'.date('Y-m-d').'</nobr></td>
                     <td></td>
                     <td></td>
                     <td></td>
@@ -6264,7 +6264,7 @@ function printDataListStatEncodeur($date1, $date2)
                     <td class="csBDA79072" colspan="3" style="width:42px;height:22px;"></td>
                     <td class="cs101A94F7" style="width:18px;height:22px;"></td>
                     <td class="cs101A94F7" colspan="2" style="width:46px;height:22px;"></td>
-                    <td class="cs38AECAED" colspan="3" style="width:252px;height:22px;line-height:16px;text-align:center;vertical-align:top;"><nobr>PROVINCE&nbsp;DU&nbsp;NORD-KIVU</nobr></td>
+                    <td class="cs38AECAED" colspan="3" style="width:252px;height:22px;line-height:16px;text-align:center;vertical-align:top;"><nobr>PROVINCE&nbsp;DE TSHOPO & BAS-UELE</nobr></td>
                     <td class="cs101A94F7" colspan="2" style="width:40px;height:22px;"></td>
                     <td class="cs101A94F7" style="width:23px;height:22px;"></td>
                     <td class="cs145AAE8A" style="width:51px;height:22px;"></td>
@@ -6275,7 +6275,7 @@ function printDataListStatEncodeur($date1, $date2)
                     <td class="csBDA79072" colspan="3" style="width:42px;height:22px;"></td>
                     <td class="cs101A94F7" style="width:18px;height:22px;"></td>
                     <td class="cs101A94F7" colspan="2" style="width:46px;height:22px;"></td>
-                    <td class="cs38AECAED" colspan="3" style="width:252px;height:22px;line-height:16px;text-align:center;vertical-align:top;"><nobr>VILLE&nbsp;DE&nbsp;GOMA</nobr></td>
+                    <td class="cs38AECAED" colspan="3" style="width:252px;height:22px;line-height:16px;text-align:center;vertical-align:top;"><nobr>VILLE&nbsp;DE&nbsp;KISANGANI</nobr></td>
                     <td class="cs101A94F7" colspan="2" style="width:40px;height:22px;"></td>
                     <td class="cs101A94F7" style="width:23px;height:22px;"></td>
                     <td class="cs145AAE8A" style="width:51px;height:22px;"></td>
@@ -6449,7 +6449,7 @@ function printDataListStatEncodeur($date1, $date2)
                 <tr style="vertical-align:top;">
                     <td style="width:0px;height:22px;"></td>
                     <td></td>
-                    <td class="cs12FE94AA" colspan="6" style="width:207px;height:22px;line-height:16px;text-align:left;vertical-align:top;"><nobr>Fait&nbsp;&#224;&nbsp;Goma&nbsp;le&nbsp;&nbsp;'.date('Y-m-d').'</nobr></td>
+                    <td class="cs12FE94AA" colspan="6" style="width:207px;height:22px;line-height:16px;text-align:left;vertical-align:top;"><nobr>Fait&nbsp;&#224;&nbsp;Kisangani&nbsp;le&nbsp;&nbsp;'.date('Y-m-d').'</nobr></td>
                     <td></td>
                     <td></td>
                     <td></td>
@@ -6943,7 +6943,7 @@ function printDataListMoisAnnee($date1, $date2, $refMois,$refAnnee)
             <tr style="vertical-align:top;">
                 <td style="width:0px;height:22px;"></td>
                 <td></td>
-                <td class="cs12FE94AA" colspan="7" style="width:207px;height:22px;line-height:16px;text-align:left;vertical-align:top;"><nobr>Fait&nbsp;&#224;&nbsp;Goma&nbsp;le&nbsp;&nbsp;'.date('Y-m-d').'</nobr></td>
+                <td class="cs12FE94AA" colspan="7" style="width:207px;height:22px;line-height:16px;text-align:left;vertical-align:top;"><nobr>Fait&nbsp;&#224;&nbsp;Kisangani&nbsp;le&nbsp;&nbsp;'.date('Y-m-d').'</nobr></td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -7248,7 +7248,7 @@ function printDataListEncodageQuartier($date1, $date2,$colQuartier_Ese)
                 <td class="csBDA79072" colspan="2" style="width:38px;height:22px;"></td>
                 <td class="cs101A94F7" style="width:18px;height:22px;"></td>
                 <td class="cs101A94F7" colspan="3" style="width:46px;height:22px;"></td>
-                <td class="cs38AECAED" colspan="2" style="width:252px;height:22px;line-height:16px;text-align:center;vertical-align:top;"><nobr>PROVINCE&nbsp;DU&nbsp;NORD-KIVU</nobr></td>
+                <td class="cs38AECAED" colspan="2" style="width:252px;height:22px;line-height:16px;text-align:center;vertical-align:top;"><nobr>PROVINCE&nbsp;DE TSHOPO & BAS-UELE</nobr></td>
                 <td class="cs101A94F7" colspan="2" style="width:40px;height:22px;"></td>
                 <td class="cs101A94F7" style="width:23px;height:22px;"></td>
                 <td class="cs145AAE8A" colspan="2" style="width:55px;height:22px;"></td>
@@ -7259,7 +7259,7 @@ function printDataListEncodageQuartier($date1, $date2,$colQuartier_Ese)
                 <td class="csBDA79072" colspan="2" style="width:38px;height:22px;"></td>
                 <td class="cs101A94F7" style="width:18px;height:22px;"></td>
                 <td class="cs101A94F7" colspan="3" style="width:46px;height:22px;"></td>
-                <td class="cs38AECAED" colspan="2" style="width:252px;height:22px;line-height:16px;text-align:center;vertical-align:top;"><nobr>VILLE&nbsp;DE&nbsp;GOMA</nobr></td>
+                <td class="cs38AECAED" colspan="2" style="width:252px;height:22px;line-height:16px;text-align:center;vertical-align:top;"><nobr>VILLE&nbsp;DE&nbsp;KISANGANI</nobr></td>
                 <td class="cs101A94F7" colspan="2" style="width:40px;height:22px;"></td>
                 <td class="cs101A94F7" style="width:23px;height:22px;"></td>
                 <td class="cs145AAE8A" colspan="2" style="width:55px;height:22px;"></td>
@@ -7320,7 +7320,7 @@ function printDataListEncodageQuartier($date1, $date2,$colQuartier_Ese)
             <tr style="vertical-align:top;">
                 <td style="width:0px;height:33px;"></td>
                 <td></td>
-                <td class="cs7D52592D" colspan="17" style="width:694px;height:33px;line-height:31px;text-align:center;vertical-align:middle;"><nobr>RAPPORT&nbsp;DE&nbsp;RECENSEMENT&nbsp;PAR&nbsp;AGENT</nobr></td>
+                <td class="cs7D52592D" colspan="17" style="width:694px;height:33px;line-height:31px;text-align:center;vertical-align:middle;"><nobr>RAPPORT&nbsp;DES&nbsp;ASSUJETTIS&nbsp;PAR&nbsp;AGENT</nobr></td>
             </tr>
             <tr style="vertical-align:top;">
                 <td style="width:0px;height:5px;"></td>
@@ -7430,7 +7430,7 @@ function printDataListEncodageQuartier($date1, $date2,$colQuartier_Ese)
             <tr style="vertical-align:top;">
                 <td style="width:0px;height:22px;"></td>
                 <td></td>
-                <td class="cs12FE94AA" colspan="7" style="width:207px;height:22px;line-height:16px;text-align:left;vertical-align:top;"><nobr>Fait&nbsp;&#224;&nbsp;Goma&nbsp;le&nbsp;&nbsp;'.date('Y-m-d').'</nobr></td>
+                <td class="cs12FE94AA" colspan="7" style="width:207px;height:22px;line-height:16px;text-align:left;vertical-align:top;"><nobr>Fait&nbsp;&#224;&nbsp;Kisangani&nbsp;le&nbsp;&nbsp;'.date('Y-m-d').'</nobr></td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -7700,7 +7700,7 @@ function printDataCarteMembre($id)
                     <td class="cs101A94F7" colspan="4" rowspan="3" style="width:64px;height:52px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:64px;height:52px;">
                         <img alt="" src="'.$image1.'" style="width:64px;height:52px;" /><!--[if lt IE 7]></div><![endif]--></div>
                     </td>
-                    <td class="csAAA9B5FF" colspan="3" style="width:165px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>VILLE&nbsp;DE&nbsp;GOMA</nobr></td>
+                    <td class="csAAA9B5FF" colspan="3" style="width:165px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>VILLE&nbsp;DE&nbsp;KISANGANI</nobr></td>
                     <td class="cs101A94F7" rowspan="3" style="width:63px;height:52px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:63px;height:52px;">
                         <img alt="" src="'.$image2.'" style="width:63px;height:52px;" /><!--[if lt IE 7]></div><![endif]--></div>
                     </td>
@@ -7710,7 +7710,7 @@ function printDataCarteMembre($id)
                     <td style="width:0px;height:22px;"></td>
                     <td></td>
                     <td></td>
-                    <td class="csAAA9B5FF" colspan="3" style="width:165px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>MAIRIE&nbsp;DE&nbsp;GOMA</nobr></td>
+                    <td class="csAAA9B5FF" colspan="3" style="width:165px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>VILLE DE KISANGANI</nobr></td>
                     <td></td>
                 </tr>
                 <tr style="vertical-align:top;">
@@ -7998,7 +7998,7 @@ function printDataListMembreProfession($id_profession)
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td class="csAAA9B5FF" colspan="4" style="width:243px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>VILLE&nbsp;DE&nbsp;GOMA</nobr></td>
+                    <td class="csAAA9B5FF" colspan="4" style="width:243px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>VILLE&nbsp;DE&nbsp;KISANGANI</nobr></td>
                     <td></td>
                     <td></td>
                     <td></td>
@@ -8009,7 +8009,7 @@ function printDataListMembreProfession($id_profession)
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td class="csAAA9B5FF" colspan="4" style="width:243px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>MAIRIE&nbsp;DE&nbsp;GOMA</nobr></td>
+                    <td class="csAAA9B5FF" colspan="4" style="width:243px;height:22px;line-height:12px;text-align:center;vertical-align:middle;"><nobr>VILLE DE KISANGANI</nobr></td>
                     <td></td>
                     <td></td>
                     <td></td>
