@@ -435,6 +435,9 @@ function showRapportContratDate($date1, $date2)
 }
 
 
+
+
+
 //==================== RAPPORT DES PAIEMENTS PAR DATE =======================================
 
 public function fetch_rapport_fincontrat_date(Request $request)
@@ -12129,7 +12132,521 @@ function showRapportTimeSheetDate($date1, $date2,$affectation_id)
 
 }
 
+//===================== DETAIL DES CONTRATAS ==================================================================
 
+
+public function fetch_rapport_detail_contrat_date(Request $request)
+{
+    //refDepartement
+
+    if ($request->get('date1') && $request->get('date2')) {
+        // code...
+        $date1 = $request->get('date1');
+        $date2 = $request->get('date2');
+        
+        $html = $this->printRapportDetailContratDate($date1, $date2);
+        $pdf = \App::make('dompdf.wrapper');
+
+        $pdf->loadHTML($html)->setPaper('a4', 'landscape');
+        return $pdf->stream();            
+
+    } else {
+        // code...
+    }  
+    
+}
+
+function printRapportDetailContratDate($date1, $date2)
+{
+
+         //Info Entreprise
+         $nomEse='';
+         $adresseEse='';
+         $Tel1Ese='';
+         $Tel2Ese='';
+         $siteEse='';
+         $emailEse='';
+         $idNatEse='';
+         $numImpotEse='';
+         $rccEse='';
+         $siege='';
+         $busnessName='';
+         $pic='';
+         $pic2 = $this->displayImg("fichier", 'logo.png');
+         $logo='';
+ 
+         $data1 = DB::table('entreprises')
+         ->join('secteurs','secteurs.id','=','entreprises.idsecteur')
+         ->join('forme_juridiques','forme_juridiques.id','=','entreprises.idforme')
+ 
+         ->join('pays','pays.id','=','entreprises.idPays')
+         ->join('provinces','provinces.id','=','entreprises.idProvince')
+         ->join('users','users.id','=','entreprises.ceo')        
+         ->select('entreprises.id as id','entreprises.id as idEntreprise',
+         'entreprises.ceo','entreprises.nomEntreprise','entreprises.descriptionEntreprise',
+         'entreprises.emailEntreprise','entreprises.adresseEntreprise',
+         'entreprises.telephoneEntreprise','entreprises.solutionEntreprise','entreprises.idsecteur',
+         'entreprises.idforme','entreprises.etat',
+         'entreprises.idPays','entreprises.idProvince','entreprises.edition','entreprises.facebook',
+         'entreprises.linkedin','entreprises.twitter','entreprises.siteweb','entreprises.rccm',
+         'entreprises.invPersonnel','entreprises.invHub','entreprises.invRecherche',
+         'entreprises.chiffreAffaire','entreprises.nbremploye','entreprises.slug','entreprises.logo',
+             //forme
+             'forme_juridiques.nomForme','secteurs.nomSecteur',
+             //users
+             'users.name','users.email','users.avatar','users.telephone','users.adresse',
+             //
+             'provinces.nomProvince','pays.nomPays', 'entreprises.created_at')
+         ->get();
+         $output='';
+         foreach ($data1 as $row) 
+         {                                
+             $nomEse=$row->nomEntreprise;
+             $adresseEse=$row->adresseEntreprise;
+             $Tel1Ese=$row->telephoneEntreprise;
+             $Tel2Ese=$row->telephone;
+             $siteEse=$row->siteweb;
+             $emailEse=$row->emailEntreprise;
+             $idNatEse=$row->rccm;
+             $numImpotEse=$row->rccm;
+             $busnessName=$row->nomSecteur;
+             $rccmEse=$row->rccm;
+             $bp=$row->edition;
+             $pic = $this->displayImg("fichier", 'logo.png');
+             $siege=$row->nomForme;         
+         }
+ 
+         $aps = "'";
+
+        $output='';           
+
+        $output='
+
+                
+            <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+            <!-- saved from url=(0016)http://localhost -->
+            <html>
+            <head>
+                <title>rpt_ListeAgent</title>
+                <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8"/>
+                <style type="text/css">
+                    .csDB0B2364 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:bold; font-style:normal; }
+                    .cs463A9CD7 {color:#000000;background-color:transparent;border-left:#000000 1px solid;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:normal; font-style:normal; }
+                    .cs5A34C077 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:bold; font-style:normal; }
+                    .cs6AEC9C2 {color:#000000;background-color:transparent;border-left-style: none;border-top:#000000 1px solid;border-right:#000000 1px solid;border-bottom:#000000 1px solid;font-family:Times New Roman; font-size:9px; font-weight:normal; font-style:normal; }
+                    .cs8BD51C12 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs101A94F7 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; }
+                    .cs5EA817F2 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:13px; font-weight:normal; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs2C853136 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:19px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs6CA35B49 {color:#000000;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Vivaldi; font-size:19px; font-weight:bold; font-style:italic; padding-left:2px;padding-right:2px;}
+                    .cs5682A5DF {color:#228B22;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Times New Roman; font-size:16px; font-weight:bold; font-style:normal; padding-left:2px;padding-right:2px;}
+                    .cs739196BC {color:#5C5C5C;background-color:transparent;border-left-style: none;border-top-style: none;border-right-style: none;border-bottom-style: none;font-family:Segoe UI; font-size:11px; font-weight:normal; font-style:normal; }
+                    .csF7D3565D {height:0px;width:0px;overflow:hidden;font-size:0px;line-height:0px;}
+                </style>
+            </head>
+            <body leftMargin=10 topMargin=10 rightMargin=10 bottomMargin=10 style="background-color:#FFFFFF">
+            <table cellpadding="0" cellspacing="0" border="0" style="border-width:0px;empty-cells:show;width:964px;height:316px;position:relative;">
+                <tr>
+                    <td style="width:0px;height:0px;"></td>
+                    <td style="height:0px;width:10px;"></td>
+                    <td style="height:0px;width:40px;"></td>
+                    <td style="height:0px;width:91px;"></td>
+                    <td style="height:0px;width:21px;"></td>
+                    <td style="height:0px;width:54px;"></td>
+                    <td style="height:0px;width:23px;"></td>
+                    <td style="height:0px;width:10px;"></td>
+                    <td style="height:0px;width:21px;"></td>
+                    <td style="height:0px;width:51px;"></td>
+                    <td style="height:0px;width:50px;"></td>
+                    <td style="height:0px;width:38px;"></td>
+                    <td style="height:0px;width:128px;"></td>
+                    <td style="height:0px;width:41px;"></td>
+                    <td style="height:0px;width:16px;"></td>
+                    <td style="height:0px;width:90px;"></td>
+                    <td style="height:0px;width:13px;"></td>
+                    <td style="height:0px;width:55px;"></td>
+                    <td style="height:0px;width:11px;"></td>
+                    <td style="height:0px;width:7px;"></td>
+                    <td style="height:0px;width:37px;"></td>
+                    <td style="height:0px;width:47px;"></td>
+                    <td style="height:0px;width:37px;"></td>
+                    <td style="height:0px;width:10px;"></td>
+                    <td style="height:0px;width:37px;"></td>
+                    <td style="height:0px;width:26px;"></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:23px;"></td>
+                    <td class="cs739196BC" colspan="11" style="width:409px;height:23px;line-height:14px;text-align:center;vertical-align:middle;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:12px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:1px;"></td>
+                    <td></td>
+                    <td class="cs101A94F7" colspan="2" rowspan="6" style="width:131px;height:110px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:131px;height:110px;">
+                        <img alt="" src="'.$pic2.'" style="width:131px;height:110px;" /></div>
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs8BD51C12" colspan="12" rowspan="2" style="width:532px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>REPUBLIQUE&nbsp;DEMOCRATIQUE&nbsp;DU&nbsp;CONGO</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:21px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs101A94F7" colspan="4" rowspan="6" style="width:131px;height:111px;text-align:left;vertical-align:top;"><div style="overflow:hidden;width:131px;height:111px;">
+                        <img alt="" src="'.$pic2.'" style="width:131px;height:111px;" /></div>
+                    </td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs8BD51C12" colspan="12" style="width:532px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>MINISTRE&nbsp;DE&nbsp;L'.$aps.'ENVIRONNEMENT&nbsp;ET&nbsp;DEVELOPPEMENT&nbsp;DURABLE</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:25px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs6CA35B49" colspan="12" style="width:532px;height:25px;line-height:23px;text-align:center;vertical-align:middle;"><nobr>Le&nbsp;Chef&nbsp;d'.$aps.'Antenne&nbsp;Provinciale&nbsp;a&nbsp;l'.$aps.'interim&nbsp;de&nbsp;la&nbsp;Tshopo&nbsp;et&nbsp;Bas-Uel&#233;</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs5682A5DF" colspan="12" style="width:532px;height:22px;line-height:18px;text-align:center;vertical-align:middle;"><nobr>Fonds&nbsp;Forestier&nbsp;National</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:19px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs5EA817F2" colspan="12" rowspan="3" style="width:532px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>E-mail&nbsp;:&nbsp;'.$emailEse.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:2px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:1px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs8BD51C12" colspan="12" style="width:532px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Tel&#233;phone&nbsp;:&nbsp;'.$Tel1Ese.',&nbsp;'.$Tel2Ese.',&nbsp;'.$Tel1Ese.',</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:18px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:23px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs2C853136" colspan="14" style="width:597px;height:23px;line-height:22px;text-align:center;vertical-align:middle;"><nobr>LES&nbsp;AGENTS&nbsp;CONTRACTUELS</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:23px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs5EA817F2" colspan="3" style="width:203px;height:23px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Du&nbsp;'.$date1.'&nbsp;&nbsp;au&nbsp;&nbsp;'.$date1.'</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:22px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="cs8BD51C12" colspan="8" style="width:431px;height:22px;line-height:15px;text-align:center;vertical-align:middle;"><nobr>Valeur&nbsp;Filtr&#233;e&nbsp;:&nbsp;GLOBAL</nobr></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:36px;"></td>
+                    <td></td>
+                    <td class="csDB0B2364" style="width:38px;height:34px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>N&#176;</nobr></td>
+                    <td class="cs5A34C077" colspan="4" style="width:188px;height:34px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>Nom&nbsp;Complet</nobr></td>
+                    <td class="cs5A34C077" colspan="2" style="width:30px;height:34px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>Sexe</nobr></td>
+                    <td class="cs5A34C077" style="width:50px;height:34px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>Matricule</nobr></td>
+                    <td class="cs5A34C077" colspan="2" style="width:87px;height:34px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>Grade</nobr></td>
+                    <td class="cs5A34C077" style="width:127px;height:34px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>Fonction</nobr></td>
+                    <td class="cs5A34C077" colspan="2" style="width:56px;height:34px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>N&#176;Decision</nobr></td>
+                    <td class="cs5A34C077" colspan="2" style="width:102px;height:34px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>Lieu&nbsp;Affectation</nobr></td>
+                    <td class="cs5A34C077" style="width:54px;height:34px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>Age</nobr></td>
+                    <td class="cs5A34C077" colspan="3" style="width:54px;height:34px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>Date</nobr><br/><nobr>angement</nobr></td>
+                    <td class="cs5A34C077" style="width:46px;height:34px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>Anciennet&#233;</nobr></td>
+                    <td class="cs5A34C077" style="width:36px;height:34px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>SIFA</nobr></td>
+                    <td class="cs5A34C077" colspan="2" style="width:46px;height:34px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>Niveau</nobr><br/><nobr>Etude</nobr></td>
+                    <td class="cs5A34C077" style="width:25px;height:34px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>Obs</nobr></td>
+                </tr>
+                ';
+
+                        $output .= $this->showRapportDetailContratDate($date1, $date2); 
+
+                        $output.='
+            </table>
+            </body>
+            </html> 
+        ';  
+       
+        return $output; 
+
+}
+
+function showRapportDetailContratDate($date1, $date2)
+{
+        $count=0;
+
+        $data = DB::table('tperso_affectation_agent')
+        // ->join('tperso_poste','tperso_poste.id','=','tperso_affectation_agent.refPoste')
+        // ->join('tperso_lieuaffectation','tperso_lieuaffectation.id','=','tperso_affectation_agent.refLieuAffectation')
+        // ->join('tperso_mutuelle','tperso_mutuelle.id','=','tperso_affectation_agent.refMutuelle')
+        ->join('tperso_typecontrat','tperso_typecontrat.id','=','tperso_affectation_agent.refTypeContrat')
+        // ->join('tperso_categorie_agent','tperso_categorie_agent.id','=','tperso_affectation_agent.refCategorieAgent')
+        // ->join('tperso_service_personnel','tperso_service_personnel.id','=','tperso_affectation_agent.refServicePerso')
+        // ->join('tperso_categorie_service','tperso_categorie_service.id','=','tperso_service_personnel.refCatService')
+        ->join('tagent','tagent.id','=','tperso_affectation_agent.refAgent')
+        // ->join('avenues' , 'avenues.id','=','tagent.refAvenue_agent')
+        // ->join('quartiers' , 'quartiers.id','=','avenues.idQuartier')
+        // ->join('communes' , 'communes.id','=','quartiers.idCommune')
+        // ->join('villes' , 'villes.id','=','communes.idVille')
+        // ->join('provinces' , 'provinces.id','=','villes.idProvince')
+        // ->join('pays' , 'pays.id','=','provinces.idPays')
+        ->join('taxe_site_affect' , 'taxe_site_affect.id','=','tperso_affectation_agent.refSiteAffectation')
+        ->join('taxe_sous_poste_affect' , 'taxe_sous_poste_affect.id','=','taxe_site_affect.id_sous_poste_affect')
+        ->join('taxe_poste_affect' , 'taxe_poste_affect.id','=','taxe_sous_poste_affect.id_poste_affect')
+        ->join('taxe_antene' , 'taxe_antene.id','=','taxe_poste_affect.id_antene')
+        ->select("tperso_affectation_agent.id",'refAgent','refServicePerso','refCategorieAgent','refPoste',
+        'refLieuAffectation',
+        'refMutuelle','refTypeContrat','dateAffectation','dureecontrat','dureeLettre','dateFin','dateDebutEssaie',
+        'dateFinEssaie','JourTrail1','JourTrail2','heureTrail1','heureTrail2','TempsPause','nbrConge','nbrCongeLettre',
+        'nomOffice','postnomOffice','qualifieOffice','codeAgent','directeur','numCNSS','numImpot','numcpteBanque',
+        'BanqueAgant','autresDetail','conge',"tperso_affectation_agent.author",
+        
+        "matricule_agent",
+        "noms_agent","sexe_agent","datenaissance_agent","lieunaissnce_agent","provinceOrigine_agent",
+        "etatcivil_agent","refAvenue_agent","contact_agent","mail_agent","grade_agent","fonction_agent",
+        "specialite_agent","Categorie_agent","niveauEtude_agent","anneeFinEtude_agent","Ecole_agent",
+        "tagent.photo as photo_agent","tagent.slug as slug_agent"
+        // ,"name_serv_perso","name_categorie_service","name_categorie_agent",
+        // 'tperso_poste.nom_poste','description_poste','nom_lieu','description_lieu','nom_mutuelle',
+        // 'description_mutuelle'
+        ,'nom_contrat','code_contrat','refSiteAffectation','nom_site_affect','id_sous_poste_affect',
+        'nom_sous_poste','id_poste_affect','taxe_poste_affect.nom_poste as nom_poste_affect','id_antene','nom_antene')
+        // ->selectRaw('CONCAT(YEAR, datenaissance_agent, CURDATE()) as age_agent')
+        ->selectRaw('TIMESTAMPDIFF(YEAR, datenaissance_agent, CURDATE()) as age_agent')   
+        ->selectRaw('TIMESTAMPDIFF(YEAR, dateAffectation, CURDATE()) as anciennete_agent')
+        ->selectRaw('TIMESTAMPDIFF(MONTH, CURDATE(), dateFin) as dureerestante')    
+        ->selectRaw("CASE  WHEN (TIMESTAMPDIFF(MONTH, CURDATE(), dateFin))>0 THEN 'Encours' ELSE 'Fini' END as Statut")     
+        ->where([
+            ['dateAffectation','>=', $date1],
+            ['dateAffectation','<=', $date2]
+        ])
+        ->orderBy("tperso_affectation_agent.created_at", "asc")
+        ->get();
+        $output='';
+
+        foreach ($data as $row) 
+        {
+            $count ++;
+
+            $output .='
+
+                <tr style="vertical-align:top;">
+                    <td style="width:0px;height:24px;"></td>
+                    <td></td>
+                    <td class="cs463A9CD7" style="width:38px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$count.'</nobr></td>
+                    <td class="cs6AEC9C2" colspan="4" style="width:188px;height:22px;line-height:10px;text-align:left;vertical-align:middle;"><nobr>'.$row->noms_agent.'</nobr></td>
+                    <td class="cs6AEC9C2" colspan="2" style="width:30px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->sexe_agent.'</nobr></td>
+                    <td class="cs6AEC9C2" style="width:50px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->matricule_agent.'</nobr></td>
+                    <td class="cs6AEC9C2" colspan="2" style="width:87px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->grade_agent.'</nobr></td>
+                    <td class="cs6AEC9C2" style="width:127px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->fonction_agent.'</nobr></td>
+                    <td class="cs6AEC9C2" colspan="2" style="width:56px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->codeAgent.'</nobr></td>
+                    <td class="cs6AEC9C2" colspan="2" style="width:102px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->nom_site_affect.'</nobr></td>
+                    <td class="cs6AEC9C2" style="width:54px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->age_agent.'&nbsp;ans</nobr></td>
+                    <td class="cs6AEC9C2" colspan="3" style="width:54px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->dateAffectation.'</nobr></td>
+                    <td class="cs6AEC9C2" style="width:46px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->anciennete_agent.'&nbsp;ans</nobr></td>
+                    <td class="cs6AEC9C2" style="width:36px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->numImpot.'</nobr></td>
+                    <td class="cs6AEC9C2" colspan="2" style="width:46px;height:22px;line-height:10px;text-align:center;vertical-align:middle;"><nobr>'.$row->niveauEtude_agent.'</nobr></td>
+                    <td class="cs6AEC9C2" style="width:25px;height:22px;"><!--[if lte IE 7]><div class="csF7D3565D"></div><![endif]--></td>
+                </tr>            
+            ';
+
+            
+    }
+
+    return $output;
+
+}
 
 
 

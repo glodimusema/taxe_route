@@ -46,7 +46,20 @@
                                 prepend-icon="mdi-calendar"
                                 readonly
                             ></v-text-field>
+
+                            <!-- showDetailContratAgentByDate -->
                           
+                            <v-tooltip bottom color="black">
+                                <template v-slot:activator="{ on, attrs }">
+                                    <span v-bind="attrs" v-on="on">
+                                        <v-btn @click="showDetailContratAgentByDate" block color="  blue" dark>
+                                            <v-icon>print</v-icon> LISTE DES GENTS/CONTRAT
+                                        </v-btn>
+                                    </span>
+                                </template>
+                                <span>Imprimer le rapport</span>
+                            </v-tooltip>
+                            <br>
                             <v-tooltip bottom color="black">
                                 <template v-slot:activator="{ on, attrs }">
                                     <span v-bind="attrs" v-on="on">
@@ -392,6 +405,17 @@ export default {
             if (date1 <= date2) {
 
                 window.open(`${this.apiBaseURL}/fetch_rapport_contrat_date?date1=` + date1+"&date2="+date2);             
+               
+            } else {
+               this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");
+            }
+        },
+        showDetailContratAgentByDate() {
+            var date1 =  this.dates[0] ;
+            var date2 =  this.dates[1] ;
+            if (date1 <= date2) {
+
+                window.open(`${this.apiBaseURL}/fetch_rapport_detail_contrat_date?date1=` + date1+"&date2="+date2);             
                
             } else {
                this.showError("Veillez vérifier les dates car la date debit doit être inférieure à la date de fin");

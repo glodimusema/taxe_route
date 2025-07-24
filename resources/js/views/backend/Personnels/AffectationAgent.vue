@@ -386,13 +386,13 @@
                           </v-flex>
 
 
-                          <!-- <v-flex xs12 sm12 md6 lg6>
+                          <v-flex xs12 sm12 md6 lg6>
                             <div class="mr-1">
-                              <v-text-field label="N° AGENT " prepend-inner-icon="event" dense
+                              <v-text-field label="N°Decision " prepend-inner-icon="event" dense
                                 :rules="[(v) => !!v || 'Ce champ est requis']" outlined v-model="svData.codeAgent">
                               </v-text-field>
                             </div>
-                          </v-flex> -->
+                          </v-flex>
                           <v-flex xs12 sm12 md6 lg6>
                             <div class="mr-1">
                               <v-text-field label="N° CNSS" prepend-inner-icon="event" dense
@@ -404,7 +404,7 @@
 
                           <v-flex xs12 sm12 md6 lg6>
                             <div class="mr-1">
-                              <v-text-field label="N° Impot" prepend-inner-icon="event" dense
+                              <v-text-field label="SIFA" prepend-inner-icon="event" dense
                                 :rules="[(v) => !!v || 'Ce champ est requis']" outlined v-model="svData.numImpot">
                               </v-text-field>
                             </div>
@@ -855,7 +855,7 @@ export default {
           this.svData.qualifieOffice= "RAS";
           //this.svData.refMutuelle = 1;
           this.svData.mission = "OUI";
-          this.svData.codeAgent = "000";
+          //this.svData.codeAgent = "000";
 
           this.insertOrUpdate(
             `${this.apiBaseURL}/update_AffectationAgent/${this.svData.id}`,
@@ -882,7 +882,7 @@ export default {
           this.svData.qualifieOffice= "RAS";
           //this.svData.refMutuelle = 1;
           this.svData.mission = "OUI";
-          this.svData.codeAgent = "000";
+          // this.svData.codeAgent = "000";
           
           this.insertOrUpdate(
             `${this.apiBaseURL}/insert_AffectationAgent`,
